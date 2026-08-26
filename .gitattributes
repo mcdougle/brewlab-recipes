@@ -1,0 +1,7 @@
+# Files tracked in git but stripped from `git archive` output (see bin/build.sh).
+# Keeps the release zip to just what WordPress needs to run the plugin.
+
+.gitattributes  export-ignore
+.gitignore      export-ignore
+README.md       export-ignore
+bin/            export-ignore
