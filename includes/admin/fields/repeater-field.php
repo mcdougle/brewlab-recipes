@@ -176,6 +176,11 @@ function brewlab_recipes_render_repeater_item_summary( $section, $fields, $row )
 			'muted' => ! empty( $config['muted'] ),
 			'width' => $config['width'] ?? null,
 			'grow'  => ! empty( $config['grow'] ),
+			// Display order within its slot — the summary row's visual
+			// order isn't always the same as the schema's (and the
+			// modal's) field order, e.g. every ingredient section leads
+			// with the amount+unit chip, not the name.
+			'order' => $config['order'] ?? 0,
 		];
 
 		if ( 'meta' === ( $config['slot'] ?? 'primary' ) ) {
@@ -184,6 +189,12 @@ function brewlab_recipes_render_repeater_item_summary( $section, $fields, $row )
 			$primary[] = $chip;
 		}
 	}
+
+	$by_order = function ( $a, $b ) {
+		return $a['order'] <=> $b['order'];
+	};
+	usort( $primary, $by_order );
+	usort( $meta, $by_order );
 
 	if ( ! $primary && ! $meta ) {
 		printf( '<span class="brewlab-recipes-repeater__item-empty">%s</span>', esc_html__( '(empty)', 'brewlab-recipes' ) );
