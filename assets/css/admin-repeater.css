@@ -1,19 +1,73 @@
 /**
  * Admin Repeater Rows
  *
- * Layout for the repeater metabox tables (fermentables, hops, etc.) on the
- * recipe edit screen.
+ * Layout for the repeater metaboxes (fermentables, hops, etc.) on the
+ * recipe edit screen — the per-section summary list, and the one shared
+ * modal every "Add"/"Edit" opens.
  */
-.brewlab-recipes-repeater__table select,
-.brewlab-recipes-repeater__table input[type="text"],
-.brewlab-recipes-repeater__table input[type="url"] {
+.brewlab-recipes-repeater__list {
+	margin: 0 0 1em;
+	padding: 0;
+	list-style: none;
+}
+
+.brewlab-recipes-repeater__item {
+	display: flex;
+	align-items: center;
+	gap: 0.75em;
+	padding: 0.5em 0;
+	border-bottom: 1px solid #eee;
+}
+
+.brewlab-recipes-repeater__item-summary {
+	flex: 1 1 auto;
+}
+
+.brewlab-recipes-repeater-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 100000;
+}
+
+.brewlab-recipes-repeater-modal__backdrop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.brewlab-recipes-repeater-modal__dialog {
+	position: relative;
+	width: 90%;
+	max-width: 560px;
+	max-height: 80vh;
+	margin: 5vh auto;
+	padding: 1.5em;
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.brewlab-recipes-repeater-modal__title {
+	margin-top: 0;
+}
+
+.brewlab-recipes-repeater-modal__body select,
+.brewlab-recipes-repeater-modal__body input[type="text"],
+.brewlab-recipes-repeater-modal__body input[type="url"] {
 	width: 100%;
 }
 
-.brewlab-recipes-repeater__table input[type="number"] {
-	width: 6em;
+.brewlab-recipes-repeater-modal__body input[type="number"] {
+	width: 8em;
 }
 
-.brewlab-recipes-repeater__table td {
-	vertical-align: middle;
+.brewlab-recipes-repeater-modal__actions {
+	margin-bottom: 0;
 }
