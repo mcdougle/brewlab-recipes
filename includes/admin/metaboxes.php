@@ -102,9 +102,8 @@ function brewlab_recipes_render_metabox( $post, $metabox ) {
 //------------------------------------------------------------------------------
 //   brewlab_recipes_enqueue_admin_assets()
 //------------------------------------------------------------------------------
-// Only the repeater boxes need JS/CSS — the simple-field boxes are plain
-// form-table markup. Scoped to the recipe edit screen so it never loads on
-// other post types' add/edit screens.
+// Scoped to the recipe edit screen so none of this loads on other post
+// types' add/edit screens.
 function brewlab_recipes_enqueue_admin_assets( $hook ) {
 	if ( ! in_array( $hook, [ 'post.php', 'post-new.php' ], true ) ) {
 		return;
@@ -126,6 +125,26 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 		BREWLAB_RECIPES_VERSION,
 		true
 	);
+
+	wp_enqueue_media();
+	wp_enqueue_style( 'wp-color-picker' );
+	wp_enqueue_style(
+		'brewlab-recipes-admin-media',
+		BREWLAB_RECIPES_URL . 'assets/css/admin-media.css',
+		[],
+		BREWLAB_RECIPES_VERSION
+	);
+	wp_enqueue_script(
+		'brewlab-recipes-admin-media-color',
+		BREWLAB_RECIPES_URL . 'assets/js/admin-media-color.js',
+		[ 'jquery', 'wp-color-picker', 'media-editor' ],
+		BREWLAB_RECIPES_VERSION,
+		true
+	);
+	wp_localize_script( 'brewlab-recipes-admin-media-color', 'brewlabRecipesMedia', [
+		'selectTitle'  => __( 'Select Recipe Image', 'brewlab-recipes' ),
+		'selectButton' => __( 'Use This Image', 'brewlab-recipes' ),
+	] );
 }
 add_action( 'admin_enqueue_scripts', 'brewlab_recipes_enqueue_admin_assets' );
 

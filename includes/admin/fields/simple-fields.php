@@ -207,22 +207,37 @@ function brewlab_recipes_render_simple_field( $post_id, $key, $field ) {
 			break;
 
 		case 'media':
-			// Plain attachment-ID input for now — a proper media-library
-			// picker button is JS-driven admin polish, built later.
+			$attachment_id = (int) $value;
+			$image_url     = $attachment_id ? wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) : '';
+
+			printf( '<div class="brewlab-recipes-media-field">' );
 			printf(
-				'<input type="number" id="%s" name="%s" value="%s" class="small-text" /> <p class="description">%s</p>',
+				'<img src="%s" class="brewlab-recipes-media-field__preview"%s alt="" />',
+				esc_url( $image_url ),
+				$image_url ? '' : ' style="display:none;"'
+			);
+			printf(
+				'<input type="hidden" id="%s" name="%s" value="%s" />',
 				esc_attr( $id ),
 				esc_attr( $name ),
-				esc_attr( $value ),
-				esc_html__( 'Attachment ID — a media picker button replaces this once the admin JS lands.', 'brewlab-recipes' )
+				esc_attr( $attachment_id ?: '' )
 			);
+			printf(
+				'<button type="button" class="button brewlab-recipes-media-field__select"%s>%s</button>',
+				$image_url ? ' style="display:none;"' : '',
+				esc_html__( 'Select Image', 'brewlab-recipes' )
+			);
+			printf(
+				'<button type="button" class="button brewlab-recipes-media-field__remove"%s>%s</button>',
+				$image_url ? '' : ' style="display:none;"',
+				esc_html__( 'Remove Image', 'brewlab-recipes' )
+			);
+			echo '</div>';
 			break;
 
 		case 'color':
-			// Plain hex input for now — the hand-rolled swatch/HSV picker
-			// is JS-driven admin polish, built later.
 			printf(
-				'<input type="text" id="%s" name="%s" value="%s" class="regular-text" placeholder="%s" />',
+				'<input type="text" id="%s" name="%s" value="%s" class="brewlab-recipes-color-picker" data-default-color="%s" />',
 				esc_attr( $id ),
 				esc_attr( $name ),
 				esc_attr( $value ),

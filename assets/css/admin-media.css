@@ -1,0 +1,19 @@
+/**
+ * Media Field
+ *
+ * Preview-image sizing for the Media metabox's image picker — without a
+ * max-width the raw <img> would render at the uploaded file's full
+ * resolution and blow out the metabox layout.
+ */
+.brewlab-recipes-media-field__preview {
+	display: block;
+	max-width: 150px;
+	height: auto;
+	margin-bottom: 0.5em;
+	border-radius: 4px;
+}
+
+.brewlab-recipes-media-field__select,
+.brewlab-recipes-media-field__remove {
+	margin-right: 0.5em;
+}
