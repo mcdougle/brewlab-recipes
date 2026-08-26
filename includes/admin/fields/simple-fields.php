@@ -232,7 +232,7 @@ function brewlab_recipes_render_media_box( $post_id ) {
 		<div class="brewlab-recipes-media-controls">
 			<div class="brewlab-recipes-media-actions">
 				<input type="hidden" id="brewlab-recipes-image-id" name="brewlab_recipes_image_id" value="<?php echo esc_attr( $image_id ?: '' ); ?>" />
-				<button type="button" class="button brewlab-recipes-media-field__select"><?php esc_html_e( 'Select Image', 'brewlab-recipes' ); ?></button>
+				<button type="button" class="button brewlab-recipes-media-field__select"><?php esc_html_e( 'Change Image', 'brewlab-recipes' ); ?></button>
 				<button type="button" class="button brewlab-recipes-media-field__remove"<?php echo $image_url ? '' : ' style="display:none;"'; ?>><?php esc_html_e( 'Remove Image', 'brewlab-recipes' ); ?></button>
 			</div>
 			<div class="brewlab-recipes-media-divider"></div>

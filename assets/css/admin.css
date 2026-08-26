@@ -171,8 +171,8 @@
 
 .brewlab-recipes-media-field__select,
 .brewlab-recipes-media-field__remove {
-	width: fit-content;
 	font-size: 13px;
+	text-align: center;
 }
 
 .brewlab-recipes-media-field__remove {
