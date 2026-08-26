@@ -40,8 +40,16 @@ function brewlab_recipes_repeater_schemas() {
 					'inline_with' => 'unit',
 				],
 				'unit'   => [
-					'type'  => 'text',
-					'label' => __( 'Unit', 'brewlab-recipes' ),
+					'type'    => 'select',
+					'label'   => __( 'Unit', 'brewlab-recipes' ),
+					'options' => [
+						'lb'  => __( 'lb', 'brewlab-recipes' ),
+						'oz'  => __( 'oz', 'brewlab-recipes' ),
+						'kg'  => __( 'kg', 'brewlab-recipes' ),
+						'g'   => __( 'g', 'brewlab-recipes' ),
+						'l'   => __( 'L', 'brewlab-recipes' ),
+						'gal' => __( 'gal', 'brewlab-recipes' ),
+					],
 				],
 				'type'   => [
 					'type'    => 'select',
@@ -79,8 +87,21 @@ function brewlab_recipes_repeater_schemas() {
 					'inline_with' => 'unit',
 				],
 				'unit'   => [
-					'type'  => 'text',
-					'label' => __( 'Unit', 'brewlab-recipes' ),
+					'type'    => 'select',
+					'label'   => __( 'Unit', 'brewlab-recipes' ),
+					'options' => [
+						'oz'   => __( 'oz', 'brewlab-recipes' ),
+						'g'    => __( 'g', 'brewlab-recipes' ),
+						'lb'   => __( 'lb', 'brewlab-recipes' ),
+						'kg'   => __( 'kg', 'brewlab-recipes' ),
+						'tsp'  => __( 'tsp', 'brewlab-recipes' ),
+						'tbsp' => __( 'tbsp', 'brewlab-recipes' ),
+						'cup'  => __( 'cup', 'brewlab-recipes' ),
+						'ml'   => __( 'ml', 'brewlab-recipes' ),
+						'l'    => __( 'L', 'brewlab-recipes' ),
+						'each' => __( 'each', 'brewlab-recipes' ),
+						'drop' => __( 'drop(s)', 'brewlab-recipes' ),
+					],
 				],
 				'stage'  => [
 					'type'    => 'select',
@@ -115,8 +136,14 @@ function brewlab_recipes_repeater_schemas() {
 					'inline_with' => 'unit',
 				],
 				'unit'    => [
-					'type'  => 'text',
-					'label' => __( 'Unit', 'brewlab-recipes' ),
+					'type'    => 'select',
+					'label'   => __( 'Unit', 'brewlab-recipes' ),
+					'options' => [
+						'oz' => __( 'oz', 'brewlab-recipes' ),
+						'g'  => __( 'g', 'brewlab-recipes' ),
+						'kg' => __( 'kg', 'brewlab-recipes' ),
+						'lb' => __( 'lb', 'brewlab-recipes' ),
+					],
 				],
 				'alpha'   => [
 					'type'  => 'number',
