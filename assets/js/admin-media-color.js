@@ -51,7 +51,6 @@
 				imageId.value = attachment.id;
 				preview.src   = previewUrl;
 				preview.style.display = '';
-				selectBtn.textContent = brewlabRecipesMedia.changeImage;
 				removeBtn.style.display = '';
 			} );
 
@@ -65,7 +64,6 @@
 				preview.src = '';
 				preview.style.display = 'none';
 				removeBtn.style.display = 'none';
-				selectBtn.textContent = brewlabRecipesMedia.selectImage;
 			} );
 		}
 	}

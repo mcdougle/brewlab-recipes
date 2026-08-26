@@ -156,8 +156,6 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 		wp_localize_script( 'brewlab-recipes-admin-media-color', 'brewlabRecipesMedia', [
 			'selectTitle'  => __( 'Select Recipe Image', 'brewlab-recipes' ),
 			'selectButton' => __( 'Use This Image', 'brewlab-recipes' ),
-			'selectImage'  => __( 'Upload / Select Image', 'brewlab-recipes' ),
-			'changeImage'  => __( 'Change Image', 'brewlab-recipes' ),
 		] );
 
 		wp_enqueue_script(
