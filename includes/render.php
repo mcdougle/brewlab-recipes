@@ -55,9 +55,27 @@ function brewlab_recipes_render_recipe( $recipe_id ) {
 		return '';
 	}
 
+	brewlab_recipes_recipe_was_rendered( true );
+
 	ob_start();
 	include BREWLAB_RECIPES_PATH . 'templates/recipe-card.php';
 	return ob_get_clean();
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_recipe_was_rendered()
+//------------------------------------------------------------------------------
+// Tracks whether render_recipe() actually produced a card this request.
+// includes/enqueue.php checks this instead of pre-scanning post_content for
+// the shortcode/block — that approach misses any recipe pulled in via a
+// widget, template part, or custom loop outside the_content(). Call with no
+// args to read the flag, call with true to set it.
+function brewlab_recipes_recipe_was_rendered( $set = null ) {
+	static $rendered = false;
+	if ( null !== $set ) {
+		$rendered = $rendered || $set;
+	}
+	return $rendered;
 }
 
 //------------------------------------------------------------------------------

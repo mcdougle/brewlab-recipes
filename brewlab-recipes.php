@@ -45,3 +45,4 @@ require_once BREWLAB_RECIPES_PATH . 'includes/admin/save.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/render.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/shortcode.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/block.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/enqueue.php';
