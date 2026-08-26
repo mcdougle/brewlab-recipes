@@ -375,16 +375,20 @@ $metric_weight_unit = function ( $unit ) {
 								<div class="brewlab-recipes-item">
 									<span class="brewlab-recipes-item__amt">
 										<?php
-										// Deliberately not a .brewlab-recipes-qty/data-base like the
-										// other ingredient sections: yeast pitch amount isn't a linear
-										// function of batch size (a packet covers a range of batch
-										// sizes, and doubling for a high-ABV or lager recipe is a
-										// deliberate brewer choice, not a ratio to preserve), and the
-										// unit set mixes weight/volume/count/cell-count with no shared
-										// conversion basis, so plain unscaled text is correct here, not
-										// a gap to wire up.
-										echo esc_html( $base_amt ) . ' ' . esc_html( brewlab_recipes_repeater_cell_value( 'yeast', 'unit', $orig_unit ) );
+										// data-type="yeast" (not "weight") — the unit set mixes
+										// weight/volume/count/cell-count with no shared conversion
+										// basis, so this never joins the US/Metric unit toggle (see
+										// applySystem() in recipe-card.js, which just redisplays the
+										// base value for this type regardless of system). It does
+										// join the batch scaler, but rounded to the nearest half
+										// packet rather than scaled to arbitrary precision — yeast
+										// pitch isn't a linear function of batch size (one packet
+										// covers a range of batch sizes; doubling for a high-ABV or
+										// lager recipe is a deliberate brewer choice, not a ratio to
+										// preserve) — see fmtYeast() in recipe-card.js.
 										?>
+										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="yeast"><?php echo esc_html( $base_amt ); ?></span>
+										<?php echo esc_html( brewlab_recipes_repeater_cell_value( 'yeast', 'unit', $orig_unit ) ); ?>
 									</span>
 									<span class="brewlab-recipes-item__name"><?php
 										$link = $y['link'] ?? '';

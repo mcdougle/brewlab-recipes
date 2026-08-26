@@ -52,6 +52,20 @@
 		return ( Math.round( val * 100 ) / 100 ).toString();
 	}
 
+	// Yeast pitch amount isn't a linear function of batch size, so scaling
+	// it to arbitrary decimal precision like a weight would imply a false
+	// exactness. For packets specifically, round to the nearest half — good
+	// enough to stop a big batch-size change from leaving the reader with a
+	// laughably undersized pitch, without pretending "1.37 packets" means
+	// anything. Never round down to zero packets. Other yeast units (grams,
+	// mL, billion cells) scale like any other weight/volume quantity.
+	function fmtYeast( val, unit ) {
+		if ( unit === 'pkg' ) {
+			return Math.max( Math.round( val * 2 ) / 2, 0.5 ).toString();
+		}
+		return fmt( val );
+	}
+
 	function initRecipeCard( card ) {
 		var authorSystem  = card.dataset.authorSystem || 'us';
 		var currentSystem = 'author';
@@ -94,6 +108,15 @@
 				if ( type === 'weight' ) {
 					if ( sys === 'author' ) { el.textContent = fmt( base ); return; }
 					el.textContent = fmt( convertWeight( base, unit, targetWeightUnit( unit, res ) ) );
+					return;
+				}
+				if ( type === 'yeast' ) {
+					// Not part of the US/Metric toggle — the unit set mixes
+					// weight/volume/count/cell-count with no shared conversion
+					// basis — so this always just redisplays the base value here.
+					// The batch scaler (scaleAll(), below) is what actually
+					// changes it.
+					el.textContent = fmt( base );
 					return;
 				}
 			} );
@@ -147,10 +170,17 @@
 				var res   = resolvedSystem( currentSystem );
 
 				card.querySelectorAll( '.brewlab-recipes-qty' ).forEach( function ( el ) {
-					if ( el.dataset.type === 'temp' ) return;
+					var type = el.dataset.type;
+					if ( type === 'temp' ) return;
 					var base = parseFloat( el.dataset.base );
 					var unit = el.dataset.unit;
 					if ( isNaN( base ) ) return;
+
+					if ( type === 'yeast' ) {
+						el.textContent = fmtYeast( base * ratio, unit );
+						return;
+					}
+
 					var converted = ( currentSystem === 'author' )
 						? base
 						: convertWeight( base, unit, targetWeightUnit( unit, res ) );
