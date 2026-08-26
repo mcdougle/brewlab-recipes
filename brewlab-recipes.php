@@ -35,3 +35,4 @@ define( 'BREWLAB_RECIPES_URL', plugin_dir_url( __FILE__ ) );
 //   Includes
 //------------------------------------------------------------------------------
 require_once BREWLAB_RECIPES_PATH . 'includes/post-types.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/repeater-schemas.php';
