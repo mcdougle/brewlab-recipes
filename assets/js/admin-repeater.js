@@ -1,23 +1,27 @@
 /**
  * Admin Repeater Rows
  *
- * Add/edit/remove behavior for the six repeater metaboxes (fermentables,
+ * Add/edit/delete behavior for the six repeater metaboxes (fermentables,
  * hops, etc.) on the recipe edit screen, backed by one shared modal instead
- * of live inline table inputs. Each row's real submittable values live in
- * hidden inputs inside its <li> — this file only ever edits those directly;
- * the modal's visible fields are a template cloned into it and copied
- * to/from on open/save. That keeps every field's POSTed name
- * (brewlab_recipes_repeater[section][index][field]) exactly what it was
- * before this rewrite, so includes/admin/save.php needed no changes.
+ * of live inline table inputs. Clicking anywhere on a row opens it in the
+ * modal — there's no separate Edit button — and Delete lives in the modal
+ * footer (shown only while editing) instead of on the row itself.
  *
- * The index counter only ever increments, even across removals — reusing a
+ * Each row's real submittable values live in hidden inputs inside its <li>
+ * — this file only ever edits those directly; the modal's visible fields
+ * are a template cloned into it and copied to/from on open/save. That keeps
+ * every field's POSTed name (brewlab_recipes_repeater[section][index][field])
+ * exactly what it was before this rewrite, so includes/admin/save.php needed
+ * no changes for the row data itself.
+ *
+ * The index counter only ever increments, even across deletions — reusing a
  * removed row's index would make a later row's inputs share its array index
  * and silently overwrite each other in $_POST on save.
  */
 ( function () {
 	'use strict';
 
-	var modal, modalTitle, modalBody, modalSaveButton;
+	var modal, modalTitle, modalBody, modalSaveButton, modalDeleteButton;
 	var activeContainer = null;
 	var activeItem       = null; // null while adding; the <li> being edited otherwise.
 
@@ -36,12 +40,13 @@
 			return;
 		}
 
-		modalTitle      = modal.querySelector( '.brewlab-recipes-repeater-modal__title' );
-		modalBody       = modal.querySelector( '.brewlab-recipes-repeater-modal__body' );
-		modalSaveButton = modal.querySelector( '.brewlab-recipes-repeater-modal__save' );
+		modalTitle         = modal.querySelector( '.brewlab-recipes-repeater-modal__title' );
+		modalBody          = modal.querySelector( '.brewlab-recipes-repeater-modal__body' );
+		modalSaveButton    = modal.querySelector( '.brewlab-recipes-repeater-modal__save' );
+		modalDeleteButton  = modal.querySelector( '.brewlab-recipes-repeater-modal__delete' );
 
 		modalSaveButton.addEventListener( 'click', onModalSave );
-		modal.querySelector( '.brewlab-recipes-repeater-modal__cancel' ).addEventListener( 'click', closeModal );
+		modalDeleteButton.addEventListener( 'click', onModalDelete );
 		modal.querySelector( '.brewlab-recipes-repeater-modal__close' ).addEventListener( 'click', closeModal );
 		modal.querySelector( '.brewlab-recipes-repeater-modal__backdrop' ).addEventListener( 'click', closeModal );
 	}
@@ -56,6 +61,7 @@
 
 		var label = container.getAttribute( 'data-item-label' );
 		modalTitle.textContent = ( item ? 'Edit ' : 'Add ' ) + label;
+		modalDeleteButton.style.display = item ? '' : 'none';
 
 		if ( item ) {
 			item.querySelectorAll( '.brewlab-recipes-repeater__item-field' ).forEach( function ( hidden ) {
@@ -128,6 +134,13 @@
 		closeModal();
 	}
 
+	function onModalDelete() {
+		if ( activeItem ) {
+			activeItem.remove();
+		}
+		closeModal();
+	}
+
 	document.addEventListener( 'click', function ( event ) {
 		var addButton = event.target.closest( '.brewlab-recipes-repeater__add' );
 		if ( addButton ) {
@@ -136,18 +149,9 @@
 			return;
 		}
 
-		var editButton = event.target.closest( '.brewlab-recipes-repeater__item-edit' );
-		if ( editButton ) {
-			event.preventDefault();
-			var item = editButton.closest( '.brewlab-recipes-repeater__item' );
+		var item = event.target.closest( '.brewlab-recipes-repeater__item' );
+		if ( item ) {
 			openModal( item.closest( '.brewlab-recipes-repeater' ), item );
-			return;
-		}
-
-		var removeButton = event.target.closest( '.brewlab-recipes-repeater__item-remove' );
-		if ( removeButton ) {
-			event.preventDefault();
-			removeButton.closest( '.brewlab-recipes-repeater__item' ).remove();
 		}
 	} );
 

@@ -12,7 +12,10 @@
 // admin-repeater.js only ever edits those directly; the modal's visible
 // fields are a template it clones into itself and copies values to/from.
 // That keeps the $_POST shape (brewlab_recipes_repeater[section][index][field])
-// identical to before this rewrite, so save.php didn't need any changes.
+// identical to before this rewrite, so save.php didn't need any changes for
+// the row data itself. Clicking anywhere on a row opens it in the modal —
+// there's no separate Edit button; Delete lives in the modal footer instead
+// of on the row, matching the old plugin's interaction model.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -40,6 +43,13 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 		esc_attr( $item_label ),
 		count( $rows )
 	);
+
+	// Only mash_steps/fermentation_steps have this — a single name for the
+	// whole profile (e.g. "Hochkurz Step Mash"), separate from each step's
+	// own name. Plain sibling postmeta key, not part of the JSON rows array.
+	if ( isset( $schemas[ $section ]['profile_label'] ) ) {
+		brewlab_recipes_render_repeater_profile_name( $post_id, $section, $schemas[ $section ]['profile_label'] );
+	}
 
 	echo '<ul class="brewlab-recipes-repeater__list">';
 	foreach ( $rows as $index => $row ) {
@@ -70,8 +80,27 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 }
 
 //------------------------------------------------------------------------------
+//   brewlab_recipes_render_repeater_profile_name()
+//------------------------------------------------------------------------------
+function brewlab_recipes_render_repeater_profile_name( $post_id, $section, $label ) {
+	$name  = 'brewlab_recipes_' . $section . '_profile_name';
+	$value = get_post_meta( $post_id, '_' . $name, true );
+	?>
+	<div class="brewlab-recipes-row">
+		<label for="<?php echo esc_attr( $name ); ?>"><?php echo esc_html( $label ); ?></label>
+		<div class="brewlab-recipes-input">
+			<input type="text" id="<?php echo esc_attr( $name ); ?>" name="<?php echo esc_attr( $name ); ?>" value="<?php echo esc_attr( $value ); ?>" class="regular-text" />
+		</div>
+	</div>
+	<?php
+}
+
+//------------------------------------------------------------------------------
 //   brewlab_recipes_render_repeater_item()
 //------------------------------------------------------------------------------
+// No Edit/Remove buttons — admin-repeater.js opens the modal on a click
+// anywhere on the row (event delegation on the list), and Delete lives in
+// the modal footer instead.
 function brewlab_recipes_render_repeater_item( $section, $fields, $index, $row ) {
 	echo '<li class="brewlab-recipes-repeater__item">';
 	printf(
@@ -90,12 +119,6 @@ function brewlab_recipes_render_repeater_item( $section, $fields, $index, $row )
 		);
 	}
 
-	printf(
-		' <button type="button" class="button-link brewlab-recipes-repeater__item-edit">%s</button>' .
-		' <button type="button" class="button-link-delete brewlab-recipes-repeater__item-remove">%s</button>',
-		esc_html__( 'Edit', 'brewlab-recipes' ),
-		esc_html__( 'Remove', 'brewlab-recipes' )
-	);
 	echo '</li>';
 }
 
@@ -127,15 +150,15 @@ function brewlab_recipes_repeater_item_summary( $section, $fields, $row ) {
 //------------------------------------------------------------------------------
 // Unlike brewlab_recipes_render_repeater_item()'s hidden inputs, these carry
 // no name/value — they're a template the modal clones and populates
-// per-open, never submitted directly.
+// per-open, never submitted directly. Label-above-field (not label-beside,
+// the way the admin form-table rows work) — matches the old plugin's modal
+// layout, and reads more like a compact form than a settings table.
 function brewlab_recipes_render_repeater_modal_fields( $fields ) {
-	echo '<table class="form-table"><tbody>';
 	foreach ( $fields as $key => $field ) {
-		printf( '<tr><th scope="row"><label>%s</label></th><td>', esc_html( $field['label'] ) );
+		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s</label>', esc_html( $field['label'] ) );
 		brewlab_recipes_render_repeater_modal_input( $key, $field );
-		echo '</td></tr>';
+		echo '</div>';
 	}
-	echo '</tbody></table>';
 }
 
 //------------------------------------------------------------------------------
@@ -199,8 +222,8 @@ function brewlab_recipes_render_repeater_modal() {
 			<h2 class="brewlab-recipes-repeater-modal__title"></h2>
 			<div class="brewlab-recipes-repeater-modal__body"></div>
 			<p class="brewlab-recipes-repeater-modal__actions">
+				<button type="button" class="button brewlab-recipes-repeater-modal__delete" style="display:none;"><?php esc_html_e( 'Delete', 'brewlab-recipes' ); ?></button>
 				<button type="button" class="button button-primary brewlab-recipes-repeater-modal__save"><?php esc_html_e( 'Save', 'brewlab-recipes' ); ?></button>
-				<button type="button" class="button brewlab-recipes-repeater-modal__cancel"><?php esc_html_e( 'Cancel', 'brewlab-recipes' ); ?></button>
 			</p>
 		</div>
 	</div>

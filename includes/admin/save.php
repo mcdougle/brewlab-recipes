@@ -37,6 +37,10 @@ function brewlab_recipes_save_meta( $post_id ) {
 
 	foreach ( brewlab_recipes_repeater_schemas() as $section_key => $section ) {
 		brewlab_recipes_save_repeater_field( $post_id, $section_key, $section['fields'] );
+
+		if ( isset( $section['profile_label'] ) ) {
+			brewlab_recipes_save_repeater_profile_name( $post_id, $section_key );
+		}
 	}
 
 	brewlab_recipes_sync_excerpt( $post_id );
@@ -146,6 +150,23 @@ function brewlab_recipes_save_repeater_field( $post_id, $section, array $fields 
 	}
 
 	update_post_meta( $post_id, $meta_key, wp_json_encode( $rows ) );
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_save_repeater_profile_name()
+//------------------------------------------------------------------------------
+// Only mash_steps/fermentation_steps have a profile_label in their schema —
+// this saves that single companion field (e.g. "Hochkurz Step Mash") as a
+// plain sibling postmeta key, not part of the section's JSON rows array.
+function brewlab_recipes_save_repeater_profile_name( $post_id, $section ) {
+	$name     = 'brewlab_recipes_' . $section . '_profile_name';
+	$meta_key = '_' . $name;
+
+	if ( ! isset( $_POST[ $name ] ) ) {
+		return;
+	}
+
+	update_post_meta( $post_id, $meta_key, sanitize_text_field( wp_unslash( $_POST[ $name ] ) ) );
 }
 
 //------------------------------------------------------------------------------

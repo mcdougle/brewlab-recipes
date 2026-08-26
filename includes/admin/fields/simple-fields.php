@@ -4,9 +4,15 @@
 //------------------------------------------------------------------------------
 // Schema and render functions for every recipe meta field that isn't one of
 // the six repeaters (see repeater-schemas.php for those): media, recipe
-// details, and batch details. Mirrors that file's plain-data-schema shape so
-// a future save handler can walk both the same way instead of hardcoding a
-// separate field list.
+// details, batch details, and the brew-type-conditional options. Mirrors
+// that file's plain-data-schema shape so save.php can walk both the same
+// way instead of hardcoding a separate field list.
+//
+// Media and Batch Details render with dedicated functions instead of the
+// generic schema loop, since their layout (an inline image/color row; a few
+// inline field pairs like Batch Size+Unit and O.G./F.G.) doesn't fit a
+// one-row-per-field pattern. Recipe Details and Options still loop
+// generically — every field they have is a plain single-row field.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -59,6 +65,7 @@ function brewlab_recipes_simple_fields() {
 				'summary'         => [
 					'type'  => 'textarea',
 					'label' => __( 'Summary', 'brewlab-recipes' ),
+					'hint'  => __( 'Short description', 'brewlab-recipes' ),
 				],
 				'author_display'  => [
 					'type'    => 'select',
@@ -96,8 +103,10 @@ function brewlab_recipes_simple_fields() {
 					],
 				],
 				'boil_time'        => [
-					'type'  => 'number',
-					'label' => __( 'Boil Time (min)', 'brewlab-recipes' ),
+					'type'      => 'number',
+					'label'     => __( 'Boil Time', 'brewlab-recipes' ),
+					'hint'      => __( 'minutes', 'brewlab-recipes' ),
+					'beer_only' => true,
 				],
 				'original_gravity' => [
 					'type'  => 'number',
@@ -109,23 +118,34 @@ function brewlab_recipes_simple_fields() {
 				],
 				'abv'              => [
 					'type'  => 'number',
-					'label' => __( 'ABV (%)', 'brewlab-recipes' ),
+					'label' => __( 'ABV', 'brewlab-recipes' ),
+					'hint'  => '%',
 				],
 				'ibu'              => [
-					'type'  => 'number',
-					'label' => __( 'IBU', 'brewlab-recipes' ),
+					'type'      => 'number',
+					'label'     => __( 'IBU', 'brewlab-recipes' ),
+					'hint'      => __( 'Bitterness', 'brewlab-recipes' ),
+					'beer_only' => true,
 				],
 				'srm'              => [
 					'type'  => 'number',
 					'label' => __( 'SRM', 'brewlab-recipes' ),
 				],
-				'show_hops'        => [
+			],
+		],
+
+		'options' => [
+			'label'  => __( 'Options', 'brewlab-recipes' ),
+			'fields' => [
+				'show_hops' => [
 					'type'  => 'checkbox',
-					'label' => __( 'Show Hops Section', 'brewlab-recipes' ),
+					'label' => __( 'Show Hops', 'brewlab-recipes' ),
+					'hint'  => __( 'Add hop details for something other than beer.', 'brewlab-recipes' ),
 				],
-				'show_mash'        => [
+				'show_mash' => [
 					'type'  => 'checkbox',
-					'label' => __( 'Show Mash Section', 'brewlab-recipes' ),
+					'label' => __( 'Show Mash Profile', 'brewlab-recipes' ),
+					'hint'  => __( 'Add mash profile details for something other than beer.', 'brewlab-recipes' ),
 				],
 			],
 		],
@@ -136,34 +156,195 @@ function brewlab_recipes_simple_fields() {
 //------------------------------------------------------------------------------
 //   brewlab_recipes_render_simple_fields()
 //------------------------------------------------------------------------------
-// Renders every field in one schema section as a form-table. Called from a
-// metabox's render callback with $section matching a top-level key above
-// (e.g. 'media', 'recipe_details', 'batch_details').
+// Dispatches to a dedicated layout for media/batch_details, or a generic
+// one-row-per-field loop for everything else (recipe_details, options).
+// Called from a metabox's render callback with $section matching a
+// top-level key in brewlab_recipes_simple_fields().
 function brewlab_recipes_render_simple_fields( $post_id, $section ) {
+	if ( 'media' === $section ) {
+		brewlab_recipes_render_media_box( $post_id );
+		return;
+	}
+	if ( 'batch_details' === $section ) {
+		brewlab_recipes_render_batch_details_box( $post_id );
+		return;
+	}
+
 	$sections = brewlab_recipes_simple_fields();
 	if ( ! isset( $sections[ $section ] ) ) {
 		return;
 	}
 
-	echo '<table class="form-table brewlab-recipes-fields"><tbody>';
+	echo '<div class="brewlab-recipes-fields">';
+
+	if ( 'recipe_details' === $section ) {
+		brewlab_recipes_render_name_proxy_row( $post_id );
+	}
+
 	foreach ( $sections[ $section ]['fields'] as $key => $field ) {
 		brewlab_recipes_render_simple_field( $post_id, $key, $field );
 	}
-	echo '</tbody></table>';
+
+	echo '</div>';
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_name_proxy_row()
+//------------------------------------------------------------------------------
+// Not a real field — brewlab_recipe only supports 'title' (see
+// post-types.php), so the recipe's name already is post_title. This is a
+// proxy input with no name attribute of its own: it seeds its value from
+// post_title and forwards every keystroke into WP's native #title input
+// (hidden via admin.css) so the native field still gets submitted and saved
+// through WP core's own normal post-save path. No new meta key, no save.php
+// changes — the whole point is to move where the title reads/writes from
+// without duplicating where it's stored.
+function brewlab_recipes_render_name_proxy_row( $post_id ) {
+	$post  = get_post( $post_id );
+	$title = ( $post && __( 'Auto Draft' ) !== $post->post_title ) ? $post->post_title : '';
+	?>
+	<div class="brewlab-recipes-row">
+		<label for="brewlab-recipes-name-proxy"><?php esc_html_e( 'Name', 'brewlab-recipes' ); ?></label>
+		<div class="brewlab-recipes-input">
+			<input type="text" id="brewlab-recipes-name-proxy"
+				placeholder="<?php esc_attr_e( 'Recipe name', 'brewlab-recipes' ); ?>"
+				value="<?php echo esc_attr( $title ); ?>"
+				oninput="document.getElementById('title').value=this.value;" />
+		</div>
+	</div>
+	<?php
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_media_box()
+//------------------------------------------------------------------------------
+function brewlab_recipes_render_media_box( $post_id ) {
+	$fields = brewlab_recipes_simple_fields()['media']['fields'];
+
+	$image_id  = (int) get_post_meta( $post_id, '_brewlab_recipes_image_id', true );
+	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
+	$color     = get_post_meta( $post_id, '_brewlab_recipes_header_color', true );
+	?>
+	<div class="brewlab-recipes-media-box">
+		<div class="brewlab-recipes-media-image">
+			<img src="<?php echo esc_url( $image_url ); ?>" class="brewlab-recipes-media-field__preview"<?php echo $image_url ? '' : ' style="display:none;"'; ?> alt="" />
+		</div>
+		<div class="brewlab-recipes-media-controls">
+			<div class="brewlab-recipes-media-actions">
+				<input type="hidden" id="brewlab-recipes-image-id" name="brewlab_recipes_image_id" value="<?php echo esc_attr( $image_id ?: '' ); ?>" />
+				<button type="button" class="button brewlab-recipes-media-field__select"<?php echo $image_url ? ' style="display:none;"' : ''; ?>><?php esc_html_e( 'Select Image', 'brewlab-recipes' ); ?></button>
+				<button type="button" class="button brewlab-recipes-media-field__remove"<?php echo $image_url ? '' : ' style="display:none;"'; ?>><?php esc_html_e( 'Remove Image', 'brewlab-recipes' ); ?></button>
+			</div>
+			<div class="brewlab-recipes-media-divider"></div>
+			<div class="brewlab-recipes-media-color">
+				<label><?php esc_html_e( 'Recipe Color', 'brewlab-recipes' ); ?></label>
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-header-color', 'brewlab_recipes_header_color', $color, $fields['header_color'] ); ?>
+			</div>
+		</div>
+	</div>
+	<?php
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_batch_details_box()
+//------------------------------------------------------------------------------
+// Style, Boil Time, ABV, IBU, and SRM are plain single-input rows (same
+// brewlab_recipes_render_field_input() the generic loop uses elsewhere);
+// Batch Size+Unit and O.G./F.G. render as inline pairs instead, which the
+// generic one-row-per-field loop has no way to express.
+function brewlab_recipes_render_batch_details_box( $post_id ) {
+	$fields = brewlab_recipes_simple_fields()['batch_details']['fields'];
+	$get    = function ( $key ) use ( $post_id ) {
+		return get_post_meta( $post_id, '_brewlab_recipes_' . $key, true );
+	};
+	// Computed server-side so beer-only rows don't flash visible-then-hidden
+	// on load — admin-conditional.js takes over from here for live changes.
+	$is_beer = 'beer' === $get( 'brew_type' );
+	?>
+	<div class="brewlab-recipes-fields">
+
+		<div class="brewlab-recipes-row">
+			<label for="brewlab-recipes-batch-size"><?php esc_html_e( 'Batch Size', 'brewlab-recipes' ); ?></label>
+			<div class="brewlab-recipes-input brewlab-recipes-input--inline">
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-batch-size', 'brewlab_recipes_batch_size', $get( 'batch_size' ), $fields['batch_size'] ); ?>
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-batch-size-unit', 'brewlab_recipes_batch_size_unit', $get( 'batch_size_unit' ), $fields['batch_size_unit'] ); ?>
+			</div>
+		</div>
+
+		<div class="brewlab-recipes-row brewlab-recipes-beer-only"<?php echo $is_beer ? '' : ' style="display:none;"'; ?>>
+			<label for="brewlab-recipes-boil-time"><?php esc_html_e( 'Boil Time', 'brewlab-recipes' ); ?><span class="brewlab-recipes-hint"><?php esc_html_e( 'minutes', 'brewlab-recipes' ); ?></span></label>
+			<div class="brewlab-recipes-input">
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-boil-time', 'brewlab_recipes_boil_time', $get( 'boil_time' ), $fields['boil_time'] ); ?>
+			</div>
+		</div>
+
+		<div class="brewlab-recipes-row">
+			<label><?php esc_html_e( 'Gravity', 'brewlab-recipes' ); ?></label>
+			<div class="brewlab-recipes-input brewlab-recipes-input--inline">
+				<div class="brewlab-recipes-labeled-input">
+					<span class="brewlab-recipes-field-label"><?php esc_html_e( 'O.G.', 'brewlab-recipes' ); ?></span>
+					<?php brewlab_recipes_render_field_input( 'brewlab-recipes-original-gravity', 'brewlab_recipes_original_gravity', $get( 'original_gravity' ), $fields['original_gravity'] ); ?>
+				</div>
+				<div class="brewlab-recipes-labeled-input">
+					<span class="brewlab-recipes-field-label"><?php esc_html_e( 'F.G.', 'brewlab-recipes' ); ?></span>
+					<?php brewlab_recipes_render_field_input( 'brewlab-recipes-final-gravity', 'brewlab_recipes_final_gravity', $get( 'final_gravity' ), $fields['final_gravity'] ); ?>
+				</div>
+			</div>
+		</div>
+
+		<div class="brewlab-recipes-row">
+			<label for="brewlab-recipes-abv"><?php esc_html_e( 'ABV', 'brewlab-recipes' ); ?><span class="brewlab-recipes-hint">%</span></label>
+			<div class="brewlab-recipes-input">
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-abv', 'brewlab_recipes_abv', $get( 'abv' ), $fields['abv'] ); ?>
+			</div>
+		</div>
+
+		<div class="brewlab-recipes-row brewlab-recipes-beer-only"<?php echo $is_beer ? '' : ' style="display:none;"'; ?>>
+			<label for="brewlab-recipes-ibu"><?php esc_html_e( 'IBU', 'brewlab-recipes' ); ?><span class="brewlab-recipes-hint"><?php esc_html_e( 'Bitterness', 'brewlab-recipes' ); ?></span></label>
+			<div class="brewlab-recipes-input">
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-ibu', 'brewlab_recipes_ibu', $get( 'ibu' ), $fields['ibu'] ); ?>
+			</div>
+		</div>
+
+		<div class="brewlab-recipes-row">
+			<label for="brewlab-recipes-srm"><?php esc_html_e( 'SRM', 'brewlab-recipes' ); ?></label>
+			<div class="brewlab-recipes-input">
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-srm', 'brewlab_recipes_srm', $get( 'srm' ), $fields['srm'] ); ?>
+			</div>
+		</div>
+
+	</div>
+	<?php
 }
 
 //------------------------------------------------------------------------------
 //   brewlab_recipes_render_simple_field()
 //------------------------------------------------------------------------------
+// One full row (label + hint + input) for the generic per-section loop.
 function brewlab_recipes_render_simple_field( $post_id, $key, $field ) {
 	$name  = 'brewlab_recipes_' . $key;
 	$id    = 'brewlab-recipes-' . str_replace( '_', '-', $key );
 	$value = get_post_meta( $post_id, '_brewlab_recipes_' . $key, true );
 
-	echo '<tr>';
-	printf( '<th scope="row"><label for="%s">%s</label></th>', esc_attr( $id ), esc_html( $field['label'] ) );
-	echo '<td>';
+	printf( '<div class="brewlab-recipes-row">' );
+	printf( '<label for="%s">%s', esc_attr( $id ), esc_html( $field['label'] ) );
+	if ( ! empty( $field['hint'] ) ) {
+		printf( '<span class="brewlab-recipes-hint">%s</span>', esc_html( $field['hint'] ) );
+	}
+	echo '</label>';
+	echo '<div class="brewlab-recipes-input">';
+	brewlab_recipes_render_field_input( $id, $name, $value, $field );
+	echo '</div></div>';
+}
 
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_field_input()
+//------------------------------------------------------------------------------
+// Just the <input>/<select>/etc — no row wrapper, no label. Split out from
+// brewlab_recipes_render_simple_field() so the Media and Batch Details
+// bespoke layouts (which need the same input types in a different row
+// shape) can call it directly instead of duplicating the type switch.
+function brewlab_recipes_render_field_input( $id, $name, $value, $field ) {
 	switch ( $field['type'] ) {
 
 		case 'select':
@@ -206,35 +387,6 @@ function brewlab_recipes_render_simple_field( $post_id, $key, $field ) {
 			);
 			break;
 
-		case 'media':
-			$attachment_id = (int) $value;
-			$image_url     = $attachment_id ? wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) : '';
-
-			printf( '<div class="brewlab-recipes-media-field">' );
-			printf(
-				'<img src="%s" class="brewlab-recipes-media-field__preview"%s alt="" />',
-				esc_url( $image_url ),
-				$image_url ? '' : ' style="display:none;"'
-			);
-			printf(
-				'<input type="hidden" id="%s" name="%s" value="%s" />',
-				esc_attr( $id ),
-				esc_attr( $name ),
-				esc_attr( $attachment_id ?: '' )
-			);
-			printf(
-				'<button type="button" class="button brewlab-recipes-media-field__select"%s>%s</button>',
-				$image_url ? ' style="display:none;"' : '',
-				esc_html__( 'Select Image', 'brewlab-recipes' )
-			);
-			printf(
-				'<button type="button" class="button brewlab-recipes-media-field__remove"%s>%s</button>',
-				$image_url ? '' : ' style="display:none;"',
-				esc_html__( 'Remove Image', 'brewlab-recipes' )
-			);
-			echo '</div>';
-			break;
-
 		case 'color':
 			printf(
 				'<input type="text" id="%s" name="%s" value="%s" class="brewlab-recipes-color-picker" data-default-color="%s" />',
@@ -253,6 +405,4 @@ function brewlab_recipes_render_simple_field( $post_id, $key, $field ) {
 				esc_attr( $value )
 			);
 	}
-
-	echo '</td></tr>';
 }
