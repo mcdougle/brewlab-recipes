@@ -17,6 +17,7 @@ function brewlab_recipes_register_post_type() {
 		'labels'       => [
 			'name'          => __( 'Recipes', 'brewlab-recipes' ),
 			'singular_name' => __( 'Recipe', 'brewlab-recipes' ),
+			'menu_name'     => __( 'BrewLab Recipes', 'brewlab-recipes' ),
 			'add_new_item'  => __( 'Add New Recipe', 'brewlab-recipes' ),
 			'edit_item'     => __( 'Edit Recipe', 'brewlab-recipes' ),
 		],
