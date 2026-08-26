@@ -41,6 +41,10 @@ function brewlab_recipes_get_recipe_data( $recipe_id ) {
 
 	foreach ( brewlab_recipes_repeater_schemas() as $section_key => $schema ) {
 		$data[ $section_key ] = brewlab_recipes_get_repeater_rows( $recipe_id, $section_key );
+
+		if ( isset( $schema['profile_label'] ) ) {
+			$data[ $section_key . '_profile_name' ] = get_post_meta( $recipe_id, '_brewlab_recipes_' . $section_key . '_profile_name', true );
+		}
 	}
 
 	return $data;
@@ -90,77 +94,25 @@ function brewlab_recipes_field_option_label( $section_key, $field_key, $value ) 
 }
 
 //------------------------------------------------------------------------------
-//   brewlab_recipes_render_repeater_table()
-//------------------------------------------------------------------------------
-// One shared table renderer for all six repeater sections, reading columns
-// from repeater-schemas.php instead of six near-identical hand-written
-// tables — same "one module, not six copies" reasoning as the admin
-// repeater UI. Returns '' (renders nothing) for a section with no rows, so
-// callers can include every section unconditionally and empty ones just
-// disappear.
-function brewlab_recipes_render_repeater_table( array $recipe, $section_key ) {
-	$schema = brewlab_recipes_repeater_schemas()[ $section_key ] ?? null;
-	$rows   = $recipe[ $section_key ] ?? [];
-
-	if ( ! $schema || empty( $rows ) ) {
-		return;
-	}
-
-	// The column whose value becomes an affiliate link when the row has one
-	// — every section with a 'link' field names its identifying column
-	// differently ('variety' for hops, 'name' everywhere else that has one).
-	$link_column = isset( $schema['fields']['link'] ) ? ( 'hops' === $section_key ? 'variety' : 'name' ) : null;
-
-	echo '<table class="brewlab-recipes-card__table"><thead><tr>';
-	foreach ( $schema['fields'] as $key => $field ) {
-		if ( 'link' === $key ) {
-			continue; // Folded into $link_column's cell, not its own column.
-		}
-		printf( '<th>%s</th>', esc_html( $field['label'] ) );
-	}
-	echo '</tr></thead><tbody>';
-
-	foreach ( $rows as $row ) {
-		echo '<tr>';
-		foreach ( $schema['fields'] as $key => $field ) {
-			if ( 'link' === $key ) {
-				continue;
-			}
-
-			$value = brewlab_recipes_repeater_cell_value( $section_key, $key, $row[ $key ] ?? '' );
-
-			echo '<td>';
-			if ( $key === $link_column && ! empty( $row['link'] ) ) {
-				printf( '<a href="%s" target="_blank" rel="noopener">%s</a>', esc_url( $row['link'] ), esc_html( $value ) );
-			} else {
-				echo esc_html( $value );
-			}
-			echo '</td>';
-		}
-		echo '</tr>';
-	}
-
-	echo '</tbody></table>';
-}
-
-//------------------------------------------------------------------------------
 //   brewlab_recipes_srm_color()
 //------------------------------------------------------------------------------
 // Standard SRM-to-hex approximation (the same beer-color scale used across
-// most homebrewing software) for the stat strip's color swatch. Returns ''
-// for anything blank/non-numeric rather than guessing at a color.
+// most homebrewing software) for the stat strip's color swatch. Values are
+// old-plugin-exact (wpbtr_srm_to_hex()) rather than a fresh approximation,
+// so a recipe's swatch doesn't shift color on migration. Returns '' for
+// anything blank/non-numeric rather than guessing at a color.
 function brewlab_recipes_srm_color( $srm ) {
 	static $scale = [
 		1  => '#FFE699', 2  => '#FFD878', 3  => '#FFCA5A', 4  => '#FFBF42',
 		5  => '#FBB123', 6  => '#F8A600', 7  => '#F39C00', 8  => '#EA8F00',
 		9  => '#E58500', 10 => '#DE7C00', 11 => '#D77200', 12 => '#CF6900',
-		13 => '#CB6200', 14 => '#C35900', 15 => '#BB5100', 16 => '#B54C00',
+		13 => '#CB6100', 14 => '#C35900', 15 => '#BB5100', 16 => '#B54C00',
 		17 => '#B04500', 18 => '#A63E00', 19 => '#A13700', 20 => '#9B3200',
 		21 => '#952D00', 22 => '#8E2900', 23 => '#882300', 24 => '#821E00',
-		25 => '#7B1A00', 26 => '#771900', 27 => '#701400', 28 => '#6A0E00',
-		29 => '#660D00', 30 => '#5E0B00', 31 => '#5A0A02', 32 => '#560A05',
-		33 => '#520907', 34 => '#4C0505', 35 => '#470606', 36 => '#440607',
-		37 => '#3F0708', 38 => '#3B0607', 39 => '#3A070B', 40 => '#36080A',
+		25 => '#7B1A00', 26 => '#771900', 27 => '#701400', 28 => '#6A0F00',
+		29 => '#660D00', 30 => '#600900', 31 => '#5B0000', 32 => '#560000',
+		33 => '#520000', 34 => '#4D0000', 35 => '#470000', 36 => '#440000',
+		37 => '#3F0000', 38 => '#3B0000', 39 => '#380000', 40 => '#350000',
 	];
 
 	if ( ! is_numeric( $srm ) ) {

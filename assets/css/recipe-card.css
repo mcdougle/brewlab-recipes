@@ -2,10 +2,20 @@
  * Recipe Card
  *
  * Front-end styling for one embedded recipe (templates/recipe-card.php).
- * --brewlab-recipes-header-color is set inline per-recipe from the Media
+ * Aesthetic, structure, and values are ported field-for-field from
+ * wp-brewtools-recipes/assets/css/recipe-card.css — dark header band, warm
+ * parchment tones, tabs, ingredient groups, step timelines, notes callout,
+ * print styles.
+ *
+ * --brewlab-recipes-header-bg is set inline per-recipe from the Media
  * metabox's color field, so the header can't be themed from here.
  *
- * Every selector below is scoped under .brewlab-recipes-card (two classes,
+ * The Google Fonts import is NOT an @import in this file — see
+ * includes/enqueue.php, which wp_enqueue_style()s Playfair Display /
+ * Source Sans 3 as their own stylesheet instead, matching this project's
+ * enqueue convention rather than the old plugin's @import.
+ *
+ * Every selector is scoped under .brewlab-recipes-card (two classes,
  * specificity 0,2,0) rather than a bare single class — found the hard way
  * on the Newspaper/tagDiv theme, which injects a per-block inline <style>
  * targeting plain descendant selectors like ".tdi_82 p" (0,1,1). That beats
@@ -13,165 +23,565 @@
  * text to match the surrounding page. Two classes beats it without relying
  * on !important.
  */
+
 .brewlab-recipes-card {
-	border: 1px solid #ddd;
-	border-radius: 6px;
+	--c-bg: #faf8f4;
+	--c-surface: #ffffff;
+	--c-border: #e8e2d9;
+	--c-text: #2c2a26;
+	--c-muted: #7a736a;
+	--c-accent: #8b6914;
+	--c-accent-lt: #f5edd6;
+	--c-header-fg: #faf8f4;
+	--c-tab-act: #8b6914;
+	--radius: 6px;
+	--shadow: 0 2px 16px rgba(0, 0, 0, .10), 0 1px 3px rgba(0, 0, 0, .06);
+	--font-display: 'Playfair Display', Georgia, serif;
+	--font-body: 'Source Sans 3', 'Source Sans Pro', -apple-system, sans-serif;
+
+	font-family: var(--font-body);
+	font-size: 15px;
+	color: var(--c-text);
+	background: var(--c-bg);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius);
+	box-shadow: var(--shadow);
 	overflow: hidden;
-	margin: 2em 0;
-	font-family: inherit;
+	max-width: 720px;
+	margin: 2rem auto;
+	line-height: 1.5;
 }
 
+/* ── Header ───────────────────────────────────────────────── */
 .brewlab-recipes-card .brewlab-recipes-card__header {
+	background: var(--brewlab-recipes-header-bg);
+	color: var(--c-header-fg);
+	padding: 28px 28px 24px;
 	display: flex;
-	gap: 1.5em;
-	padding: 1.5em;
-	background: var(--brewlab-recipes-header-color);
-	color: #fff;
+	gap: 24px;
+	align-items: flex-start;
 }
 
 .brewlab-recipes-card .brewlab-recipes-card__image {
-	flex: 0 0 auto;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__image img {
-	display: block;
-	width: 120px;
-	height: 120px;
-	object-fit: cover;
+	flex: 0 0 180px;
+	width: 180px;
+	height: 180px;
 	border-radius: 4px;
+	overflow: hidden;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, .4);
+}
+.brewlab-recipes-card .brewlab-recipes-card__image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__header-content {
-	flex: 1 1 auto;
+.brewlab-recipes-card .brewlab-recipes-card__meta {
+	flex: 1;
 	min-width: 0;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__badges {
 	display: flex;
-	gap: 0.5em;
-	margin-bottom: 0.5em;
+	flex-direction: column;
+	gap: 8px;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__badge {
+.brewlab-recipes-card .brewlab-recipes-card__eyebrow {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.brewlab-recipes-card .brewlab-recipes-tag {
 	display: inline-block;
-	padding: 0.15em 0.75em;
-	border: 1px solid rgba(255, 255, 255, 0.6);
-	border-radius: 999px;
-	color: #fff;
-	font-size: 0.75em;
-	letter-spacing: 0.05em;
+	font-family: var(--font-body);
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .1em;
 	text-transform: uppercase;
+	padding: 3px 10px;
+	border-radius: 3px;
+	background: var(--c-accent);
+	color: #fff;
+}
+.brewlab-recipes-card .brewlab-recipes-tag--muted {
+	background: rgba(255, 255, 255, .12);
+	color: rgba(255, 255, 255, .75);
 }
 
 .brewlab-recipes-card .brewlab-recipes-card__title {
-	margin: 0 0 0.35em;
-	color: #fff;
-	font-size: 1.4em;
+	font-family: var(--font-display);
+	font-size: clamp(22px, 4vw, 32px);
+	font-weight: 700;
+	color: var(--c-header-fg);
+	margin: 0;
 	line-height: 1.2;
 }
 
 .brewlab-recipes-card .brewlab-recipes-card__summary {
-	margin: 0 0 0.5em;
-	color: #fff;
-	opacity: 0.9;
+	font-size: 14px;
+	color: rgba(255, 255, 255, .7);
+	margin: 0;
+	line-height: 1.55;
 }
 
 .brewlab-recipes-card .brewlab-recipes-card__author {
+	font-size: 13px;
+	color: rgba(255, 255, 255, .5);
 	margin: 0;
-	color: #fff;
-	font-size: 0.85em;
-	opacity: 0.75;
+	font-style: italic;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__stats {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1.5em;
-	padding: 1em 1.5em;
-	background: #f7f7f7;
-	border-bottom: 1px solid #ddd;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__stat {
-	display: flex;
-	flex-direction: column;
-	gap: 0.15em;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__stat-label {
-	color: #666;
-	font-size: 0.7em;
-	letter-spacing: 0.05em;
-	text-transform: uppercase;
-	opacity: 0.6;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__stat-value {
+/* Footer row: author · batch scaler · print — all in one line */
+.brewlab-recipes-card .brewlab-recipes-card__footer-row {
 	display: flex;
 	align-items: center;
-	gap: 0.4em;
-	color: #222;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: nowrap;
+	margin-top: 4px;
+}
+.brewlab-recipes-card .brewlab-recipes-footer-left {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-shrink: 0;
+}
+.brewlab-recipes-card .brewlab-recipes-footer-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+.brewlab-recipes-card .brewlab-recipes-unit-toggle {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+.brewlab-recipes-card .brewlab-recipes-unit-toggle__label {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, .4);
+	margin-right: 3px;
+	white-space: nowrap;
+}
+.brewlab-recipes-card .brewlab-recipes-unit-btn {
+	padding: 2px 8px;
+	border-radius: 3px;
+	border: 1px solid rgba(255, 255, 255, .15);
+	background: transparent;
+	color: rgba(255, 255, 255, .55);
+	cursor: pointer;
+	font-size: 11px;
+	font-family: sans-serif;
+	font-weight: 400;
+	line-height: 1.6;
+	white-space: nowrap;
+	transition: background .15s, color .15s, border-color .15s;
+}
+.brewlab-recipes-card .brewlab-recipes-unit-btn:hover {
+	border-color: rgba(255, 255, 255, .3);
+	color: rgba(255, 255, 255, .8);
+}
+.brewlab-recipes-card .brewlab-recipes-unit-btn.is-active {
+	background: rgba(255, 255, 255, .25);
+	color: #fff;
+	border-color: rgba(255, 255, 255, .4);
 	font-weight: 600;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__srm-swatch {
-	display: inline-block;
-	width: 0.9em;
-	height: 0.9em;
-	border-radius: 50%;
-	border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__section {
-	padding: 1.25em 1.5em;
-	border-bottom: 1px solid #eee;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__section:last-child {
-	border-bottom: none;
-}
-
-.brewlab-recipes-card .brewlab-recipes-card__section-title {
+/* Batch scaler */
+.brewlab-recipes-card .brewlab-recipes-batch-scaler {
 	display: flex;
 	align-items: center;
-	gap: 0.5em;
-	margin: 0 0 0.75em;
-	color: #222;
-	font-size: 1em;
+	gap: 8px;
+}
+.brewlab-recipes-card .brewlab-recipes-batch-scaler__label {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .08em;
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	color: rgba(255, 255, 255, .45);
+	white-space: nowrap;
+}
+.brewlab-recipes-card .brewlab-recipes-batch-scaler__control {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	background: rgba(255, 255, 255, .1);
+	border: 1px solid rgba(255, 255, 255, .2);
+	border-radius: 4px;
+	padding: 4px 10px 4px 6px;
+}
+.brewlab-recipes-card .brewlab-recipes-batch-input {
+	width: 52px;
+	background: transparent;
+	border: none;
+	outline: none;
+	color: #fff;
+	font-family: var(--font-body);
+	font-size: 14px;
+	font-weight: 700;
+	text-align: right;
+	-moz-appearance: textfield;
+}
+.brewlab-recipes-card .brewlab-recipes-batch-input::-webkit-outer-spin-button,
+.brewlab-recipes-card .brewlab-recipes-batch-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.brewlab-recipes-card .brewlab-recipes-batch-scaler__unit {
+	font-size: 13px;
+	color: rgba(255, 255, 255, .6);
+	white-space: nowrap;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__section-icon {
-	width: 1.1em;
-	height: 1.1em;
-	fill: currentColor;
+.brewlab-recipes-card .brewlab-recipes-print-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 7px 16px;
+	border-radius: 4px;
+	border: 1px solid rgba(255, 255, 255, .25);
+	background: rgba(255, 255, 255, .08);
+	color: rgba(255, 255, 255, .85);
+	font-family: var(--font-body);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background .15s, border-color .15s;
+}
+.brewlab-recipes-card .brewlab-recipes-print-btn:hover {
+	background: rgba(255, 255, 255, .16);
+	border-color: rgba(255, 255, 255, .45);
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__table {
-	width: 100%;
-	border-collapse: collapse;
+/* ── Stat Strip ───────────────────────────────────────────── */
+.brewlab-recipes-card .brewlab-recipes-stats {
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+	gap: 0;
+	border-bottom: 1px solid var(--c-border);
+	background: var(--c-surface);
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__table th,
-.brewlab-recipes-card .brewlab-recipes-card__table td {
-	padding: 0.4em 0.6em;
-	color: #222;
-	text-align: left;
-	border-bottom: 1px solid #eee;
-	font-size: 0.9em;
+.brewlab-recipes-card .brewlab-recipes-stat {
+	flex: 1 1 auto;
+	min-width: 80px;
+	text-align: center;
+	padding: 14px 10px 12px;
+	border-right: 1px solid var(--c-border);
+	position: relative;
+}
+.brewlab-recipes-card .brewlab-recipes-stat:last-child { border-right: none; }
+
+.brewlab-recipes-card .brewlab-recipes-stat__value {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	font-family: var(--font-body);
+	font-size: 17px;
+	font-weight: 700;
+	color: var(--c-text);
+	line-height: 1;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__table th {
-	color: #666;
-	font-size: 0.75em;
+.brewlab-recipes-card .brewlab-recipes-stat__label {
+	display: block;
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: .09em;
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	opacity: 0.6;
+	color: var(--c-muted);
+	margin-top: 4px;
 }
 
-.brewlab-recipes-card .brewlab-recipes-card__notes {
+.brewlab-recipes-card .brewlab-recipes-srm-dot {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	border: 1px solid rgba(0, 0, 0, .12);
+	flex-shrink: 0;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+.brewlab-recipes-card .brewlab-recipes-tabs {
+	background: var(--c-surface);
+}
+
+.brewlab-recipes-card .brewlab-recipes-tabs__nav {
+	display: flex;
+	border-bottom: 2px solid var(--c-border);
+	overflow-x: auto;
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+}
+.brewlab-recipes-card .brewlab-recipes-tabs__nav::-webkit-scrollbar { display: none; }
+
+.brewlab-recipes-card .brewlab-recipes-tab-btn {
+	flex: 0 0 auto;
+	padding: 13px 20px;
+	border: none;
+	background: none;
+	font-family: var(--font-body);
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: .04em;
+	color: var(--c-muted);
+	cursor: pointer;
+	border-bottom: 2px solid transparent;
+	margin-bottom: -2px;
+	transition: color .15s, border-color .15s;
+	white-space: nowrap;
+}
+.brewlab-recipes-card .brewlab-recipes-tab-btn:hover { color: var(--c-text); }
+.brewlab-recipes-card .brewlab-recipes-tab-btn.is-active {
+	color: var(--c-tab-act);
+	border-bottom-color: var(--c-tab-act);
+}
+
+.brewlab-recipes-card .brewlab-recipes-tab-panel {
+	display: none;
+	padding: 0;
+}
+.brewlab-recipes-card .brewlab-recipes-tab-panel.is-active { display: block; }
+
+/* ── Ingredient Groups ────────────────────────────────────── */
+.brewlab-recipes-card .brewlab-recipes-group {
+	margin-bottom: 0;
+}
+.brewlab-recipes-card .brewlab-recipes-group + .brewlab-recipes-group {
+	border-top: 1px solid var(--c-border);
+	padding-top: 0;
+}
+
+.brewlab-recipes-card .brewlab-recipes-group__title {
+	font-family: var(--font-display);
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--c-text);
+	margin: 0 0 4px;
+	padding: 16px 24px 10px;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	line-height: 1.2;
+}
+.brewlab-recipes-card .brewlab-recipes-group__subtitle {
+	font-size: 13px;
+	font-family: var(--font-body);
+	font-weight: 400;
+	color: var(--c-muted);
+	margin-left: 8px;
+	font-style: italic;
+	text-transform: none;
+	letter-spacing: normal;
+}
+
+.brewlab-recipes-card .brewlab-recipes-subheading {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: .09em;
+	text-transform: uppercase;
+	color: var(--c-accent);
+	padding: 10px 24px 6px;
+}
+
+.brewlab-recipes-card .brewlab-recipes-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.brewlab-recipes-card .brewlab-recipes-item {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	padding: 9px 24px;
+	border-top: 1px solid var(--c-border);
+	font-size: 15px;
+	line-height: 1.4;
+}
+.brewlab-recipes-card .brewlab-recipes-item--total {
+	font-weight: 700;
+	color: var(--c-muted);
+	font-size: 13px;
+	border-top: 2px solid var(--c-border);
+	justify-content: flex-end;
+}
+.brewlab-recipes-card .brewlab-recipes-item__total-label {
+	flex: 0 0 auto;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--c-muted);
+	text-align: right;
+	white-space: nowrap;
+}
+
+.brewlab-recipes-card .brewlab-recipes-item__amt {
+	flex: 0 0 100px;
+	font-weight: 700;
+	color: var(--c-text);
+	white-space: nowrap;
+	font-size: 15px;
+}
+.brewlab-recipes-card .brewlab-recipes-item__name {
+	flex: 1;
+	color: var(--c-text);
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+.brewlab-recipes-card .brewlab-recipes-item__detail {
+	font-size: 13px;
+	color: var(--c-muted);
+	font-weight: 400;
+}
+.brewlab-recipes-card .brewlab-recipes-item__pct {
+	flex: 0 0 44px;
+	text-align: right;
+	font-size: 13px;
+	color: var(--c-muted);
+	white-space: nowrap;
+}
+.brewlab-recipes-card .brewlab-recipes-item__use {
+	flex: 0 0 120px;
+	text-align: right;
+}
+
+.brewlab-recipes-card .brewlab-recipes-empty-tab {
+	padding: 24px;
+	color: var(--c-muted);
+	font-size: 14px;
+	font-style: italic;
 	margin: 0;
-	color: #222;
-	white-space: pre-line;
+}
+
+/* ── Step timelines (mash + fermentation) ─────────────────── */
+.brewlab-recipes-card .brewlab-recipes-steps {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	padding: 0 24px 16px;
+}
+
+.brewlab-recipes-card .brewlab-recipes-step {
+	display: flex;
+	align-items: flex-start;
+	gap: 16px;
+	padding: 10px 0;
+	border-bottom: 1px solid var(--c-border);
+	position: relative;
+}
+.brewlab-recipes-card .brewlab-recipes-step:last-child { border-bottom: none; }
+
+.brewlab-recipes-card .brewlab-recipes-step__dot {
+	flex: 0 0 10px;
+	width: 10px;
+	height: 10px;
+	margin-top: 5px;
+	border-radius: 50%;
+	background: var(--c-accent);
+	position: relative;
+}
+
+.brewlab-recipes-card .brewlab-recipes-step__body {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	flex: 1;
+	gap: 16px;
+}
+.brewlab-recipes-card .brewlab-recipes-step__name {
+	font-weight: 600;
+	font-size: 14px;
+}
+.brewlab-recipes-card .brewlab-recipes-step__detail {
+	font-size: 14px;
+	color: var(--c-muted);
+	white-space: nowrap;
+}
+
+/* ── Notes ────────────────────────────────────────────────── */
+.brewlab-recipes-card .brewlab-recipes-notes {
+	font-size: 14px;
+	line-height: 1.7;
+	color: var(--c-text);
+	background: var(--c-accent-lt);
+	border-left: 3px solid var(--c-accent);
+	border-radius: 0 4px 4px 0;
+	padding: 16px 18px;
+	margin: 20px 24px;
+}
+
+/* ── Icons ────────────────────────────────────────────────── */
+.brewlab-recipes-card .brewlab-recipes-icon {
+	display: inline-block;
+	width: 1em;
+	height: 1em;
+	vertical-align: middle;
+	flex-shrink: 0;
+}
+
+.brewlab-recipes-card .brewlab-recipes-section-heading .brewlab-recipes-icon {
+	height: 1.15em;
+	width: auto;
+	margin-right: 6px;
+	vertical-align: -0.2em;
+	color: var(--c-accent);
+}
+
+/* Barley is a tall narrow SVG — keep height in sync, width follows aspect ratio */
+.brewlab-recipes-card .brewlab-recipes-section-heading .brewlab-recipes-icon--barley {
+	width: 0.8em;
+	height: 1.15em;
+	vertical-align: -0.2em;
+}
+
+/* ── Buy links on ingredient names ── */
+.brewlab-recipes-card .brewlab-recipes-item__name a {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-color: var(--c-accent);
+	text-underline-offset: 2px;
+}
+.brewlab-recipes-card .brewlab-recipes-item__name a:hover {
+	color: var(--c-accent);
+}
+
+/* ── Print styles ─────────────────────────────────────────── */
+@media print {
+	.brewlab-recipes-card .brewlab-recipes-print-btn { display: none; }
+	.brewlab-recipes-card {
+		box-shadow: none;
+		border: 1px solid #ccc;
+		max-width: 100%;
+	}
+	.brewlab-recipes-card .brewlab-recipes-tab-panel { display: block !important; }
+	.brewlab-recipes-card .brewlab-recipes-tabs__nav { display: none; }
+	.brewlab-recipes-card .brewlab-recipes-card__header {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 520px) {
+	.brewlab-recipes-card .brewlab-recipes-card__header {
+		flex-direction: column;
+		padding: 20px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-card__image {
+		flex: none;
+		width: 100%;
+		height: 200px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-stat {
+		min-width: 70px;
+		padding: 12px 6px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-stat__value { font-size: 15px; }
+	.brewlab-recipes-card .brewlab-recipes-tab-btn { padding: 12px 14px; }
+	.brewlab-recipes-card .brewlab-recipes-tab-panel { padding: 16px; }
 }
