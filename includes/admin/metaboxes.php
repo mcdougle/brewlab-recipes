@@ -8,10 +8,10 @@
 // user's drag-and-drop order to user_meta, which drifts from the intended
 // order over time; the old plugin hit this directly.
 //
-// Only the three simple-field boxes (media, recipe details, batch details)
-// are registered for now. The six repeater boxes (fermentables, additions,
-// hops, yeast, mash profile, fermentation profile) get appended to the
-// config in Phase 3, once repeater-field.php's renderer exists to back them.
+// Config entries carry a 'type' of 'simple' or 'repeater', which the render
+// dispatcher below uses to pick simple-fields.php or repeater-field.php.
+// The six repeater boxes are built straight from repeater-schemas.php so
+// their titles/order can't drift out of sync with the schema itself.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -21,13 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 //   brewlab_recipes_metabox_config()
 //------------------------------------------------------------------------------
 function brewlab_recipes_metabox_config() {
-	return [
+	$boxes = [
 		[
 			'id'       => 'brewlab_recipes_media',
 			'title'    => __( 'Media', 'brewlab-recipes' ),
 			'section'  => 'media',
 			'context'  => 'normal',
 			'priority' => 'high',
+			'type'     => 'simple',
 		],
 		[
 			'id'       => 'brewlab_recipes_recipe_details',
@@ -35,6 +36,7 @@ function brewlab_recipes_metabox_config() {
 			'section'  => 'recipe_details',
 			'context'  => 'normal',
 			'priority' => 'high',
+			'type'     => 'simple',
 		],
 		[
 			'id'       => 'brewlab_recipes_batch_details',
@@ -42,8 +44,22 @@ function brewlab_recipes_metabox_config() {
 			'section'  => 'batch_details',
 			'context'  => 'normal',
 			'priority' => 'high',
+			'type'     => 'simple',
 		],
 	];
+
+	foreach ( brewlab_recipes_repeater_schemas() as $key => $schema ) {
+		$boxes[] = [
+			'id'       => 'brewlab_recipes_' . $key,
+			'title'    => $schema['label'],
+			'section'  => $key,
+			'context'  => 'normal',
+			'priority' => 'default',
+			'type'     => 'repeater',
+		];
+	}
+
+	return $boxes;
 }
 
 //------------------------------------------------------------------------------
@@ -58,7 +74,10 @@ function brewlab_recipes_register_metaboxes() {
 			'brewlab_recipe',
 			$box['context'],
 			$box['priority'],
-			[ 'section' => $box['section'] ]
+			[
+				'section' => $box['section'],
+				'type'    => $box['type'],
+			]
 		);
 	}
 }
@@ -68,11 +87,47 @@ add_action( 'add_meta_boxes_brewlab_recipe', 'brewlab_recipes_register_metaboxes
 //   brewlab_recipes_render_metabox()
 //------------------------------------------------------------------------------
 // Single dispatcher for every box registered above — reads which schema
-// section to render from the $args passed to add_meta_box().
+// section and renderer to use from the $args passed to add_meta_box().
 function brewlab_recipes_render_metabox( $post, $metabox ) {
 	$section = $metabox['args']['section'] ?? '';
-	brewlab_recipes_render_simple_fields( $post->ID, $section );
+	$type    = $metabox['args']['type'] ?? 'simple';
+
+	if ( 'repeater' === $type ) {
+		brewlab_recipes_render_repeater_field( $post->ID, $section );
+	} else {
+		brewlab_recipes_render_simple_fields( $post->ID, $section );
+	}
 }
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_enqueue_admin_assets()
+//------------------------------------------------------------------------------
+// Only the repeater boxes need JS/CSS — the simple-field boxes are plain
+// form-table markup. Scoped to the recipe edit screen so it never loads on
+// other post types' add/edit screens.
+function brewlab_recipes_enqueue_admin_assets( $hook ) {
+	if ( ! in_array( $hook, [ 'post.php', 'post-new.php' ], true ) ) {
+		return;
+	}
+	if ( 'brewlab_recipe' !== get_current_screen()->post_type ) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'brewlab-recipes-admin-repeater',
+		BREWLAB_RECIPES_URL . 'assets/css/admin-repeater.css',
+		[],
+		BREWLAB_RECIPES_VERSION
+	);
+	wp_enqueue_script(
+		'brewlab-recipes-admin-repeater',
+		BREWLAB_RECIPES_URL . 'assets/js/admin-repeater.js',
+		[],
+		BREWLAB_RECIPES_VERSION,
+		true
+	);
+}
+add_action( 'admin_enqueue_scripts', 'brewlab_recipes_enqueue_admin_assets' );
 
 //------------------------------------------------------------------------------
 //   brewlab_recipes_enforce_metabox_order()
