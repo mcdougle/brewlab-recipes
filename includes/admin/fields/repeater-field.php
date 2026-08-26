@@ -103,10 +103,9 @@ function brewlab_recipes_render_repeater_profile_name( $post_id, $section, $labe
 // the modal footer instead.
 function brewlab_recipes_render_repeater_item( $section, $fields, $index, $row ) {
 	echo '<li class="brewlab-recipes-repeater__item">';
-	printf(
-		'<span class="brewlab-recipes-repeater__item-summary">%s</span>',
-		esc_html( brewlab_recipes_repeater_item_summary( $section, $fields, $row ) )
-	);
+	echo '<span class="brewlab-recipes-repeater__item-summary">';
+	brewlab_recipes_render_repeater_item_summary( $section, $fields, $row );
+	echo '</span>';
 
 	foreach ( $fields as $key => $field ) {
 		$name  = sprintf( 'brewlab_recipes_repeater[%s][%s][%s]', $section, $index, $key );
@@ -123,27 +122,149 @@ function brewlab_recipes_render_repeater_item( $section, $fields, $index, $row )
 }
 
 //------------------------------------------------------------------------------
-//   brewlab_recipes_repeater_item_summary()
+//   brewlab_recipes_render_repeater_item_summary()
 //------------------------------------------------------------------------------
-// Up to the first three non-link fields (schema declaration order), skipping
-// anything blank — 'select' values already come back as their option label
-// via repeater-data.php's brewlab_recipes_repeater_cell_value(), matching
-// what admin-repeater.js does when it rebuilds this same summary after a
-// modal save (it reads the modal <select>'s chosen option text directly,
-// same end result, no schema duplicated into JS to get there).
-function brewlab_recipes_repeater_item_summary( $section, $fields, $row ) {
-	$parts = [];
+// A row's summary: a left-hand "primary" cluster (name/variety, plus an
+// amount+unit-style chip when a primary field is paired via inline_with)
+// and a right-aligned "meta" cluster, each field's chip styled per its
+// schema 'summary' config (slot/bold/muted/width/suffix) — see the
+// repeater-schemas.php header comment for the shape. This is the single
+// place a row ever gets turned into a summary: admin-repeater.js doesn't
+// duplicate this logic — after a modal save it POSTs the row's values to
+// brewlab_recipes_ajax_render_repeater_summary() (below), which calls this
+// same function, so there's exactly one implementation of "what a row
+// looks like" for both the initial page load and every live edit.
+function brewlab_recipes_render_repeater_item_summary( $section, $fields, $row ) {
+	$primary = [];
+	$meta    = [];
+	$skip    = [];
+
 	foreach ( $fields as $key => $field ) {
-		if ( 'link' === $key || count( $parts ) >= 3 ) {
+		if ( in_array( $key, $skip, true ) || empty( $field['summary'] ) ) {
 			continue;
 		}
-		$value = brewlab_recipes_repeater_cell_value( $section, $key, $row[ $key ] ?? '' );
-		if ( '' !== $value ) {
-			$parts[] = $value;
+
+		$config = $field['summary'];
+		$value  = brewlab_recipes_repeater_cell_value( $section, $key, $row[ $key ] ?? '' );
+
+		// A primary/meta field that's the first half of an inline_with pair
+		// (amount+unit, temp+temp_unit) renders as one combined chip.
+		if ( ! empty( $field['inline_with'] ) && isset( $fields[ $field['inline_with'] ] ) ) {
+			$partner_key = $field['inline_with'];
+			$partner_val = brewlab_recipes_repeater_cell_value( $section, $partner_key, $row[ $partner_key ] ?? '' );
+			$value       = trim( $value . ' ' . $partner_val );
+			$skip[]      = $partner_key;
+		}
+
+		// Hops' time is measured in days for a dry-hop addition, minutes for
+		// everything else — the one suffix that depends on another field's
+		// value rather than being static.
+		if ( 'hops' === $section && 'time' === $key ) {
+			$config['suffix'] = ( 'dry_hop' === ( $row['use'] ?? '' ) ) ? ' days' : ' min';
+		}
+
+		if ( '' === $value ) {
+			continue;
+		}
+		if ( ! empty( $config['suffix'] ) ) {
+			$value .= $config['suffix'];
+		}
+
+		$chip = [
+			'value' => $value,
+			'bold'  => ! empty( $config['bold'] ),
+			'muted' => ! empty( $config['muted'] ),
+			'width' => $config['width'] ?? null,
+			'grow'  => ! empty( $config['grow'] ),
+		];
+
+		if ( 'meta' === ( $config['slot'] ?? 'primary' ) ) {
+			$meta[] = $chip;
+		} else {
+			$primary[] = $chip;
 		}
 	}
-	return $parts ? implode( ' ', $parts ) : __( '(empty)', 'brewlab-recipes' );
+
+	if ( ! $primary && ! $meta ) {
+		printf( '<span class="brewlab-recipes-repeater__item-empty">%s</span>', esc_html__( '(empty)', 'brewlab-recipes' ) );
+		return;
+	}
+
+	echo '<span class="brewlab-recipes-repeater__item-primary">';
+	array_map( 'brewlab_recipes_render_repeater_summary_chip', $primary );
+	echo '</span>';
+
+	if ( $meta ) {
+		echo '<span class="brewlab-recipes-repeater__item-meta">';
+		array_map( 'brewlab_recipes_render_repeater_summary_chip', $meta );
+		echo '</span>';
+	}
 }
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_repeater_summary_chip()
+//------------------------------------------------------------------------------
+function brewlab_recipes_render_repeater_summary_chip( array $chip ) {
+	$classes = [ 'brewlab-recipes-repeater__chip' ];
+	if ( $chip['bold'] ) {
+		$classes[] = 'brewlab-recipes-repeater__chip--bold';
+	}
+	if ( $chip['muted'] ) {
+		$classes[] = 'brewlab-recipes-repeater__chip--muted';
+	}
+
+	// Fixed-width chips (amount, temp, time, days...) get a right-aligned
+	// column of that width, so varying-length values still line up on a
+	// consistent edge. The one 'grow' chip per section (name/variety) fills
+	// whatever space is left; anything else with neither (hops' alpha) just
+	// sits at its own natural size.
+	if ( $chip['width'] ) {
+		$style = sprintf( ' style="flex:0 0 %dpx;text-align:right;"', (int) $chip['width'] );
+	} elseif ( $chip['grow'] ) {
+		$style = ' style="flex:1 1 auto;"';
+	} else {
+		$style = ' style="flex:0 0 auto;"';
+	}
+
+	printf(
+		'<span class="%s"%s>%s</span>',
+		esc_attr( implode( ' ', $classes ) ),
+		$style,
+		esc_html( $chip['value'] )
+	);
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_ajax_render_repeater_summary()
+//------------------------------------------------------------------------------
+// admin-repeater.js calls this after every modal Save, POSTing the row's
+// current field values and getting back the exact HTML
+// brewlab_recipes_render_repeater_item_summary() would have produced on a
+// full page load — reusing save.php's row sanitizer so an AJAX-rendered
+// summary is sanitized the same way a saved one is, not a separate,
+// looser path.
+function brewlab_recipes_ajax_render_repeater_summary() {
+	check_ajax_referer( 'brewlab_recipes_save_meta', 'nonce' );
+
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		wp_send_json_error();
+	}
+
+	$section = sanitize_key( wp_unslash( $_POST['section'] ?? '' ) );
+	$schemas = brewlab_recipes_repeater_schemas();
+	if ( ! isset( $schemas[ $section ] ) ) {
+		wp_send_json_error();
+	}
+
+	$fields  = $schemas[ $section ]['fields'];
+	$raw_row = is_array( $_POST['row'] ?? null ) ? wp_unslash( $_POST['row'] ) : [];
+	$row     = brewlab_recipes_sanitize_repeater_row( $raw_row, $fields );
+
+	ob_start();
+	brewlab_recipes_render_repeater_item_summary( $section, $fields, $row );
+	wp_send_json_success( [ 'html' => ob_get_clean() ] );
+}
+add_action( 'wp_ajax_brewlab_recipes_render_repeater_summary', 'brewlab_recipes_ajax_render_repeater_summary' );
 
 //------------------------------------------------------------------------------
 //   brewlab_recipes_render_repeater_modal_fields()

@@ -9,6 +9,19 @@
 // field definitions and select-option labels from here instead of each
 // redefining their own copy (that duplication is what made the old plugin's
 // meta-fields.php unmaintainable).
+//
+// A field's 'summary' key drives the admin row summary (see
+// brewlab_recipes_render_repeater_item() in repeater-field.php): 'slot' is
+// 'primary' (left side) or 'meta' (right-aligned), 'bold'/'muted' set text
+// weight/color, 'width' pins a fixed-width column (omit for the flexible
+// name/variety field), 'suffix' appends fixed text when the value is
+// non-empty. A primary/meta field that's also the first half of an
+// inline_with pair (e.g. amount+unit) renders as one combined chip using
+// both fields' values — reusing that existing relationship instead of a
+// second "these two go together" key. This is old-plugin-exact per-section
+// styling (bold varies by field, hops bolds two fields where every other
+// section bolds one, chip widths differ), expressed as schema data instead
+// of six hand-written summary-building functions.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -28,6 +41,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
 				],
 				'link'   => [
 					'type'  => 'url',
@@ -38,6 +52,7 @@ function brewlab_recipes_repeater_schemas() {
 					'label'       => __( 'Amount', 'brewlab-recipes' ),
 					'required'    => true,
 					'inline_with' => 'unit',
+					'summary'     => [ 'slot' => 'primary', 'bold' => true, 'width' => 80 ],
 				],
 				'unit'   => [
 					'type'    => 'select',
@@ -75,6 +90,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
 				],
 				'link'   => [
 					'type'  => 'url',
@@ -85,6 +101,7 @@ function brewlab_recipes_repeater_schemas() {
 					'label'       => __( 'Amount', 'brewlab-recipes' ),
 					'required'    => true,
 					'inline_with' => 'unit',
+					'summary'     => [ 'slot' => 'primary', 'bold' => true, 'width' => 80 ],
 				],
 				'unit'   => [
 					'type'    => 'select',
@@ -112,6 +129,7 @@ function brewlab_recipes_repeater_schemas() {
 						'bulk_aging'  => __( 'Bulk Aging', 'brewlab-recipes' ),
 						'packaging'   => __( 'Packaging', 'brewlab-recipes' ),
 					],
+					'summary' => [ 'slot' => 'meta', 'muted' => true ],
 				],
 			],
 		],
@@ -124,6 +142,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Variety', 'brewlab-recipes' ),
 					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'bold' => true, 'grow' => true ],
 				],
 				'link'    => [
 					'type'  => 'url',
@@ -134,6 +153,7 @@ function brewlab_recipes_repeater_schemas() {
 					'label'       => __( 'Amount', 'brewlab-recipes' ),
 					'required'    => true,
 					'inline_with' => 'unit',
+					'summary'     => [ 'slot' => 'primary', 'bold' => true, 'width' => 60 ],
 				],
 				'unit'    => [
 					'type'    => 'select',
@@ -146,8 +166,9 @@ function brewlab_recipes_repeater_schemas() {
 					],
 				],
 				'alpha'   => [
-					'type'  => 'number',
-					'label' => __( 'Alpha Acid %', 'brewlab-recipes' ),
+					'type'    => 'number',
+					'label'   => __( 'Alpha Acid %', 'brewlab-recipes' ),
+					'summary' => [ 'slot' => 'primary', 'muted' => true, 'suffix' => '%' ],
 				],
 				'type'    => [
 					'type'    => 'select',
@@ -168,10 +189,16 @@ function brewlab_recipes_repeater_schemas() {
 						'mash'       => __( 'Mash', 'brewlab-recipes' ),
 						'first_wort' => __( 'First Wort', 'brewlab-recipes' ),
 					],
+					'summary' => [ 'slot' => 'meta', 'muted' => true ],
 				],
 				'time'    => [
-					'type'  => 'number',
-					'label' => __( 'Time (min)', 'brewlab-recipes' ),
+					'type'    => 'number',
+					'label'   => __( 'Time (min)', 'brewlab-recipes' ),
+					// Suffix depends on 'use' (dry hop is measured in days,
+					// everything else in minutes) — the one case that
+					// doesn't fit a static suffix, handled directly in
+					// brewlab_recipes_repeater_item_summary().
+					'summary' => [ 'slot' => 'meta', 'muted' => true ],
 				],
 			],
 		],
@@ -184,6 +211,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
 				],
 				'link'   => [
 					'type'  => 'url',
@@ -194,6 +222,7 @@ function brewlab_recipes_repeater_schemas() {
 					'label'       => __( 'Amount', 'brewlab-recipes' ),
 					'required'    => true,
 					'inline_with' => 'unit',
+					'summary'     => [ 'slot' => 'primary', 'bold' => true, 'width' => 80 ],
 				],
 				'unit'   => [
 					'type'    => 'select',
@@ -218,6 +247,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
 				],
 				'type'      => [
 					'type'    => 'select',
@@ -232,6 +262,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'        => 'number',
 					'label'       => __( 'Temp', 'brewlab-recipes' ),
 					'inline_with' => 'temp_unit',
+					'summary'     => [ 'slot' => 'meta', 'width' => 80 ],
 				],
 				'temp_unit' => [
 					'type'         => 'select',
@@ -247,8 +278,9 @@ function brewlab_recipes_repeater_schemas() {
 					],
 				],
 				'time'      => [
-					'type'  => 'number',
-					'label' => __( 'Time (min)', 'brewlab-recipes' ),
+					'type'    => 'number',
+					'label'   => __( 'Time (min)', 'brewlab-recipes' ),
+					'summary' => [ 'slot' => 'meta', 'muted' => true, 'width' => 60, 'suffix' => ' min' ],
 				],
 			],
 		],
@@ -262,6 +294,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
 				],
 				'type'      => [
 					'type'    => 'select',
@@ -279,6 +312,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'        => 'number',
 					'label'       => __( 'Temp', 'brewlab-recipes' ),
 					'inline_with' => 'temp_unit',
+					'summary'     => [ 'slot' => 'meta', 'width' => 80 ],
 				],
 				'temp_unit' => [
 					'type'         => 'select',
@@ -294,16 +328,18 @@ function brewlab_recipes_repeater_schemas() {
 					],
 				],
 				'days'      => [
-					'type'  => 'number',
-					'label' => __( 'Days', 'brewlab-recipes' ),
+					'type'    => 'number',
+					'label'   => __( 'Days', 'brewlab-recipes' ),
+					'summary' => [ 'slot' => 'meta', 'muted' => true, 'width' => 70, 'suffix' => ' days' ],
 				],
 				'ramp'      => [
 					'type'  => 'text',
 					'label' => __( 'Ramp', 'brewlab-recipes' ),
 				],
 				'pressure'  => [
-					'type'  => 'text',
-					'label' => __( 'Pressure', 'brewlab-recipes' ),
+					'type'    => 'text',
+					'label'   => __( 'Pressure', 'brewlab-recipes' ),
+					'summary' => [ 'slot' => 'meta', 'muted' => true, 'width' => 70, 'suffix' => ' PSI' ],
 				],
 			],
 		],

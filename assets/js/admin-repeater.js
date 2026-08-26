@@ -25,6 +25,14 @@
  * visual (which button looks active) synced separately after the hidden
  * input's value changes underneath it, both right after the fields-template
  * clones in and right after populating from an existing row.
+ *
+ * A row's summary display (bold amount+unit, muted right-aligned metadata,
+ * per-field widths — see repeater-schemas.php's 'summary' key) is real
+ * per-field styling logic, not something worth re-implementing here in
+ * parallel with PHP. After a save this file POSTs the row's current values
+ * to brewlab_recipes_ajax_render_repeater_summary() and drops the returned
+ * HTML straight in — one implementation of "what a row looks like," used
+ * for both the initial page load and every live edit.
  */
 ( function () {
 	'use strict';
@@ -113,6 +121,7 @@
 		var container = activeContainer;
 		var item       = activeItem;
 		var isNew      = ! item;
+		var section    = container.getAttribute( 'data-section' );
 
 		if ( isNew ) {
 			var itemTemplate = container.querySelector( '.brewlab-recipes-repeater__item-template' );
@@ -125,13 +134,8 @@
 			} );
 		}
 
-		// Copy modal field values into the item's hidden inputs, and build
-		// its summary from the same fields in the same pass — a 'select'
-		// field's summary text is its chosen option's label (read straight
-		// off the modal <select>, same value repeater-data.php's
-		// brewlab_recipes_repeater_cell_value() would produce server-side),
-		// not the raw stored value.
-		var summaryParts = [];
+		// Copy modal field values into the item's hidden inputs.
+		var row = {};
 		modalBody.querySelectorAll( '[data-field]' ).forEach( function ( field ) {
 			var key    = field.getAttribute( 'data-field' );
 			var hidden = item.querySelector( '.brewlab-recipes-repeater__item-field[data-field="' + key + '"]' );
@@ -139,29 +143,36 @@
 				return;
 			}
 			hidden.value = field.value;
-
-			if ( 'link' === key || summaryParts.length >= 3 ) {
-				return;
-			}
-			var displayValue = field.value;
-			if ( 'SELECT' === field.tagName && field.selectedIndex >= 0 ) {
-				displayValue = field.options[ field.selectedIndex ].text;
-			} else if ( field.hasAttribute( 'data-label' ) ) {
-				displayValue = field.getAttribute( 'data-label' );
-			}
-			if ( displayValue ) {
-				summaryParts.push( displayValue );
-			}
+			row[ key ]   = field.value;
 		} );
-
-		item.querySelector( '.brewlab-recipes-repeater__item-summary' ).textContent =
-			summaryParts.length ? summaryParts.join( ' ' ) : '(empty)';
 
 		if ( isNew ) {
 			container.querySelector( '.brewlab-recipes-repeater__list' ).appendChild( item );
 		}
 
+		updateItemSummary( section, item, row );
 		closeModal();
+	}
+
+	function updateItemSummary( section, item, row ) {
+		var nonce = document.querySelector( '[name="brewlab_recipes_nonce"]' );
+		var body  = new URLSearchParams();
+		body.set( 'action', 'brewlab_recipes_render_repeater_summary' );
+		body.set( 'nonce', nonce ? nonce.value : '' );
+		body.set( 'section', section );
+		Object.keys( row ).forEach( function ( key ) {
+			body.set( 'row[' + key + ']', row[ key ] );
+		} );
+
+		fetch( window.ajaxurl, { method: 'POST', credentials: 'same-origin', body: body } )
+			.then( function ( response ) {
+				return response.json();
+			} )
+			.then( function ( result ) {
+				if ( result && result.success ) {
+					item.querySelector( '.brewlab-recipes-repeater__item-summary' ).innerHTML = result.data.html;
+				}
+			} );
 	}
 
 	function onModalDelete() {
