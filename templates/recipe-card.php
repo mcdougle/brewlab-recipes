@@ -374,8 +374,17 @@ $metric_weight_unit = function ( $unit ) {
 								?>
 								<div class="brewlab-recipes-item">
 									<span class="brewlab-recipes-item__amt">
-										<span class="brewlab-recipes-scalable" data-base="<?php echo esc_attr( $base_amt ); ?>"><?php echo esc_html( $base_amt ); ?></span>
-										<?php echo esc_html( $orig_unit ); ?>
+										<?php
+										// Deliberately not a .brewlab-recipes-qty/data-base like the
+										// other ingredient sections: yeast pitch amount isn't a linear
+										// function of batch size (a packet covers a range of batch
+										// sizes, and doubling for a high-ABV or lager recipe is a
+										// deliberate brewer choice, not a ratio to preserve), and the
+										// unit set mixes weight/volume/count/cell-count with no shared
+										// conversion basis, so plain unscaled text is correct here, not
+										// a gap to wire up.
+										echo esc_html( $base_amt ) . ' ' . esc_html( brewlab_recipes_repeater_cell_value( 'yeast', 'unit', $orig_unit ) );
+										?>
 									</span>
 									<span class="brewlab-recipes-item__name"><?php
 										$link = $y['link'] ?? '';
