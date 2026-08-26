@@ -13,20 +13,26 @@
 // A field's 'summary' key drives the admin row summary (see
 // brewlab_recipes_render_repeater_item() in repeater-field.php): 'slot' is
 // 'primary' (left side) or 'meta' (right-aligned), 'bold'/'muted' set text
-// weight/color, 'width' pins a fixed-width column (omit + 'grow' => true for
-// the one field, usually name/variety, that should fill remaining space),
-// 'suffix' appends fixed text when the value is non-empty, and 'order' sets
-// display order within its slot (lower first) — needed because the summary
-// row's visual order isn't always the schema's field-declaration order
-// (every ingredient section leads its primary chips with amount+unit, not
-// name, even though name is declared first for the modal's sake). A
-// primary/meta field that's also the first half of an inline_with pair
-// (e.g. amount+unit) renders as one combined chip using both fields'
-// values — reusing that existing relationship instead of a second "these
-// two go together" key. This is old-plugin-exact per-section styling (bold
-// varies by field, hops bolds two fields where every other section bolds
-// one, chip widths and order differ), expressed as schema data instead of
-// six hand-written summary-building functions.
+// weight/color, 'width' pins a fixed-width column (omit it for a chip that
+// should sit at its own natural size, like name/variety), 'suffix' appends
+// fixed text when the value is non-empty, and 'order' sets display order
+// within its slot (lower first) — needed because the summary row's visual
+// order isn't always the schema's field-declaration order (every
+// ingredient section leads its primary chips with amount+unit, not name,
+// even though name is declared first for the modal's sake). No individual
+// chip grows to fill space — only the primary/meta containers do (see the
+// CSS) — matching the old plugin's actual mechanism: its own name/variety
+// span has no flex property at all, only the row's left-hand wrapper does,
+// which is what keeps a 3-chip primary group (hops: amount, variety,
+// alpha) packed tightly together instead of the middle chip stretching and
+// shoving the one after it away. A primary/meta field that's also the
+// first half of an inline_with pair (e.g. amount+unit) renders as one
+// combined chip using both fields' values — reusing that existing
+// relationship instead of a second "these two go together" key. This is
+// old-plugin-exact per-section styling (bold varies by field, hops bolds
+// two fields where every other section bolds one, chip widths and order
+// differ), expressed as schema data instead of six hand-written
+// summary-building functions.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -46,7 +52,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
-					'summary'  => [ 'slot' => 'primary', 'grow' => true, 'order' => 2 ],
+					'summary'  => [ 'slot' => 'primary', 'order' => 2 ],
 				],
 				'link'   => [
 					'type'  => 'url',
@@ -95,7 +101,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
-					'summary'  => [ 'slot' => 'primary', 'grow' => true, 'order' => 2 ],
+					'summary'  => [ 'slot' => 'primary', 'order' => 2 ],
 				],
 				'link'   => [
 					'type'  => 'url',
@@ -147,7 +153,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Variety', 'brewlab-recipes' ),
 					'required' => true,
-					'summary'  => [ 'slot' => 'primary', 'bold' => true, 'grow' => true, 'order' => 2 ],
+					'summary'  => [ 'slot' => 'primary', 'bold' => true, 'order' => 2 ],
 				],
 				'link'    => [
 					'type'  => 'url',
@@ -220,7 +226,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
-					'summary'  => [ 'slot' => 'primary', 'grow' => true, 'order' => 2 ],
+					'summary'  => [ 'slot' => 'primary', 'order' => 2 ],
 				],
 				'link'   => [
 					'type'  => 'url',
@@ -256,7 +262,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
-					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
+					'summary'  => [ 'slot' => 'primary' ],
 				],
 				'type'      => [
 					'type'    => 'select',
@@ -303,7 +309,7 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
-					'summary'  => [ 'slot' => 'primary', 'grow' => true ],
+					'summary'  => [ 'slot' => 'primary' ],
 				],
 				'type'      => [
 					'type'    => 'select',

@@ -175,7 +175,6 @@ function brewlab_recipes_render_repeater_item_summary( $section, $fields, $row )
 			'bold'  => ! empty( $config['bold'] ),
 			'muted' => ! empty( $config['muted'] ),
 			'width' => $config['width'] ?? null,
-			'grow'  => ! empty( $config['grow'] ),
 			// Display order within its slot — the summary row's visual
 			// order isn't always the same as the schema's (and the
 			// modal's) field order, e.g. every ingredient section leads
@@ -226,16 +225,12 @@ function brewlab_recipes_render_repeater_summary_chip( array $chip ) {
 
 	// Fixed-width chips (amount, temp, time, days...) get a right-aligned
 	// column of that width, so varying-length values still line up on a
-	// consistent edge. The one 'grow' chip per section (name/variety) fills
-	// whatever space is left; anything else with neither (hops' alpha) just
-	// sits at its own natural size.
-	if ( $chip['width'] ) {
-		$style = sprintf( ' style="flex:0 0 %dpx;text-align:right;"', (int) $chip['width'] );
-	} elseif ( $chip['grow'] ) {
-		$style = ' style="flex:1 1 auto;"';
-	} else {
-		$style = ' style="flex:0 0 auto;"';
-	}
+	// consistent edge. Everything else sits at its own natural size — no
+	// individual chip grows; only the primary/meta containers do (see the
+	// repeater-schemas.php header comment for why that matters).
+	$style = $chip['width']
+		? sprintf( ' style="flex:0 0 %dpx;text-align:right;"', (int) $chip['width'] )
+		: ' style="flex:0 0 auto;"';
 
 	printf(
 		'<span class="%s"%s>%s</span>',
