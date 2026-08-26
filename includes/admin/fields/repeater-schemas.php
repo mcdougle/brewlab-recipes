@@ -29,6 +29,10 @@ function brewlab_recipes_repeater_schemas() {
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
 				],
+				'link'   => [
+					'type'  => 'url',
+					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
+				],
 				'amount' => [
 					'type'     => 'number',
 					'label'    => __( 'Amount', 'brewlab-recipes' ),
@@ -51,10 +55,6 @@ function brewlab_recipes_repeater_schemas() {
 						'other'        => __( 'Other', 'brewlab-recipes' ),
 					],
 				],
-				'link'   => [
-					'type'  => 'url',
-					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
-				],
 			],
 		],
 
@@ -66,6 +66,10 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+				],
+				'link'   => [
+					'type'  => 'url',
+					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount' => [
 					'type'     => 'number',
@@ -86,10 +90,6 @@ function brewlab_recipes_repeater_schemas() {
 						'packaging'   => __( 'Packaging', 'brewlab-recipes' ),
 					],
 				],
-				'link'   => [
-					'type'  => 'url',
-					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
-				],
 			],
 		],
 
@@ -101,6 +101,10 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Variety', 'brewlab-recipes' ),
 					'required' => true,
+				],
+				'link'    => [
+					'type'  => 'url',
+					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount'  => [
 					'type'     => 'number',
@@ -139,10 +143,6 @@ function brewlab_recipes_repeater_schemas() {
 					'type'  => 'number',
 					'label' => __( 'Time (min)', 'brewlab-recipes' ),
 				],
-				'link'    => [
-					'type'  => 'url',
-					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
-				],
 			],
 		],
 
@@ -154,6 +154,10 @@ function brewlab_recipes_repeater_schemas() {
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
+				],
+				'link'   => [
+					'type'  => 'url',
+					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount' => [
 					'type'     => 'number',
@@ -171,17 +175,14 @@ function brewlab_recipes_repeater_schemas() {
 						'oz'            => __( 'Ounces', 'brewlab-recipes' ),
 					],
 				],
-				'link'   => [
-					'type'  => 'url',
-					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
-				],
 			],
 		],
 
 		'mash_steps' => [
-			'label'      => __( 'Mash Steps', 'brewlab-recipes' ),
-			'item_label' => __( 'Mash Step', 'brewlab-recipes' ),
-			'fields'     => [
+			'label'         => __( 'Mash Steps', 'brewlab-recipes' ),
+			'item_label'    => __( 'Mash Step', 'brewlab-recipes' ),
+			'profile_label' => __( 'Profile Name', 'brewlab-recipes' ),
+			'fields'        => [
 				'name' => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
@@ -208,9 +209,10 @@ function brewlab_recipes_repeater_schemas() {
 		],
 
 		'fermentation_steps' => [
-			'label'      => __( 'Fermentation Steps', 'brewlab-recipes' ),
-			'item_label' => __( 'Fermentation Step', 'brewlab-recipes' ),
-			'fields'     => [
+			'label'         => __( 'Fermentation Steps', 'brewlab-recipes' ),
+			'item_label'    => __( 'Fermentation Step', 'brewlab-recipes' ),
+			'profile_label' => __( 'Profile Name', 'brewlab-recipes' ),
+			'fields'        => [
 				'name'      => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
