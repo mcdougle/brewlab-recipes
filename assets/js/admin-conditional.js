@@ -1,12 +1,19 @@
 /**
- * Brew-Type-Conditional Fields
+ * Conditional Fields
  *
- * Beer always includes hops and a mash — Show Hops/Show Mash Profile (the
- * Options sidebar box) only mean anything for a non-beer recipe, so for
- * "beer" the whole Options box hides and the Hops/Mash Steps metaboxes are
- * forced visible regardless of the checkboxes. Boil Time and IBU are a
- * simpler case — beer-only fields, no override, just hidden outright for
- * anything else.
+ * Two independent controllers on the same file since both are "recipe edit
+ * screen field visibility reacting to another field's value" — brew-type
+ * business logic (hops/mash/boil-time/IBU) below, and a fully generic
+ * depends_on mechanism (any field with a 'depends_on' schema key, e.g.
+ * "Other Type Name" only mattering when Brew Type is "Other") at the
+ * bottom, which isn't specific to brew type at all.
+ *
+ * Brew-Type-Conditional Fields — beer always includes hops and a mash, so
+ * Show Hops/Show Mash Profile (the Options sidebar box) only mean anything
+ * for a non-beer recipe: for "beer" the whole Options box hides and the
+ * Hops/Mash Steps metaboxes are forced visible regardless of the
+ * checkboxes. Boil Time and IBU are a simpler case — beer-only fields, no
+ * override, just hidden outright for anything else.
  *
  * One centralized controller instead of a listener per affected box: same
  * end result as scattering the logic across each box's own render callback,

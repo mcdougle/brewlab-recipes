@@ -32,11 +32,15 @@ function brewlab_recipes_get_repeater_rows( $post_id, $section ) {
 //   brewlab_recipes_repeater_cell_value()
 //------------------------------------------------------------------------------
 // 'select' fields display their option label, everything else (text/number/
-// url) displays as stored.
+// url) displays as stored. A field's short_labels (e.g. temp_unit's "°F"
+// instead of "Fahrenheit (°F)") takes precedence over options where both
+// exist — the compact form reads better anywhere this value gets displayed,
+// not just in the toggle widget it was added for.
 function brewlab_recipes_repeater_cell_value( $section_key, $field_key, $value ) {
 	$field = brewlab_recipes_repeater_schemas()[ $section_key ]['fields'][ $field_key ] ?? [];
 	if ( 'select' === ( $field['type'] ?? '' ) ) {
-		return $field['options'][ $value ] ?? $value;
+		$labels = $field['short_labels'] ?? $field['options'] ?? [];
+		return $labels[ $value ] ?? $value;
 	}
 	return $value;
 }

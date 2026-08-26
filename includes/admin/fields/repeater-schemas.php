@@ -34,9 +34,10 @@ function brewlab_recipes_repeater_schemas() {
 					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount' => [
-					'type'     => 'number',
-					'label'    => __( 'Amount', 'brewlab-recipes' ),
-					'required' => true,
+					'type'        => 'number',
+					'label'       => __( 'Amount', 'brewlab-recipes' ),
+					'required'    => true,
+					'inline_with' => 'unit',
 				],
 				'unit'   => [
 					'type'  => 'text',
@@ -72,9 +73,10 @@ function brewlab_recipes_repeater_schemas() {
 					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount' => [
-					'type'     => 'number',
-					'label'    => __( 'Amount', 'brewlab-recipes' ),
-					'required' => true,
+					'type'        => 'number',
+					'label'       => __( 'Amount', 'brewlab-recipes' ),
+					'required'    => true,
+					'inline_with' => 'unit',
 				],
 				'unit'   => [
 					'type'  => 'text',
@@ -107,9 +109,10 @@ function brewlab_recipes_repeater_schemas() {
 					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount'  => [
-					'type'     => 'number',
-					'label'    => __( 'Amount', 'brewlab-recipes' ),
-					'required' => true,
+					'type'        => 'number',
+					'label'       => __( 'Amount', 'brewlab-recipes' ),
+					'required'    => true,
+					'inline_with' => 'unit',
 				],
 				'unit'    => [
 					'type'  => 'text',
@@ -160,9 +163,10 @@ function brewlab_recipes_repeater_schemas() {
 					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
 				],
 				'amount' => [
-					'type'     => 'number',
-					'label'    => __( 'Amount', 'brewlab-recipes' ),
-					'required' => true,
+					'type'        => 'number',
+					'label'       => __( 'Amount', 'brewlab-recipes' ),
+					'required'    => true,
+					'inline_with' => 'unit',
 				],
 				'unit'   => [
 					'type'    => 'select',
@@ -183,12 +187,12 @@ function brewlab_recipes_repeater_schemas() {
 			'item_label'    => __( 'Mash Step', 'brewlab-recipes' ),
 			'profile_label' => __( 'Profile Name', 'brewlab-recipes' ),
 			'fields'        => [
-				'name' => [
+				'name'      => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
 					'required' => true,
 				],
-				'type' => [
+				'type'      => [
 					'type'    => 'select',
 					'label'   => __( 'Type', 'brewlab-recipes' ),
 					'options' => [
@@ -197,11 +201,25 @@ function brewlab_recipes_repeater_schemas() {
 						'decoction'   => __( 'Decoction', 'brewlab-recipes' ),
 					],
 				],
-				'temp' => [
-					'type'  => 'number',
-					'label' => __( 'Temp (°F)', 'brewlab-recipes' ),
+				'temp'      => [
+					'type'        => 'number',
+					'label'       => __( 'Temp', 'brewlab-recipes' ),
+					'inline_with' => 'temp_unit',
 				],
-				'time' => [
+				'temp_unit' => [
+					'type'         => 'select',
+					'label'        => __( 'Temp Unit', 'brewlab-recipes' ),
+					'widget'       => 'toggle',
+					'options'      => [
+						'f' => __( 'Fahrenheit (°F)', 'brewlab-recipes' ),
+						'c' => __( 'Celsius (°C)', 'brewlab-recipes' ),
+					],
+					'short_labels' => [
+						'f' => '°F',
+						'c' => '°C',
+					],
+				],
+				'time'      => [
 					'type'  => 'number',
 					'label' => __( 'Time (min)', 'brewlab-recipes' ),
 				],
@@ -231,15 +249,21 @@ function brewlab_recipes_repeater_schemas() {
 					],
 				],
 				'temp'      => [
-					'type'  => 'number',
-					'label' => __( 'Temp', 'brewlab-recipes' ),
+					'type'        => 'number',
+					'label'       => __( 'Temp', 'brewlab-recipes' ),
+					'inline_with' => 'temp_unit',
 				],
 				'temp_unit' => [
-					'type'    => 'select',
-					'label'   => __( 'Temp Unit', 'brewlab-recipes' ),
-					'options' => [
+					'type'         => 'select',
+					'label'        => __( 'Temp Unit', 'brewlab-recipes' ),
+					'widget'       => 'toggle',
+					'options'      => [
 						'f' => __( 'Fahrenheit (°F)', 'brewlab-recipes' ),
 						'c' => __( 'Celsius (°C)', 'brewlab-recipes' ),
+					],
+					'short_labels' => [
+						'f' => '°F',
+						'c' => '°C',
 					],
 				],
 				'days'      => [

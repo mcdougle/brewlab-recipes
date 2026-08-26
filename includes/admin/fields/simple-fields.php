@@ -55,12 +55,9 @@ function brewlab_recipes_simple_fields() {
 					],
 				],
 				'brew_type_other' => [
-					'type'  => 'text',
-					'label' => __( 'Other Type Name', 'brewlab-recipes' ),
-				],
-				'style'           => [
-					'type'  => 'text',
-					'label' => __( 'Style', 'brewlab-recipes' ),
+					'type'       => 'text',
+					'label'      => __( 'Other Type Name', 'brewlab-recipes' ),
+					'depends_on' => [ 'field' => 'brew_type', 'value' => 'other' ],
 				],
 				'summary'         => [
 					'type'  => 'textarea',
@@ -77,8 +74,9 @@ function brewlab_recipes_simple_fields() {
 					],
 				],
 				'author_custom'   => [
-					'type'  => 'text',
-					'label' => __( 'Custom Author Name', 'brewlab-recipes' ),
+					'type'       => 'text',
+					'label'      => __( 'Custom Author Name', 'brewlab-recipes' ),
+					'depends_on' => [ 'field' => 'author_display', 'value' => 'custom' ],
 				],
 				'notes'           => [
 					'type'  => 'textarea',
@@ -90,6 +88,10 @@ function brewlab_recipes_simple_fields() {
 		'batch_details' => [
 			'label'  => __( 'Batch Details', 'brewlab-recipes' ),
 			'fields' => [
+				'style'            => [
+					'type'  => 'text',
+					'label' => __( 'Style', 'brewlab-recipes' ),
+				],
 				'batch_size'       => [
 					'type'  => 'number',
 					'label' => __( 'Batch Size', 'brewlab-recipes' ),
@@ -219,11 +221,9 @@ function brewlab_recipes_render_name_proxy_row( $post_id ) {
 //   brewlab_recipes_render_media_box()
 //------------------------------------------------------------------------------
 function brewlab_recipes_render_media_box( $post_id ) {
-	$fields = brewlab_recipes_simple_fields()['media']['fields'];
-
 	$image_id  = (int) get_post_meta( $post_id, '_brewlab_recipes_image_id', true );
-	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'thumbnail' ) : '';
-	$color     = get_post_meta( $post_id, '_brewlab_recipes_header_color', true );
+	$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'medium' ) : '';
+	$color     = get_post_meta( $post_id, '_brewlab_recipes_header_color', true ) ?: '#1e1b17';
 	?>
 	<div class="brewlab-recipes-media-box">
 		<div class="brewlab-recipes-media-image">
@@ -232,18 +232,72 @@ function brewlab_recipes_render_media_box( $post_id ) {
 		<div class="brewlab-recipes-media-controls">
 			<div class="brewlab-recipes-media-actions">
 				<input type="hidden" id="brewlab-recipes-image-id" name="brewlab_recipes_image_id" value="<?php echo esc_attr( $image_id ?: '' ); ?>" />
-				<button type="button" class="button brewlab-recipes-media-field__select"<?php echo $image_url ? ' style="display:none;"' : ''; ?>><?php esc_html_e( 'Select Image', 'brewlab-recipes' ); ?></button>
+				<button type="button" class="button brewlab-recipes-media-field__select"><?php echo $image_id ? esc_html__( 'Change Image', 'brewlab-recipes' ) : esc_html__( 'Upload / Select Image', 'brewlab-recipes' ); ?></button>
 				<button type="button" class="button brewlab-recipes-media-field__remove"<?php echo $image_url ? '' : ' style="display:none;"'; ?>><?php esc_html_e( 'Remove Image', 'brewlab-recipes' ); ?></button>
 			</div>
 			<div class="brewlab-recipes-media-divider"></div>
 			<div class="brewlab-recipes-media-color">
-				<label><?php esc_html_e( 'Recipe Color', 'brewlab-recipes' ); ?></label>
-				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-header-color', 'brewlab_recipes_header_color', $color, $fields['header_color'] ); ?>
+				<input type="hidden" id="brewlab-recipes-header-color" name="brewlab_recipes_header_color" value="<?php echo esc_attr( $color ); ?>" />
+				<button type="button" id="brewlab-recipes-color-btn" class="brewlab-recipes-color-btn" title="<?php esc_attr_e( 'Edit recipe color', 'brewlab-recipes' ); ?>">
+					<span class="brewlab-recipes-color-swatch" id="brewlab-recipes-color-swatch" data-default="#1e1b17" style="background:<?php echo esc_attr( $color ); ?>"></span>
+					<span class="brewlab-recipes-color-label"><?php esc_html_e( 'Recipe Color', 'brewlab-recipes' ); ?></span>
+				</button>
 			</div>
 		</div>
 	</div>
 	<?php
 }
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_color_picker_modal()
+//------------------------------------------------------------------------------
+// Rendered once in the footer (same pattern as the repeater modal in
+// repeater-field.php) — a hand-rolled canvas HSV picker, not WP core's
+// bundled Iris picker, matching the old plugin's exact UI. The SV
+// square/hue strip/hex/preset interaction is all in admin-media-color.js;
+// this only needs to emit the DOM it operates on.
+function brewlab_recipes_render_color_picker_modal() {
+	$screen = get_current_screen();
+	if ( ! $screen || 'brewlab_recipe' !== $screen->post_type ) {
+		return;
+	}
+
+	$presets = [ '#1e1b17', '#1a2634', '#1a2a1a', '#2d1a0e', '#1f1a2e', '#2a1a1a', '#0d1f2d', '#263326' ];
+	?>
+	<div class="brewlab-recipes-color-modal" style="display:none;">
+		<div class="brewlab-recipes-color-backdrop"></div>
+		<div class="brewlab-recipes-color-dialog" role="dialog" aria-modal="true">
+			<button type="button" class="brewlab-recipes-color-close" aria-label="<?php esc_attr_e( 'Close', 'brewlab-recipes' ); ?>">&times;</button>
+			<h2 class="brewlab-recipes-color-title"><?php esc_html_e( 'Recipe Color', 'brewlab-recipes' ); ?></h2>
+			<div class="brewlab-recipes-color-body">
+				<div class="brewlab-recipes-color-sv-wrap">
+					<canvas class="brewlab-recipes-color-sv-canvas" width="220" height="180"></canvas>
+					<div class="brewlab-recipes-color-sv-cursor"></div>
+				</div>
+				<canvas class="brewlab-recipes-color-hue-canvas" width="220" height="16"></canvas>
+				<div class="brewlab-recipes-color-hue-cursor"></div>
+				<div class="brewlab-recipes-color-preview-row">
+					<div class="brewlab-recipes-color-preview-swatch"></div>
+					<div class="brewlab-recipes-color-hex-wrap">
+						<span class="brewlab-recipes-color-hex-hash">#</span>
+						<input type="text" class="brewlab-recipes-color-hex-input" maxlength="6" spellcheck="false" />
+					</div>
+				</div>
+				<div class="brewlab-recipes-color-presets">
+					<?php foreach ( $presets as $preset ) : ?>
+						<button type="button" class="brewlab-recipes-color-preset" data-color="<?php echo esc_attr( $preset ); ?>" style="background:<?php echo esc_attr( $preset ); ?>" title="<?php echo esc_attr( $preset ); ?>"></button>
+					<?php endforeach; ?>
+				</div>
+			</div>
+			<p class="brewlab-recipes-color-actions">
+				<button type="button" class="button brewlab-recipes-color-reset"><?php esc_html_e( 'Reset to Default', 'brewlab-recipes' ); ?></button>
+				<button type="button" class="button button-primary brewlab-recipes-color-apply"><?php esc_html_e( 'Apply', 'brewlab-recipes' ); ?></button>
+			</p>
+		</div>
+	</div>
+	<?php
+}
+add_action( 'admin_footer', 'brewlab_recipes_render_color_picker_modal' );
 
 //------------------------------------------------------------------------------
 //   brewlab_recipes_render_batch_details_box()
@@ -262,6 +316,13 @@ function brewlab_recipes_render_batch_details_box( $post_id ) {
 	$is_beer = 'beer' === $get( 'brew_type' );
 	?>
 	<div class="brewlab-recipes-fields">
+
+		<div class="brewlab-recipes-row">
+			<label for="brewlab-recipes-style"><?php esc_html_e( 'Style', 'brewlab-recipes' ); ?></label>
+			<div class="brewlab-recipes-input">
+				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-style', 'brewlab_recipes_style', $get( 'style' ), $fields['style'] ); ?>
+			</div>
+		</div>
 
 		<div class="brewlab-recipes-row">
 			<label for="brewlab-recipes-batch-size"><?php esc_html_e( 'Batch Size', 'brewlab-recipes' ); ?></label>
@@ -321,12 +382,17 @@ function brewlab_recipes_render_batch_details_box( $post_id ) {
 //   brewlab_recipes_render_simple_field()
 //------------------------------------------------------------------------------
 // One full row (label + hint + input) for the generic per-section loop.
+// A field with a 'depends_on' key (e.g. brew_type_other only mattering when
+// brew_type is 'other') renders with its initial visibility computed
+// server-side from the controlling field's current value, and a
+// data-depends-on/data-depends-value pair admin-conditional.js reads to
+// keep it in sync live — see brewlab_recipes_render_conditional_row_attrs().
 function brewlab_recipes_render_simple_field( $post_id, $key, $field ) {
 	$name  = 'brewlab_recipes_' . $key;
 	$id    = 'brewlab-recipes-' . str_replace( '_', '-', $key );
 	$value = get_post_meta( $post_id, '_brewlab_recipes_' . $key, true );
 
-	printf( '<div class="brewlab-recipes-row">' );
+	printf( '<div class="brewlab-recipes-row%s"%s>', empty( $field['depends_on'] ) ? '' : ' brewlab-recipes-conditional', brewlab_recipes_render_conditional_row_attrs( $post_id, $field ) );
 	printf( '<label for="%s">%s', esc_attr( $id ), esc_html( $field['label'] ) );
 	if ( ! empty( $field['hint'] ) ) {
 		printf( '<span class="brewlab-recipes-hint">%s</span>', esc_html( $field['hint'] ) );
@@ -335,6 +401,32 @@ function brewlab_recipes_render_simple_field( $post_id, $key, $field ) {
 	echo '<div class="brewlab-recipes-input">';
 	brewlab_recipes_render_field_input( $id, $name, $value, $field );
 	echo '</div></div>';
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_conditional_row_attrs()
+//------------------------------------------------------------------------------
+// '' for a field with no 'depends_on'. Otherwise the data attributes
+// admin-conditional.js needs to watch the controlling field, plus an
+// inline display:none computed from its current value so a conditional
+// row that shouldn't show yet doesn't flash visible on load.
+function brewlab_recipes_render_conditional_row_attrs( $post_id, $field ) {
+	if ( empty( $field['depends_on'] ) ) {
+		return '';
+	}
+
+	$controls      = $field['depends_on']['field'];
+	$expected      = $field['depends_on']['value'];
+	$controller_id = 'brewlab-recipes-' . str_replace( '_', '-', $controls );
+	$current       = get_post_meta( $post_id, '_brewlab_recipes_' . $controls, true );
+	$visible       = ( $current === $expected );
+
+	return sprintf(
+		' data-depends-on="%s" data-depends-value="%s"%s',
+		esc_attr( $controller_id ),
+		esc_attr( $expected ),
+		$visible ? '' : ' style="display:none;"'
+	);
 }
 
 //------------------------------------------------------------------------------
@@ -384,16 +476,6 @@ function brewlab_recipes_render_field_input( $id, $name, $value, $field ) {
 				esc_attr( $id ),
 				esc_attr( $name ),
 				esc_attr( $value )
-			);
-			break;
-
-		case 'color':
-			printf(
-				'<input type="text" id="%s" name="%s" value="%s" class="brewlab-recipes-color-picker" data-default-color="%s" />',
-				esc_attr( $id ),
-				esc_attr( $name ),
-				esc_attr( $value ),
-				esc_attr( $field['default'] ?? '' )
 			);
 			break;
 

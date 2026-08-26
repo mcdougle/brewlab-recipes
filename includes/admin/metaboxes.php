@@ -140,7 +140,6 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 		);
 
 		wp_enqueue_media();
-		wp_enqueue_style( 'wp-color-picker' );
 		wp_enqueue_style(
 			'brewlab-recipes-admin-media',
 			BREWLAB_RECIPES_URL . 'assets/css/admin-media.css',
@@ -150,13 +149,15 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 		wp_enqueue_script(
 			'brewlab-recipes-admin-media-color',
 			BREWLAB_RECIPES_URL . 'assets/js/admin-media-color.js',
-			[ 'jquery', 'wp-color-picker', 'media-editor' ],
+			[ 'media-editor' ],
 			BREWLAB_RECIPES_VERSION,
 			true
 		);
 		wp_localize_script( 'brewlab-recipes-admin-media-color', 'brewlabRecipesMedia', [
 			'selectTitle'  => __( 'Select Recipe Image', 'brewlab-recipes' ),
 			'selectButton' => __( 'Use This Image', 'brewlab-recipes' ),
+			'selectImage'  => __( 'Upload / Select Image', 'brewlab-recipes' ),
+			'changeImage'  => __( 'Change Image', 'brewlab-recipes' ),
 		] );
 
 		wp_enqueue_script(

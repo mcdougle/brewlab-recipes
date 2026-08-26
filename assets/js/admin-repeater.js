@@ -17,6 +17,14 @@
  * The index counter only ever increments, even across deletions — reusing a
  * removed row's index would make a later row's inputs share its array index
  * and silently overwrite each other in $_POST on save.
+ *
+ * A toggle-widget field (e.g. temp_unit's °F/°C pair) is a hidden input
+ * carrying data-field like any other modal field — the visible buttons
+ * are UI only, writing into that hidden input on click — so the generic
+ * value-sync code below needs no special case for it. It does need its own
+ * visual (which button looks active) synced separately after the hidden
+ * input's value changes underneath it, both right after the fields-template
+ * clones in and right after populating from an existing row.
  */
 ( function () {
 	'use strict';
@@ -58,6 +66,7 @@
 		var template = container.querySelector( '.brewlab-recipes-repeater__fields-template' );
 		modalBody.innerHTML = '';
 		modalBody.appendChild( template.content.cloneNode( true ) );
+		syncToggleButtons( modalBody );
 
 		var label = container.getAttribute( 'data-item-label' );
 		modalTitle.textContent = ( item ? 'Edit ' : 'Add ' ) + label;
@@ -70,9 +79,28 @@
 					field.value = hidden.value;
 				}
 			} );
+			syncToggleButtons( modalBody );
 		}
 
 		modal.style.display = 'block';
+	}
+
+	// Makes every .brewlab-recipes-toggle's active button (and its hidden
+	// input's data-label) match its hidden input's current value — needed
+	// after that value gets set some other way (template clone, populating
+	// from an existing row) rather than by clicking a toggle button directly.
+	function syncToggleButtons( scope ) {
+		scope.querySelectorAll( '.brewlab-recipes-toggle' ).forEach( function ( toggle ) {
+			var hidden  = toggle.querySelector( 'input[type="hidden"]' );
+			var buttons = toggle.querySelectorAll( '.brewlab-recipes-toggle__option' );
+			buttons.forEach( function ( btn ) {
+				var active = btn.getAttribute( 'data-value' ) === hidden.value;
+				btn.classList.toggle( 'is-active', active );
+				if ( active ) {
+					hidden.setAttribute( 'data-label', btn.textContent );
+				}
+			} );
+		} );
 	}
 
 	function closeModal() {
@@ -118,6 +146,8 @@
 			var displayValue = field.value;
 			if ( 'SELECT' === field.tagName && field.selectedIndex >= 0 ) {
 				displayValue = field.options[ field.selectedIndex ].text;
+			} else if ( field.hasAttribute( 'data-label' ) ) {
+				displayValue = field.getAttribute( 'data-label' );
 			}
 			if ( displayValue ) {
 				summaryParts.push( displayValue );
@@ -146,6 +176,15 @@
 		if ( addButton ) {
 			event.preventDefault();
 			openModal( addButton.closest( '.brewlab-recipes-repeater' ), null );
+			return;
+		}
+
+		var toggleOption = event.target.closest( '.brewlab-recipes-toggle__option' );
+		if ( toggleOption ) {
+			event.preventDefault();
+			var toggle = toggleOption.closest( '.brewlab-recipes-toggle' );
+			toggle.querySelector( 'input[type="hidden"]' ).value = toggleOption.getAttribute( 'data-value' );
+			syncToggleButtons( toggle.parentNode );
 			return;
 		}
 

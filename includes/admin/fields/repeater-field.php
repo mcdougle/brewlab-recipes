@@ -153,8 +153,32 @@ function brewlab_recipes_repeater_item_summary( $section, $fields, $row ) {
 // per-open, never submitted directly. Label-above-field (not label-beside,
 // the way the admin form-table rows work) — matches the old plugin's modal
 // layout, and reads more like a compact form than a settings table.
+//
+// A field with an 'inline_with' key (e.g. amount → unit, temp → temp_unit)
+// renders paired with the field it names in one row instead of two,
+// matching how Batch Size+Unit pairs in Batch Details — the paired field is
+// skipped when the loop reaches it on its own.
 function brewlab_recipes_render_repeater_modal_fields( $fields ) {
+	$skip_next = null;
+
 	foreach ( $fields as $key => $field ) {
+		if ( $key === $skip_next ) {
+			$skip_next = null;
+			continue;
+		}
+
+		if ( ! empty( $field['inline_with'] ) && isset( $fields[ $field['inline_with'] ] ) ) {
+			$partner_key = $field['inline_with'];
+			$skip_next   = $partner_key;
+
+			printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s</label>', esc_html( $field['label'] ) );
+			echo '<div class="brewlab-recipes-repeater-modal-field__inline">';
+			brewlab_recipes_render_repeater_modal_input( $key, $field );
+			brewlab_recipes_render_repeater_modal_input( $partner_key, $fields[ $partner_key ] );
+			echo '</div></div>';
+			continue;
+		}
+
 		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s</label>', esc_html( $field['label'] ) );
 		brewlab_recipes_render_repeater_modal_input( $key, $field );
 		echo '</div>';
@@ -165,6 +189,11 @@ function brewlab_recipes_render_repeater_modal_fields( $fields ) {
 //   brewlab_recipes_render_repeater_modal_input()
 //------------------------------------------------------------------------------
 function brewlab_recipes_render_repeater_modal_input( $key, $field ) {
+	if ( 'select' === $field['type'] && 'toggle' === ( $field['widget'] ?? '' ) ) {
+		brewlab_recipes_render_repeater_modal_toggle( $key, $field );
+		return;
+	}
+
 	switch ( $field['type'] ) {
 
 		case 'select':
@@ -200,6 +229,40 @@ function brewlab_recipes_render_repeater_modal_input( $key, $field ) {
 				esc_attr( $key )
 			);
 	}
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_repeater_modal_toggle()
+//------------------------------------------------------------------------------
+// A segmented button pair (e.g. °F / °C) instead of a <select> — for any
+// 'select' field with 'widget' => 'toggle' set (currently just temp_unit).
+// The real value lives in a hidden input carrying data-field like every
+// other modal input, so admin-repeater.js's existing generic value-sync
+// loop (modalBody.querySelectorAll('[data-field]')) picks it up unchanged;
+// the visible buttons are just UI that write into it on click. data-label
+// mirrors the active button's short text, since a hidden input has no
+// visible "selected option" text the way a <select> does — see
+// admin-repeater.js's onModalSave() for where that gets read.
+function brewlab_recipes_render_repeater_modal_toggle( $key, $field ) {
+	$options = $field['short_labels'] ?? $field['options'];
+	$default = array_key_first( $options );
+
+	printf( '<div class="brewlab-recipes-toggle">' );
+	printf(
+		'<input type="hidden" data-field="%s" data-label="%s" value="%s" />',
+		esc_attr( $key ),
+		esc_attr( $options[ $default ] ),
+		esc_attr( $default )
+	);
+	foreach ( $options as $value => $label ) {
+		printf(
+			'<button type="button" class="brewlab-recipes-toggle__option%s" data-value="%s">%s</button>',
+			$value === $default ? ' is-active' : '',
+			esc_attr( $value ),
+			esc_html( $label )
+		);
+	}
+	echo '</div>';
 }
 
 //------------------------------------------------------------------------------

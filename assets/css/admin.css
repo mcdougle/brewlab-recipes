@@ -192,18 +192,236 @@
 	background: #dcdcde;
 }
 
-.brewlab-recipes-media-color {
+.brewlab-recipes-color-btn {
 	display: flex;
 	flex-direction: column;
-	gap: 5px;
+	align-items: center;
+	gap: 7px;
+	padding: 6px 8px;
+	background: none;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: background 0.15s;
 }
 
-.brewlab-recipes-media-color label {
-	font-size: 12px;
+.brewlab-recipes-color-btn:hover {
+	background: #f0f0f1;
+}
+
+.brewlab-recipes-color-swatch {
+	display: block;
+	flex-shrink: 0;
+	width: 32px;
+	height: 32px;
+	border: 1px solid rgba(0, 0, 0, 0.18);
+	border-radius: 6px;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.brewlab-recipes-color-label {
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: #646970;
+	white-space: nowrap;
+	line-height: 1;
+}
+
+/* ── Color picker modal ── */
+.brewlab-recipes-color-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	width: 100%;
+	height: 100%;
+}
+
+.brewlab-recipes-color-backdrop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.brewlab-recipes-color-dialog {
+	position: relative;
+	width: 264px;
+	max-width: calc(100vw - 32px);
+	margin: 8vh auto;
+	padding: 18px;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+}
+
+.brewlab-recipes-color-title {
+	margin: 0 0 12px;
+	font-size: 14px;
 	font-weight: 700;
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	color: #646970;
+	letter-spacing: 0.06em;
+	color: #23282d;
+}
+
+.brewlab-recipes-color-close {
+	position: absolute;
+	top: 0.6em;
+	right: 0.6em;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	background: none;
+	border: none;
+	border-radius: 3px;
+	color: #787c82;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.brewlab-recipes-color-close:hover {
+	background: #e0e0e0;
+	color: #23282d;
+}
+
+.brewlab-recipes-color-body {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 10px;
+}
+
+.brewlab-recipes-color-sv-wrap {
+	position: relative;
+	width: 220px;
+	height: 180px;
+	cursor: crosshair;
+}
+
+.brewlab-recipes-color-sv-canvas {
+	display: block;
+	width: 220px;
+	height: 180px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.brewlab-recipes-color-sv-cursor {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 12px;
+	height: 12px;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.brewlab-recipes-color-hue-canvas {
+	display: block;
+	width: 220px;
+	height: 16px;
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	cursor: ew-resize;
+}
+
+.brewlab-recipes-color-hue-cursor {
+	position: relative;
+	top: -18px;
+	left: 0;
+	width: 4px;
+	height: 20px;
+	margin-bottom: -18px;
+	background: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.5);
+	border-radius: 2px;
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
+.brewlab-recipes-color-preview-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.brewlab-recipes-color-preview-swatch {
+	flex-shrink: 0;
+	width: 36px;
+	height: 36px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+.brewlab-recipes-color-hex-wrap {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	overflow: hidden;
+	border: 1px solid #8c8f94;
+	border-radius: 3px;
+}
+
+.brewlab-recipes-color-hex-hash {
+	padding: 5px 6px;
+	background: #f6f7f7;
+	border-right: 1px solid #8c8f94;
+	color: #787c82;
+	font-size: 13px;
+	line-height: 1;
+}
+
+.brewlab-recipes-color-hex-input {
+	box-sizing: border-box;
+	width: 100%;
+	padding: 5px 8px;
+	border: none;
+	font-family: monospace;
+	font-size: 13px;
+	text-transform: lowercase;
+}
+
+.brewlab-recipes-color-hex-input:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+.brewlab-recipes-color-presets {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 6px;
+	width: 100%;
+}
+
+.brewlab-recipes-color-preset {
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	border: 2px solid transparent;
+	border-radius: 3px;
+	cursor: pointer;
+	transition: border-color 0.15s, transform 0.1s;
+}
+
+.brewlab-recipes-color-preset:hover {
+	border-color: #2271b1;
+	transform: scale(1.15);
+}
+
+.brewlab-recipes-color-actions {
+	display: flex;
+	gap: 8px;
+	justify-content: flex-end;
+	margin: 14px 0 0;
 }
 
 /* ── Repeater list items ── */
@@ -280,6 +498,47 @@
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	color: #646970;
+}
+
+.brewlab-recipes-repeater-modal-field__inline {
+	display: flex;
+	gap: 8px;
+}
+
+.brewlab-recipes-repeater-modal-field__inline > input,
+.brewlab-recipes-repeater-modal-field__inline > select {
+	flex: 1;
+}
+
+/* Segmented toggle (e.g. °F / °C) — a 'select' field rendered with
+   widget: 'toggle' instead of a <select>. */
+.brewlab-recipes-toggle {
+	display: inline-flex;
+	flex: 0 0 auto;
+	overflow: hidden;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
+}
+
+.brewlab-recipes-toggle__option {
+	padding: 8px 14px;
+	background: #fff;
+	border: none;
+	border-left: 1px solid #dcdcde;
+	font-family: inherit;
+	font-size: 14px;
+	color: #23282d;
+	cursor: pointer;
+	transition: background 0.12s, color 0.12s;
+}
+
+.brewlab-recipes-toggle__option:first-child {
+	border-left: none;
+}
+
+.brewlab-recipes-toggle__option.is-active {
+	background: #2271b1;
+	color: #fff;
 }
 
 .brewlab-recipes-repeater-modal-field input[type="text"],
