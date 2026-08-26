@@ -38,3 +38,4 @@ require_once BREWLAB_RECIPES_PATH . 'includes/post-types.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/icons.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/repeater-schemas.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/simple-fields.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/admin/metaboxes.php';
