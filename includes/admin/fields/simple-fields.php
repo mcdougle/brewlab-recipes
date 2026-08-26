@@ -66,7 +66,7 @@ function brewlab_recipes_simple_fields() {
 				],
 				'author_display'  => [
 					'type'    => 'select',
-					'label'   => __( 'Show Author As', 'brewlab-recipes' ),
+					'label'   => __( 'Author', 'brewlab-recipes' ),
 					'options' => [
 						'none'        => __( 'Hidden', 'brewlab-recipes' ),
 						'post_author' => __( 'Post Author', 'brewlab-recipes' ),

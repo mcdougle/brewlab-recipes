@@ -73,3 +73,28 @@
 		apply();
 	} );
 } )();
+
+//------------------------------------------------------------------------------
+// Generic depends_on controller — any row simple-fields.php rendered with a
+// 'depends_on' schema key (currently "Other Type Name" depending on Brew
+// Type = "Other", and "Custom Author Name" depending on Show Author As =
+// "Custom Name"). PHP already computes each row's correct display on load
+// (see brewlab_recipes_render_conditional_row_attrs()); this only has to
+// react when the controlling field changes afterward.
+( function () {
+	'use strict';
+
+	document.addEventListener( 'DOMContentLoaded', function () {
+		document.querySelectorAll( '.brewlab-recipes-conditional' ).forEach( function ( row ) {
+			var controller = document.getElementById( row.getAttribute( 'data-depends-on' ) );
+			var expected   = row.getAttribute( 'data-depends-value' );
+			if ( ! controller ) {
+				return;
+			}
+
+			controller.addEventListener( 'change', function () {
+				row.style.display = ( controller.value === expected ) ? '' : 'none';
+			} );
+		} );
+	} );
+} )();
