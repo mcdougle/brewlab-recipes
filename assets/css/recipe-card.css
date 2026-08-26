@@ -303,6 +303,11 @@
 	border-radius: 50%;
 	border: 1px solid rgba(0, 0, 0, .12);
 	flex-shrink: 0;
+	/* A numeral's ink sits slightly below the true center of its line-height:1
+	   box (cap-height, not full ascender/descender), so flex-centering it
+	   against a true circle leaves the circle looking a hair high. */
+	position: relative;
+	top: 1px;
 }
 
 /* ── Tabs ─────────────────────────────────────────────────── */
