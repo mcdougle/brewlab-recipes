@@ -102,49 +102,68 @@ function brewlab_recipes_render_metabox( $post, $metabox ) {
 //------------------------------------------------------------------------------
 //   brewlab_recipes_enqueue_admin_assets()
 //------------------------------------------------------------------------------
-// Scoped to the recipe edit screen so none of this loads on other post
-// types' add/edit screens.
+// Scoped to the recipe screens so none of this loads on other post types'
+// add/edit/list screens. admin.css is the one stylesheet the list table
+// (edit.php) also needs, for its two custom columns — everything else here
+// (repeater UI, media/color pickers) is single-edit-screen only.
 function brewlab_recipes_enqueue_admin_assets( $hook ) {
-	if ( ! in_array( $hook, [ 'post.php', 'post-new.php' ], true ) ) {
+	if ( ! in_array( $hook, [ 'post.php', 'post-new.php', 'edit.php' ], true ) ) {
 		return;
 	}
 	if ( 'brewlab_recipe' !== get_current_screen()->post_type ) {
 		return;
 	}
 
-	wp_enqueue_style(
-		'brewlab-recipes-admin-repeater',
-		BREWLAB_RECIPES_URL . 'assets/css/admin-repeater.css',
-		[],
-		BREWLAB_RECIPES_VERSION
-	);
-	wp_enqueue_script(
-		'brewlab-recipes-admin-repeater',
-		BREWLAB_RECIPES_URL . 'assets/js/admin-repeater.js',
-		[],
-		BREWLAB_RECIPES_VERSION,
-		true
-	);
+	$admin_css_deps = [];
 
-	wp_enqueue_media();
-	wp_enqueue_style( 'wp-color-picker' );
+	if ( 'edit.php' !== $hook ) {
+		wp_enqueue_style(
+			'brewlab-recipes-admin-repeater',
+			BREWLAB_RECIPES_URL . 'assets/css/admin-repeater.css',
+			[],
+			BREWLAB_RECIPES_VERSION
+		);
+		wp_enqueue_script(
+			'brewlab-recipes-admin-repeater',
+			BREWLAB_RECIPES_URL . 'assets/js/admin-repeater.js',
+			[],
+			BREWLAB_RECIPES_VERSION,
+			true
+		);
+
+		wp_enqueue_media();
+		wp_enqueue_style( 'wp-color-picker' );
+		wp_enqueue_style(
+			'brewlab-recipes-admin-media',
+			BREWLAB_RECIPES_URL . 'assets/css/admin-media.css',
+			[],
+			BREWLAB_RECIPES_VERSION
+		);
+		wp_enqueue_script(
+			'brewlab-recipes-admin-media-color',
+			BREWLAB_RECIPES_URL . 'assets/js/admin-media-color.js',
+			[ 'jquery', 'wp-color-picker', 'media-editor' ],
+			BREWLAB_RECIPES_VERSION,
+			true
+		);
+		wp_localize_script( 'brewlab-recipes-admin-media-color', 'brewlabRecipesMedia', [
+			'selectTitle'  => __( 'Select Recipe Image', 'brewlab-recipes' ),
+			'selectButton' => __( 'Use This Image', 'brewlab-recipes' ),
+		] );
+
+		$admin_css_deps = [ 'brewlab-recipes-admin-repeater', 'brewlab-recipes-admin-media' ];
+	}
+
+	// Declared as depending on the two feature stylesheets above (when
+	// they're enqueued) so it reliably loads — and therefore wins on any
+	// equal-specificity selector both define — after them, rather than
+	// trusting enqueue call order alone.
 	wp_enqueue_style(
-		'brewlab-recipes-admin-media',
-		BREWLAB_RECIPES_URL . 'assets/css/admin-media.css',
-		[],
+		'brewlab-recipes-admin',
+		BREWLAB_RECIPES_URL . 'assets/css/admin.css',
+		$admin_css_deps,
 		BREWLAB_RECIPES_VERSION
 	);
-	wp_enqueue_script(
-		'brewlab-recipes-admin-media-color',
-		BREWLAB_RECIPES_URL . 'assets/js/admin-media-color.js',
-		[ 'jquery', 'wp-color-picker', 'media-editor' ],
-		BREWLAB_RECIPES_VERSION,
-		true
-	);
-	wp_localize_script( 'brewlab-recipes-admin-media-color', 'brewlabRecipesMedia', [
-		'selectTitle'  => __( 'Select Recipe Image', 'brewlab-recipes' ),
-		'selectButton' => __( 'Use This Image', 'brewlab-recipes' ),
-	] );
 }
 add_action( 'admin_enqueue_scripts', 'brewlab_recipes_enqueue_admin_assets' );
 

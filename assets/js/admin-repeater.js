@@ -42,6 +42,7 @@
 
 		modalSaveButton.addEventListener( 'click', onModalSave );
 		modal.querySelector( '.brewlab-recipes-repeater-modal__cancel' ).addEventListener( 'click', closeModal );
+		modal.querySelector( '.brewlab-recipes-repeater-modal__close' ).addEventListener( 'click', closeModal );
 		modal.querySelector( '.brewlab-recipes-repeater-modal__backdrop' ).addEventListener( 'click', closeModal );
 	}
 

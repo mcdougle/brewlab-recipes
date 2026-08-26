@@ -1,0 +1,119 @@
+/**
+ * Admin Polish
+ *
+ * General visual pass over the recipe edit screen — the repeater list items,
+ * the modal chrome, and the Recipes list table's two custom columns. Keeps
+ * WP admin's own color/spacing conventions rather than introducing a new
+ * palette; the front-end card (assets/css/recipe-card.css) is where the
+ * actual BrewLab visual identity lives, not here.
+ */
+
+/* Repeater list items */
+.brewlab-recipes-repeater__item {
+	padding: 0.6em 0.75em;
+	border-bottom: none;
+	border-radius: 3px;
+	transition: background-color 0.1s ease-in-out;
+}
+
+.brewlab-recipes-repeater__item:hover {
+	background: #f6f7f7;
+}
+
+.brewlab-recipes-repeater__list {
+	border-top: 1px solid #eee;
+}
+
+.brewlab-recipes-repeater__item + .brewlab-recipes-repeater__item {
+	border-top: 1px solid #eee;
+}
+
+.brewlab-recipes-repeater__item-summary {
+	font-size: 14px;
+}
+
+.brewlab-recipes-repeater__item-edit,
+.brewlab-recipes-repeater__item-remove {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25em;
+	text-decoration: none;
+}
+
+.brewlab-recipes-repeater__item-edit::before,
+.brewlab-recipes-repeater__item-remove::before {
+	font-family: dashicons;
+	font-size: 16px;
+	line-height: 1;
+}
+
+.brewlab-recipes-repeater__item-edit::before {
+	content: "\f464";
+}
+
+.brewlab-recipes-repeater__item-remove::before {
+	content: "\f182";
+}
+
+/* Modal chrome */
+.brewlab-recipes-repeater-modal__dialog {
+	padding: 0;
+	animation: brewlab-recipes-modal-in 0.12s ease-out;
+}
+
+@keyframes brewlab-recipes-modal-in {
+	from {
+		opacity: 0;
+		transform: translateY(-8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.brewlab-recipes-repeater-modal__title {
+	margin: 0;
+	padding: 1em 2.5em 1em 1.5em;
+	border-bottom: 1px solid #eee;
+	font-size: 16px;
+}
+
+.brewlab-recipes-repeater-modal__body {
+	padding: 1.25em 1.5em 0;
+}
+
+.brewlab-recipes-repeater-modal__actions {
+	padding: 1em 1.5em 1.5em;
+}
+
+.brewlab-recipes-repeater-modal__close {
+	position: absolute;
+	top: 0.75em;
+	right: 0.75em;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	background: none;
+	border: none;
+	border-radius: 3px;
+	color: #787c82;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.brewlab-recipes-repeater-modal__close:hover {
+	background: #f0f0f1;
+	color: #1d2327;
+}
+
+/* Recipes list table columns */
+.column-used_in a {
+	text-decoration: none;
+}
+
+.column-used_in,
+.column-stats {
+	color: #50575e;
+}

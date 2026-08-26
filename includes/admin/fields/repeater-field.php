@@ -192,6 +192,7 @@ function brewlab_recipes_render_repeater_modal() {
 	<div class="brewlab-recipes-repeater-modal" style="display:none;">
 		<div class="brewlab-recipes-repeater-modal__backdrop"></div>
 		<div class="brewlab-recipes-repeater-modal__dialog" role="dialog" aria-modal="true">
+			<button type="button" class="brewlab-recipes-repeater-modal__close" aria-label="<?php esc_attr_e( 'Close', 'brewlab-recipes' ); ?>">&times;</button>
 			<h2 class="brewlab-recipes-repeater-modal__title"></h2>
 			<div class="brewlab-recipes-repeater-modal__body"></div>
 			<p class="brewlab-recipes-repeater-modal__actions">
