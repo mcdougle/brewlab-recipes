@@ -31,6 +31,11 @@ $brew_type_label = 'other' === $brew_type && ! empty( $recipe['brew_type_other']
 	? $recipe['brew_type_other']
 	: brewlab_recipes_field_option_label( 'recipe_details', 'brew_type', $brew_type );
 
+// Style badge is redundant noise when it's empty or just repeats the type
+// badge (e.g. style "Mead" on a type-"Mead" recipe) — collapse to one badge
+// rather than showing "MEAD" / "Mead" side by side.
+$show_style_badge = ! empty( $recipe['style'] ) && 0 !== strcasecmp( $recipe['style'], $brew_type_label );
+
 $image_id  = (int) ( $recipe['image_id'] ?? 0 );
 $image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
 
@@ -107,7 +112,7 @@ $metric_weight_unit = function ( $unit ) {
 				<?php if ( $brew_type_label ) : ?>
 					<span class="brewlab-recipes-tag"><?php echo esc_html( $brew_type_label ); ?></span>
 				<?php endif; ?>
-				<?php if ( ! empty( $recipe['style'] ) ) : ?>
+				<?php if ( $show_style_badge ) : ?>
 					<span class="brewlab-recipes-tag brewlab-recipes-tag--muted"><?php echo esc_html( $recipe['style'] ); ?></span>
 				<?php endif; ?>
 			</div>
@@ -118,43 +123,47 @@ $metric_weight_unit = function ( $unit ) {
 				<p class="brewlab-recipes-card__summary"><?php echo esc_html( $recipe['summary'] ); ?></p>
 			<?php endif; ?>
 
-			<div class="brewlab-recipes-card__footer-row">
-				<div class="brewlab-recipes-footer-left">
-					<?php if ( $author_name ) : ?>
-						<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf( __( 'by %s', 'brewlab-recipes' ), $author_name ) ); ?></p>
-					<?php endif; ?>
-					<?php if ( $batch_size > 0 ) : ?>
-						<div class="brewlab-recipes-batch-scaler">
-							<label class="brewlab-recipes-batch-scaler__label" for="<?php echo esc_attr( $uid ); ?>-batch"><?php esc_html_e( 'Batch', 'brewlab-recipes' ); ?></label>
-							<div class="brewlab-recipes-batch-scaler__control">
-								<input type="number" id="<?php echo esc_attr( $uid ); ?>-batch"
-									class="brewlab-recipes-batch-input"
-									value="<?php echo esc_attr( $batch_size ); ?>"
-									min="0.1" step="0.5"
-									data-base="<?php echo esc_attr( $batch_size ); ?>"
-									data-base-unit="<?php echo esc_attr( $batch_unit ); ?>" />
-								<span class="brewlab-recipes-batch-scaler__unit brewlab-recipes-unit-label"
-									data-author="<?php echo esc_attr( $batch_unit ); ?>"
-									data-us="<?php echo esc_attr( 'litres' === $batch_unit ? 'gallons' : $batch_unit ); ?>"
-									data-metric="<?php echo esc_attr( 'gallons' === $batch_unit ? 'litres' : $batch_unit ); ?>"
-								><?php echo esc_html( $batch_unit ); ?></span>
-							</div>
-						</div>
-					<?php endif; ?>
-				</div>
-				<div class="brewlab-recipes-footer-right">
-					<div class="brewlab-recipes-unit-toggle">
-						<span class="brewlab-recipes-unit-toggle__label"><?php esc_html_e( 'Units', 'brewlab-recipes' ); ?></span>
-						<button class="brewlab-recipes-unit-btn" data-system="author"><?php esc_html_e( 'Default', 'brewlab-recipes' ); ?></button>
-						<button class="brewlab-recipes-unit-btn" data-system="us"><?php esc_html_e( 'US', 'brewlab-recipes' ); ?></button>
-						<button class="brewlab-recipes-unit-btn" data-system="metric"><?php esc_html_e( 'Metric', 'brewlab-recipes' ); ?></button>
+			<?php if ( $author_name ) : ?>
+				<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf( __( 'by %s', 'brewlab-recipes' ), $author_name ) ); ?></p>
+			<?php endif; ?>
+		</div>
+	</div>
+
+	<?php // ── Toolbar — functional controls live on a neutral strip, not the
+	// per-recipe-colored header, so they stay readable regardless of what
+	// color a recipe's author picked. ?>
+	<div class="brewlab-recipes-toolbar">
+		<div class="brewlab-recipes-toolbar__left">
+			<?php if ( $batch_size > 0 ) : ?>
+				<div class="brewlab-recipes-batch-scaler">
+					<label class="brewlab-recipes-batch-scaler__label" for="<?php echo esc_attr( $uid ); ?>-batch"><?php esc_html_e( 'Batch', 'brewlab-recipes' ); ?></label>
+					<div class="brewlab-recipes-batch-scaler__control">
+						<input type="number" id="<?php echo esc_attr( $uid ); ?>-batch"
+							class="brewlab-recipes-batch-input"
+							value="<?php echo esc_attr( $batch_size ); ?>"
+							min="0.1" step="0.5"
+							data-base="<?php echo esc_attr( $batch_size ); ?>"
+							data-base-unit="<?php echo esc_attr( $batch_unit ); ?>" />
+						<span class="brewlab-recipes-batch-scaler__unit brewlab-recipes-unit-label"
+							data-author="<?php echo esc_attr( $batch_unit ); ?>"
+							data-us="<?php echo esc_attr( 'litres' === $batch_unit ? 'gallons' : $batch_unit ); ?>"
+							data-metric="<?php echo esc_attr( 'gallons' === $batch_unit ? 'litres' : $batch_unit ); ?>"
+						><?php echo esc_html( $batch_unit ); ?></span>
 					</div>
-					<button class="brewlab-recipes-print-btn" onclick="window.print()">
-						<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-						<?php esc_html_e( 'Print', 'brewlab-recipes' ); ?>
-					</button>
 				</div>
+			<?php endif; ?>
+		</div>
+		<div class="brewlab-recipes-toolbar__right">
+			<div class="brewlab-recipes-unit-toggle">
+				<span class="brewlab-recipes-unit-toggle__label"><?php esc_html_e( 'Units', 'brewlab-recipes' ); ?></span>
+				<button class="brewlab-recipes-unit-btn" data-system="author"><?php esc_html_e( 'Original', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-unit-btn" data-system="us"><?php esc_html_e( 'US', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-unit-btn" data-system="metric"><?php esc_html_e( 'Metric', 'brewlab-recipes' ); ?></button>
 			</div>
+			<button class="brewlab-recipes-print-btn" onclick="window.print()">
+				<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+				<?php esc_html_e( 'Print', 'brewlab-recipes' ); ?>
+			</button>
 		</div>
 	</div>
 
