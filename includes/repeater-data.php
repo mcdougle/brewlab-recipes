@@ -3,11 +3,13 @@
 //   Repeater Data
 //------------------------------------------------------------------------------
 // Reads a repeater section's stored meta (JSON-encoded arrays, written by
-// includes/admin/save.php) back into a plain PHP array. Lives outside
-// includes/admin/ because it's not an admin-only concern — the front-end
-// render path (includes/render.php, Phase 4) decodes the same six meta keys
-// to build a recipe card, so both admin and front-end read through here
-// instead of each re-implementing the same json_decode() call.
+// includes/admin/save.php) back into a plain PHP array, and the shared
+// value-formatting rule (a 'select' field's raw stored value becomes its
+// option label) any repeater row display needs. Lives outside includes/admin/
+// because neither is admin-only — the front-end render path
+// (includes/render.php) and the admin repeater UI both need the same reads
+// and the same formatting rule, so both go through here instead of each
+// keeping their own copy.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -24,4 +26,17 @@ function brewlab_recipes_get_repeater_rows( $post_id, $section ) {
 
 	$rows = json_decode( $raw, true );
 	return is_array( $rows ) ? $rows : [];
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_repeater_cell_value()
+//------------------------------------------------------------------------------
+// 'select' fields display their option label, everything else (text/number/
+// url) displays as stored.
+function brewlab_recipes_repeater_cell_value( $section_key, $field_key, $value ) {
+	$field = brewlab_recipes_repeater_schemas()[ $section_key ]['fields'][ $field_key ] ?? [];
+	if ( 'select' === ( $field['type'] ?? '' ) ) {
+		return $field['options'][ $value ] ?? $value;
+	}
+	return $value;
 }

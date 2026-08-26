@@ -90,20 +90,6 @@ function brewlab_recipes_field_option_label( $section_key, $field_key, $value ) 
 }
 
 //------------------------------------------------------------------------------
-//   brewlab_recipes_repeater_cell_value()
-//------------------------------------------------------------------------------
-// Same reasoning as brewlab_recipes_field_option_label() but for a repeater
-// row's cell — 'select' columns display their option label, everything else
-// (text/number/url) displays as stored.
-function brewlab_recipes_repeater_cell_value( $section_key, $field_key, $value ) {
-	$field = brewlab_recipes_repeater_schemas()[ $section_key ]['fields'][ $field_key ] ?? [];
-	if ( 'select' === ( $field['type'] ?? '' ) ) {
-		return $field['options'][ $value ] ?? $value;
-	}
-	return $value;
-}
-
-//------------------------------------------------------------------------------
 //   brewlab_recipes_render_repeater_table()
 //------------------------------------------------------------------------------
 // One shared table renderer for all six repeater sections, reading columns
