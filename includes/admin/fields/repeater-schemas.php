@@ -21,8 +21,9 @@ function brewlab_recipes_repeater_schemas() {
 	return [
 
 		'fermentables' => [
-			'label'  => __( 'Fermentables', 'brewlab-recipes' ),
-			'fields' => [
+			'label'      => __( 'Fermentables', 'brewlab-recipes' ),
+			'item_label' => __( 'Fermentable', 'brewlab-recipes' ),
+			'fields'     => [
 				'name'   => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
@@ -58,8 +59,9 @@ function brewlab_recipes_repeater_schemas() {
 		],
 
 		'additions' => [
-			'label'  => __( 'Other Additions', 'brewlab-recipes' ),
-			'fields' => [
+			'label'      => __( 'Other Additions', 'brewlab-recipes' ),
+			'item_label' => __( 'Addition', 'brewlab-recipes' ),
+			'fields'     => [
 				'name'   => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
@@ -92,8 +94,9 @@ function brewlab_recipes_repeater_schemas() {
 		],
 
 		'hops' => [
-			'label'  => __( 'Hops', 'brewlab-recipes' ),
-			'fields' => [
+			'label'      => __( 'Hops', 'brewlab-recipes' ),
+			'item_label' => __( 'Hop', 'brewlab-recipes' ),
+			'fields'     => [
 				'variety' => [
 					'type'     => 'text',
 					'label'    => __( 'Variety', 'brewlab-recipes' ),
@@ -144,8 +147,9 @@ function brewlab_recipes_repeater_schemas() {
 		],
 
 		'yeast' => [
-			'label'  => __( 'Yeast', 'brewlab-recipes' ),
-			'fields' => [
+			'label'      => __( 'Yeast', 'brewlab-recipes' ),
+			'item_label' => __( 'Yeast', 'brewlab-recipes' ),
+			'fields'     => [
 				'name'   => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
@@ -175,8 +179,9 @@ function brewlab_recipes_repeater_schemas() {
 		],
 
 		'mash_steps' => [
-			'label'  => __( 'Mash Steps', 'brewlab-recipes' ),
-			'fields' => [
+			'label'      => __( 'Mash Steps', 'brewlab-recipes' ),
+			'item_label' => __( 'Mash Step', 'brewlab-recipes' ),
+			'fields'     => [
 				'name' => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),
@@ -203,8 +208,9 @@ function brewlab_recipes_repeater_schemas() {
 		],
 
 		'fermentation_steps' => [
-			'label'  => __( 'Fermentation Steps', 'brewlab-recipes' ),
-			'fields' => [
+			'label'      => __( 'Fermentation Steps', 'brewlab-recipes' ),
+			'item_label' => __( 'Fermentation Step', 'brewlab-recipes' ),
+			'fields'     => [
 				'name'      => [
 					'type'     => 'text',
 					'label'    => __( 'Name', 'brewlab-recipes' ),

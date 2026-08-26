@@ -54,7 +54,7 @@
 		modalBody.innerHTML = '';
 		modalBody.appendChild( template.content.cloneNode( true ) );
 
-		var label = container.getAttribute( 'data-label' );
+		var label = container.getAttribute( 'data-item-label' );
 		modalTitle.textContent = ( item ? 'Edit ' : 'Add ' ) + label;
 
 		if ( item ) {

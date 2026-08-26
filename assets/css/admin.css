@@ -2,17 +2,43 @@
  * Admin Polish
  *
  * General visual pass over the recipe edit screen — the repeater list items,
- * the modal chrome, and the Recipes list table's two custom columns. Keeps
- * WP admin's own color/spacing conventions rather than introducing a new
- * palette; the front-end card (assets/css/recipe-card.css) is where the
- * actual BrewLab visual identity lives, not here.
+ * the modal chrome, and the Recipes list table's two custom columns. Values
+ * (font, metabox header treatment, per-row hover-reveal actions) match the
+ * old plugin's admin.css deliberately, since the old plugin's admin UI
+ * already looked considered and there was no reason to reinvent it. The
+ * front-end card (assets/css/recipe-card.css) is where the actual BrewLab
+ * visual identity lives, not here.
  */
 
+/* Font — Source Sans 3, enqueued from Google Fonts in metaboxes.php */
+#poststuff,
+.brewlab-recipes-repeater-modal {
+	font-family: 'Source Sans 3', 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Metabox headers — every box this plugin registers has an id starting
+   brewlab_recipes_, so one attribute selector covers all nine instead of
+   repeating a rule per box id the way the old plugin did. */
+[id^="brewlab_recipes_"] > .postbox-header,
+[id^="brewlab_recipes_"] > .postbox-header h2,
+[id^="brewlab_recipes_"] > .postbox-header .hndle {
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #555d66;
+}
+
 /* Repeater list items */
+.brewlab-recipes-repeater__list {
+	border-top: 1px solid #f0f0f1;
+	margin-bottom: 0.75em;
+}
+
 .brewlab-recipes-repeater__item {
-	padding: 0.6em 0.75em;
-	border-bottom: none;
-	border-radius: 3px;
+	padding: 7px 4px;
+	border-bottom: 1px solid #f0f0f1;
+	border-radius: 0;
 	transition: background-color 0.1s ease-in-out;
 }
 
@@ -20,16 +46,9 @@
 	background: #f6f7f7;
 }
 
-.brewlab-recipes-repeater__list {
-	border-top: 1px solid #eee;
-}
-
-.brewlab-recipes-repeater__item + .brewlab-recipes-repeater__item {
-	border-top: 1px solid #eee;
-}
-
 .brewlab-recipes-repeater__item-summary {
-	font-size: 14px;
+	font-size: 13px;
+	color: #23282d;
 }
 
 .brewlab-recipes-repeater__item-edit,
@@ -37,7 +56,23 @@
 	display: inline-flex;
 	align-items: center;
 	gap: 0.25em;
+	color: #c0c5ca;
 	text-decoration: none;
+	opacity: 0;
+	transition: opacity 0.1s, color 0.1s;
+}
+
+.brewlab-recipes-repeater__item:hover .brewlab-recipes-repeater__item-edit,
+.brewlab-recipes-repeater__item:hover .brewlab-recipes-repeater__item-remove {
+	opacity: 1;
+}
+
+.brewlab-recipes-repeater__item-edit:hover {
+	color: #2271b1;
+}
+
+.brewlab-recipes-repeater__item-remove:hover {
+	color: #cc1818;
 }
 
 .brewlab-recipes-repeater__item-edit::before,
@@ -53,6 +88,10 @@
 
 .brewlab-recipes-repeater__item-remove::before {
 	content: "\f182";
+}
+
+.brewlab-recipes-repeater__add {
+	font-size: 13px;
 }
 
 /* Modal chrome */
@@ -74,23 +113,52 @@
 
 .brewlab-recipes-repeater-modal__title {
 	margin: 0;
-	padding: 1em 2.5em 1em 1.5em;
-	border-bottom: 1px solid #eee;
-	font-size: 16px;
+	padding: 14px 2.5em 13px 18px;
+	background: #f6f7f7;
+	border-bottom: 1px solid #dcdcde;
+	font-size: 14px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: #23282d;
 }
 
 .brewlab-recipes-repeater-modal__body {
-	padding: 1.25em 1.5em 0;
+	padding: 18px 18px 4px;
+}
+
+.brewlab-recipes-repeater-modal__body th label {
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #646970;
+}
+
+.brewlab-recipes-repeater-modal__body input[type="text"],
+.brewlab-recipes-repeater-modal__body input[type="number"],
+.brewlab-recipes-repeater-modal__body input[type="url"],
+.brewlab-recipes-repeater-modal__body select {
+	border-color: #dcdcde;
+	border-radius: 3px;
+}
+
+.brewlab-recipes-repeater-modal__body input:focus,
+.brewlab-recipes-repeater-modal__body select:focus {
+	border-color: #2271b1;
+	box-shadow: 0 0 0 1px #2271b1;
+	outline: none;
 }
 
 .brewlab-recipes-repeater-modal__actions {
-	padding: 1em 1.5em 1.5em;
+	padding: 12px 18px 16px;
+	border-top: 1px solid #f0f0f1;
 }
 
 .brewlab-recipes-repeater-modal__close {
 	position: absolute;
-	top: 0.75em;
-	right: 0.75em;
+	top: 0.6em;
+	right: 0.6em;
 	width: 32px;
 	height: 32px;
 	padding: 0;
@@ -104,8 +172,8 @@
 }
 
 .brewlab-recipes-repeater-modal__close:hover {
-	background: #f0f0f1;
-	color: #1d2327;
+	background: #e0e0e0;
+	color: #23282d;
 }
 
 /* Recipes list table columns */

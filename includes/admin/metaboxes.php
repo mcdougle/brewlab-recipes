@@ -154,10 +154,20 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 		$admin_css_deps = [ 'brewlab-recipes-admin-repeater', 'brewlab-recipes-admin-media' ];
 	}
 
-	// Declared as depending on the two feature stylesheets above (when
-	// they're enqueued) so it reliably loads — and therefore wins on any
-	// equal-specificity selector both define — after them, rather than
-	// trusting enqueue call order alone.
+	// Source Sans 3 — matches the old plugin's admin UI (and WP Recipe
+	// Maker's, which it was matching in turn).
+	wp_enqueue_style(
+		'brewlab-recipes-source-sans',
+		'https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap',
+		[],
+		null
+	);
+	$admin_css_deps[] = 'brewlab-recipes-source-sans';
+
+	// Declared as depending on the font and the two feature stylesheets
+	// above (when they're enqueued) so it reliably loads — and therefore
+	// wins on any equal-specificity selector the feature stylesheets also
+	// define — after them, rather than trusting enqueue call order alone.
 	wp_enqueue_style(
 		'brewlab-recipes-admin',
 		BREWLAB_RECIPES_URL . 'assets/css/admin.css',

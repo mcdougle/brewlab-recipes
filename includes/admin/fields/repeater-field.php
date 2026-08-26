@@ -32,10 +32,12 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 	$fields = $schemas[ $section ]['fields'];
 	$rows   = brewlab_recipes_get_repeater_rows( $post_id, $section );
 
+	$item_label = $schemas[ $section ]['item_label'];
+
 	printf(
-		'<div class="brewlab-recipes-repeater" data-section="%s" data-label="%s" data-next-index="%d">',
+		'<div class="brewlab-recipes-repeater" data-section="%s" data-item-label="%s" data-next-index="%d">',
 		esc_attr( $section ),
-		esc_attr( $schemas[ $section ]['label'] ),
+		esc_attr( $item_label ),
 		count( $rows )
 	);
 
@@ -59,8 +61,9 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 	echo '</template>';
 
 	printf(
-		'<p><button type="button" class="button brewlab-recipes-repeater__add">%s</button></p>',
-		esc_html__( 'Add Row', 'brewlab-recipes' )
+		/* translators: %s: singular item name, e.g. "Fermentable" */
+		'<p><button type="button" class="button brewlab-recipes-repeater__add">+ %s</button></p>',
+		esc_html( sprintf( __( 'Add %s', 'brewlab-recipes' ), $item_label ) )
 	);
 
 	echo '</div>';
