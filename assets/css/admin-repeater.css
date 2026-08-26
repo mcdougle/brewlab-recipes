@@ -1,0 +1,19 @@
+/**
+ * Admin Repeater Rows
+ *
+ * Layout for the repeater metabox tables (fermentables, hops, etc.) on the
+ * recipe edit screen.
+ */
+.brewlab-recipes-repeater__table select,
+.brewlab-recipes-repeater__table input[type="text"],
+.brewlab-recipes-repeater__table input[type="url"] {
+	width: 100%;
+}
+
+.brewlab-recipes-repeater__table input[type="number"] {
+	width: 6em;
+}
+
+.brewlab-recipes-repeater__table td {
+	vertical-align: middle;
+}

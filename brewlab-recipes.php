@@ -37,6 +37,8 @@ define( 'BREWLAB_RECIPES_URL', plugin_dir_url( __FILE__ ) );
 require_once BREWLAB_RECIPES_PATH . 'includes/post-types.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/icons.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/repeater-schemas.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/repeater-data.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/repeater-field.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/simple-fields.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/metaboxes.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/save.php';
