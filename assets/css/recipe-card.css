@@ -4,6 +4,14 @@
  * Front-end styling for one embedded recipe (templates/recipe-card.php).
  * --brewlab-recipes-header-color is set inline per-recipe from the Media
  * metabox's color field, so the header can't be themed from here.
+ *
+ * Every selector below is scoped under .brewlab-recipes-card (two classes,
+ * specificity 0,2,0) rather than a bare single class — found the hard way
+ * on the Newspaper/tagDiv theme, which injects a per-block inline <style>
+ * targeting plain descendant selectors like ".tdi_82 p" (0,1,1). That beats
+ * a single-class rule regardless of load order, silently recoloring card
+ * text to match the surrounding page. Two classes beats it without relying
+ * on !important.
  */
 .brewlab-recipes-card {
 	border: 1px solid #ddd;
@@ -13,7 +21,7 @@
 	font-family: inherit;
 }
 
-.brewlab-recipes-card__header {
+.brewlab-recipes-card .brewlab-recipes-card__header {
 	display: flex;
 	gap: 1.5em;
 	padding: 1.5em;
@@ -21,11 +29,11 @@
 	color: #fff;
 }
 
-.brewlab-recipes-card__image {
+.brewlab-recipes-card .brewlab-recipes-card__image {
 	flex: 0 0 auto;
 }
 
-.brewlab-recipes-card__image img {
+.brewlab-recipes-card .brewlab-recipes-card__image img {
 	display: block;
 	width: 120px;
 	height: 120px;
@@ -33,45 +41,49 @@
 	border-radius: 4px;
 }
 
-.brewlab-recipes-card__header-content {
+.brewlab-recipes-card .brewlab-recipes-card__header-content {
 	flex: 1 1 auto;
 	min-width: 0;
 }
 
-.brewlab-recipes-card__badges {
+.brewlab-recipes-card .brewlab-recipes-card__badges {
 	display: flex;
 	gap: 0.5em;
 	margin-bottom: 0.5em;
 }
 
-.brewlab-recipes-card__badge {
+.brewlab-recipes-card .brewlab-recipes-card__badge {
 	display: inline-block;
 	padding: 0.15em 0.75em;
 	border: 1px solid rgba(255, 255, 255, 0.6);
 	border-radius: 999px;
+	color: #fff;
 	font-size: 0.75em;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
 }
 
-.brewlab-recipes-card__title {
+.brewlab-recipes-card .brewlab-recipes-card__title {
 	margin: 0 0 0.35em;
+	color: #fff;
 	font-size: 1.4em;
 	line-height: 1.2;
 }
 
-.brewlab-recipes-card__summary {
+.brewlab-recipes-card .brewlab-recipes-card__summary {
 	margin: 0 0 0.5em;
+	color: #fff;
 	opacity: 0.9;
 }
 
-.brewlab-recipes-card__author {
+.brewlab-recipes-card .brewlab-recipes-card__author {
 	margin: 0;
+	color: #fff;
 	font-size: 0.85em;
 	opacity: 0.75;
 }
 
-.brewlab-recipes-card__stats {
+.brewlab-recipes-card .brewlab-recipes-card__stats {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1.5em;
@@ -80,27 +92,29 @@
 	border-bottom: 1px solid #ddd;
 }
 
-.brewlab-recipes-card__stat {
+.brewlab-recipes-card .brewlab-recipes-card__stat {
 	display: flex;
 	flex-direction: column;
 	gap: 0.15em;
 }
 
-.brewlab-recipes-card__stat-label {
+.brewlab-recipes-card .brewlab-recipes-card__stat-label {
+	color: #666;
 	font-size: 0.7em;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
 	opacity: 0.6;
 }
 
-.brewlab-recipes-card__stat-value {
+.brewlab-recipes-card .brewlab-recipes-card__stat-value {
 	display: flex;
 	align-items: center;
 	gap: 0.4em;
+	color: #222;
 	font-weight: 600;
 }
 
-.brewlab-recipes-card__srm-swatch {
+.brewlab-recipes-card .brewlab-recipes-card__srm-swatch {
 	display: inline-block;
 	width: 0.9em;
 	height: 0.9em;
@@ -108,52 +122,56 @@
 	border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-.brewlab-recipes-card__section {
+.brewlab-recipes-card .brewlab-recipes-card__section {
 	padding: 1.25em 1.5em;
 	border-bottom: 1px solid #eee;
 }
 
-.brewlab-recipes-card__section:last-child {
+.brewlab-recipes-card .brewlab-recipes-card__section:last-child {
 	border-bottom: none;
 }
 
-.brewlab-recipes-card__section-title {
+.brewlab-recipes-card .brewlab-recipes-card__section-title {
 	display: flex;
 	align-items: center;
 	gap: 0.5em;
 	margin: 0 0 0.75em;
+	color: #222;
 	font-size: 1em;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 }
 
-.brewlab-recipes-card__section-icon {
+.brewlab-recipes-card .brewlab-recipes-card__section-icon {
 	width: 1.1em;
 	height: 1.1em;
 	fill: currentColor;
 }
 
-.brewlab-recipes-card__table {
+.brewlab-recipes-card .brewlab-recipes-card__table {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-.brewlab-recipes-card__table th,
-.brewlab-recipes-card__table td {
+.brewlab-recipes-card .brewlab-recipes-card__table th,
+.brewlab-recipes-card .brewlab-recipes-card__table td {
 	padding: 0.4em 0.6em;
+	color: #222;
 	text-align: left;
 	border-bottom: 1px solid #eee;
 	font-size: 0.9em;
 }
 
-.brewlab-recipes-card__table th {
+.brewlab-recipes-card .brewlab-recipes-card__table th {
+	color: #666;
 	font-size: 0.75em;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	opacity: 0.6;
 }
 
-.brewlab-recipes-card__notes {
+.brewlab-recipes-card .brewlab-recipes-card__notes {
 	margin: 0;
+	color: #222;
 	white-space: pre-line;
 }
