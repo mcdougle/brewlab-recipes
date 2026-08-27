@@ -51,3 +51,4 @@ require_once BREWLAB_RECIPES_PATH . 'includes/shortcode.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/block.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/enqueue.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/columns.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/updates.php';
