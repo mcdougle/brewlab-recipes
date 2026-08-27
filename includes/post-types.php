@@ -30,10 +30,17 @@ function brewlab_recipes_register_post_type() {
 		'show_ui'      => true,
 		'show_in_menu' => true,
 		// BrewLab's actual flask logo, not a dashicon — full color, so it
-		// won't get WP's usual monochrome hover/active dimming, but it's
-		// the real brand mark instead of an arbitrary dashicon (previously
-		// dashicons-carrot, which had no connection to the plugin at all).
-		'menu_icon'    => BREWLAB_RECIPES_URL . 'assets/svg/brewlab-logo.svg',
+		// won't get WP's usual monochrome hover/active recoloring (dimming
+		// still applies), but it's the real brand mark instead of an
+		// arbitrary dashicon (previously dashicons-carrot, which had no
+		// connection to the plugin at all).
+		//
+		// Must be a data: URI, not a plain file URL — WP only applies its
+		// menu-icon size constraint (scaled to 20x20 via CSS background-size)
+		// to 'none', a dashicons-* class, or a data:image/svg+xml URI. A
+		// regular URL renders the image at its native size instead, which
+		// on this 370x425 source blew out over most of the admin sidebar.
+		'menu_icon'    => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( BREWLAB_RECIPES_PATH . 'assets/svg/brewlab-logo.svg' ) ),
 		'supports'     => [ 'title' ],
 	] );
 }
