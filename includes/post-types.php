@@ -18,13 +18,22 @@ function brewlab_recipes_register_post_type() {
 			'name'          => __( 'Recipes', 'brewlab-recipes' ),
 			'singular_name' => __( 'Recipe', 'brewlab-recipes' ),
 			'menu_name'     => __( 'BrewLab Recipes', 'brewlab-recipes' ),
+			// Without this, WP defaults the first submenu item (the recipe
+			// list) to the same label as the top-level menu — "BrewLab
+			// Recipes" appearing twice, once as the menu and once directly
+			// under it.
+			'all_items'     => __( 'Manage Recipes', 'brewlab-recipes' ),
 			'add_new_item'  => __( 'Add New Recipe', 'brewlab-recipes' ),
 			'edit_item'     => __( 'Edit Recipe', 'brewlab-recipes' ),
 		],
 		'public'       => false,
 		'show_ui'      => true,
 		'show_in_menu' => true,
-		'menu_icon'    => 'dashicons-carrot',
+		// BrewLab's actual flask logo, not a dashicon — full color, so it
+		// won't get WP's usual monochrome hover/active dimming, but it's
+		// the real brand mark instead of an arbitrary dashicon (previously
+		// dashicons-carrot, which had no connection to the plugin at all).
+		'menu_icon'    => BREWLAB_RECIPES_URL . 'assets/svg/brewlab-logo.svg',
 		'supports'     => [ 'title' ],
 	] );
 }
