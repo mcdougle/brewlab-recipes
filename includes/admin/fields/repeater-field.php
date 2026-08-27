@@ -314,7 +314,11 @@ function brewlab_recipes_render_repeater_modal_fields( $fields ) {
 			continue;
 		}
 
-		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s</label>', esc_html( $field['label'] ) );
+		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s', esc_html( $field['label'] ) );
+		if ( ! empty( $field['hint'] ) ) {
+			printf( '<span class="brewlab-recipes-hint">%s</span>', esc_html( $field['hint'] ) );
+		}
+		echo '</label>';
 		brewlab_recipes_render_repeater_modal_input( $key, $field );
 		echo '</div>';
 	}
