@@ -140,7 +140,11 @@ $metric_weight_unit = function ( $unit ) {
 			<?php endif; ?>
 
 			<?php if ( $author_name ) : ?>
-				<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf( __( 'by %s', 'brewlab-recipes' ), $author_name ) ); ?></p>
+				<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf(
+					/* translators: %s: recipe author's display name */
+					__( 'by %s', 'brewlab-recipes' ),
+					$author_name
+				) ); ?></p>
 			<?php endif; ?>
 		</div>
 	</div>

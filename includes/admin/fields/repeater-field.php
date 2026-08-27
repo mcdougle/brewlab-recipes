@@ -71,9 +71,12 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 	echo '</template>';
 
 	printf(
-		/* translators: %s: singular item name, e.g. "Fermentable" */
 		'<p><button type="button" class="button brewlab-recipes-repeater__add">+ %s</button></p>',
-		esc_html( sprintf( __( 'Add %s', 'brewlab-recipes' ), $item_label ) )
+		esc_html( sprintf(
+			/* translators: %s: singular item name, e.g. "Fermentable" */
+			__( 'Add %s', 'brewlab-recipes' ),
+			$item_label
+		) )
 	);
 
 	echo '</div>';

@@ -1,0 +1,750 @@
+# Copyright (C) 2026 mcdougle
+# This file is distributed under the Proprietary.
+msgid ""
+msgstr ""
+"Project-Id-Version: BrewLab Recipes 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/brewlab-recipes\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-08-27T14:40:29+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: brewlab-recipes\n"
+
+#. Plugin Name of the plugin
+#: brewlab-recipes.php
+#: includes/post-types.php:20
+msgid "BrewLab Recipes"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: brewlab-recipes.php
+msgid "https://brewlab.app"
+msgstr ""
+
+#. Description of the plugin
+#: brewlab-recipes.php
+msgid "Homebrew recipe cards for beer, mead, cider, and wine — embedded in WordPress posts via shortcode or Gutenberg block."
+msgstr ""
+
+#. Author of the plugin
+#: brewlab-recipes.php
+msgid "mcdougle"
+msgstr ""
+
+#: includes/admin/columns.php:77
+msgid "Used In"
+msgstr ""
+
+#: includes/admin/columns.php:78
+msgid "Stats"
+msgstr ""
+
+#. translators: %s: singular item name, e.g. "Fermentable"
+#: includes/admin/fields/repeater-field.php:77
+#, php-format
+msgid "Add %s"
+msgstr ""
+
+#: includes/admin/fields/repeater-field.php:202
+msgid "(empty)"
+msgstr ""
+
+#: includes/admin/fields/repeater-field.php:213
+msgid "Affiliate link set"
+msgstr ""
+
+#: includes/admin/fields/repeater-field.php:458
+#: includes/admin/fields/simple-fields.php:270
+#: includes/admin/preview.php:52
+msgid "Close"
+msgstr ""
+
+#: includes/admin/fields/repeater-field.php:462
+msgid "Delete"
+msgstr ""
+
+#: includes/admin/fields/repeater-field.php:463
+msgid "Save"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:48
+#: templates/recipe-card.php:258
+msgid "Fermentables"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:49
+msgid "Fermentable"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:53
+#: includes/admin/fields/repeater-schemas.php:102
+#: includes/admin/fields/repeater-schemas.php:227
+#: includes/admin/fields/repeater-schemas.php:263
+#: includes/admin/fields/repeater-schemas.php:310
+#: includes/admin/fields/simple-fields.php:209
+msgid "Name"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:59
+#: includes/admin/fields/repeater-schemas.php:108
+#: includes/admin/fields/repeater-schemas.php:160
+#: includes/admin/fields/repeater-schemas.php:233
+msgid "Affiliate Link"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:63
+#: includes/admin/fields/repeater-schemas.php:112
+#: includes/admin/fields/repeater-schemas.php:164
+#: includes/admin/fields/repeater-schemas.php:237
+msgid "Amount"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:70
+#: includes/admin/fields/repeater-schemas.php:119
+#: includes/admin/fields/repeater-schemas.php:171
+#: includes/admin/fields/repeater-schemas.php:244
+#: includes/admin/fields/simple-fields.php:101
+msgid "Unit"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:72
+#: includes/admin/fields/repeater-schemas.php:123
+#: includes/admin/fields/repeater-schemas.php:176
+msgid "lb"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:73
+#: includes/admin/fields/repeater-schemas.php:121
+#: includes/admin/fields/repeater-schemas.php:173
+msgid "oz"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:74
+#: includes/admin/fields/repeater-schemas.php:124
+#: includes/admin/fields/repeater-schemas.php:175
+msgid "kg"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:75
+#: includes/admin/fields/repeater-schemas.php:122
+#: includes/admin/fields/repeater-schemas.php:174
+msgid "g"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:76
+#: includes/admin/fields/repeater-schemas.php:129
+msgid "L"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:77
+msgid "gal"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:82
+#: includes/admin/fields/repeater-schemas.php:269
+msgid "Type"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:84
+msgid "Grain"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:85
+msgid "Adjunct"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:86
+msgid "Malt Extract"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:87
+msgid "Sugar"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:88
+msgid "Honey"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:89
+msgid "Fruit"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:90
+#: includes/admin/fields/simple-fields.php:54
+#: templates/recipe-card.php:263
+msgid "Other"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:97
+#: templates/recipe-card.php:313
+msgid "Other Additions"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:98
+msgid "Addition"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:125
+msgid "tsp"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:126
+msgid "tbsp"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:127
+msgid "cup"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:128
+msgid "ml"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:130
+msgid "each"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:131
+msgid "drop(s)"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:136
+msgid "Added At"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:138
+#: includes/admin/fields/repeater-schemas.php:318
+msgid "Primary"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:139
+#: includes/admin/fields/repeater-schemas.php:319
+msgid "Secondary"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:140
+msgid "Bulk Aging"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:141
+msgid "Packaging"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:149
+#: templates/recipe-card.php:342
+msgid "Hops"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:150
+msgid "Hop"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:154
+msgid "Variety"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:181
+msgid "Alpha Acid %"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:186
+msgid "Form"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:188
+msgid "Pellet"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:189
+msgid "Whole"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:190
+msgid "Extract"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:195
+msgid "Use"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:197
+#: templates/recipe-card.php:479
+msgid "Boil"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:198
+msgid "Dry Hop"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:199
+msgid "Aroma"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:200
+#: templates/recipe-card.php:443
+msgid "Mash"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:201
+msgid "First Wort"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:207
+#: includes/admin/fields/repeater-schemas.php:297
+msgid "Time (min)"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:222
+#: includes/admin/fields/repeater-schemas.php:223
+#: templates/recipe-card.php:393
+msgid "Yeast"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:246
+msgid "Package"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:247
+msgid "Grams"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:248
+msgid "mL"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:249
+msgid "Billion Cells"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:250
+msgid "Ounces"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:257
+msgid "Mash Steps"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:258
+msgid "Mash Step"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:259
+#: includes/admin/fields/repeater-schemas.php:306
+msgid "Profile Name"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:271
+msgid "Temperature Rest"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:272
+msgid "Infusion"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:273
+msgid "Decoction"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:278
+#: includes/admin/fields/repeater-schemas.php:328
+msgid "Temp"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:284
+#: includes/admin/fields/repeater-schemas.php:334
+msgid "Temp Unit"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:287
+#: includes/admin/fields/repeater-schemas.php:337
+msgid "Fahrenheit (°F)"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:288
+#: includes/admin/fields/repeater-schemas.php:338
+msgid "Celsius (°C)"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:304
+msgid "Fermentation Steps"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:305
+msgid "Fermentation Step"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:316
+msgid "Stage"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:320
+msgid "Tertiary"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:321
+msgid "Cold Crash"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:322
+msgid "Carbonation"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:323
+msgid "Conditioning"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:349
+msgid "Days"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:354
+msgid "Ramp"
+msgstr ""
+
+#: includes/admin/fields/repeater-schemas.php:358
+msgid "Pressure"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:28
+#: includes/admin/metaboxes.php:27
+msgid "Media"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:32
+msgid "Recipe Image"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:36
+#: includes/admin/fields/simple-fields.php:243
+#: includes/admin/fields/simple-fields.php:271
+msgid "Recipe Color"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:43
+#: includes/admin/metaboxes.php:35
+msgid "Recipe Details"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:47
+msgid "Brew Type"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:50
+msgid "Beer"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:51
+msgid "Mead"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:52
+msgid "Wine"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:53
+msgid "Cider"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:59
+msgid "Other Type Name"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:64
+msgid "Summary"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:65
+msgid "Short description"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:69
+msgid "Author"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:71
+msgid "Hidden"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:72
+msgid "Post Author"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:73
+msgid "Custom Name"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:78
+msgid "Custom Author Name"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:83
+#: templates/recipe-card.php:231
+msgid "Notes"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:89
+#: includes/admin/metaboxes.php:43
+msgid "Batch Details"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:93
+#: includes/admin/fields/simple-fields.php:321
+msgid "Style"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:97
+#: includes/admin/fields/simple-fields.php:328
+msgid "Batch Size"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:103
+msgid "Gallons"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:104
+msgid "Litres"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:109
+#: includes/admin/fields/simple-fields.php:336
+msgid "Boil Time"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:110
+#: includes/admin/fields/simple-fields.php:336
+msgid "minutes"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:115
+msgid "Original Gravity"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:119
+msgid "Final Gravity"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:123
+#: includes/admin/fields/simple-fields.php:357
+#: templates/recipe-card.php:195
+msgid "ABV"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:128
+#: includes/admin/fields/simple-fields.php:364
+#: templates/recipe-card.php:198
+msgid "IBU"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:129
+#: includes/admin/fields/simple-fields.php:364
+msgid "Bitterness"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:134
+#: includes/admin/fields/simple-fields.php:371
+#: templates/recipe-card.php:199
+msgid "SRM"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:140
+#: includes/admin/metaboxes.php:51
+msgid "Options"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:144
+msgid "Show Hops"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:145
+msgid "Add hop details for something other than beer."
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:149
+msgid "Show Mash Profile"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:150
+msgid "Add mash profile details for something other than beer."
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:212
+msgid "Recipe name"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:235
+msgid "Change Image"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:236
+msgid "Remove Image"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:241
+msgid "Edit recipe color"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:293
+msgid "Reset to Default"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:294
+msgid "Apply"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:343
+msgid "Gravity"
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:346
+msgid "O.G."
+msgstr ""
+
+#: includes/admin/fields/simple-fields.php:350
+msgid "F.G."
+msgstr ""
+
+#: includes/admin/metaboxes.php:157
+msgid "Select Recipe Image"
+msgstr ""
+
+#: includes/admin/metaboxes.php:158
+msgid "Use This Image"
+msgstr ""
+
+#: includes/admin/metaboxes.php:200
+msgid "Loading…"
+msgstr ""
+
+#: includes/admin/metaboxes.php:201
+msgid "Preview failed. Please try again."
+msgstr ""
+
+#: includes/admin/preview.php:34
+msgid "Preview Recipe Card"
+msgstr ""
+
+#: includes/admin/preview.php:51
+msgid "Recipe card preview"
+msgstr ""
+
+#: includes/post-types.php:18
+msgid "Recipes"
+msgstr ""
+
+#: includes/post-types.php:19
+#: assets/js/block.js:54
+msgid "Recipe"
+msgstr ""
+
+#: includes/post-types.php:25
+msgid "Manage Recipes"
+msgstr ""
+
+#: includes/post-types.php:26
+msgid "Add New Recipe"
+msgstr ""
+
+#: includes/post-types.php:27
+msgid "Edit Recipe"
+msgstr ""
+
+#. translators: %s: recipe author's display name
+#: templates/recipe-card.php:145
+#, php-format
+msgid "by %s"
+msgstr ""
+
+#: templates/recipe-card.php:159
+msgid "Batch"
+msgstr ""
+
+#: templates/recipe-card.php:178
+msgid "Units"
+msgstr ""
+
+#: templates/recipe-card.php:179
+msgid "Original"
+msgstr ""
+
+#: templates/recipe-card.php:180
+msgid "US"
+msgstr ""
+
+#: templates/recipe-card.php:181
+msgid "Metric"
+msgstr ""
+
+#: templates/recipe-card.php:187
+msgid "Print"
+msgstr ""
+
+#: templates/recipe-card.php:196
+msgid "OG"
+msgstr ""
+
+#: templates/recipe-card.php:197
+msgid "FG"
+msgstr ""
+
+#: templates/recipe-card.php:222
+msgid "Ingredients"
+msgstr ""
+
+#: templates/recipe-card.php:225
+msgid "Method"
+msgstr ""
+
+#: templates/recipe-card.php:228
+#: templates/recipe-card.php:526
+msgid "Fermentation"
+msgstr ""
+
+#: templates/recipe-card.php:293
+msgid "Total:"
+msgstr ""
+
+#: templates/recipe-card.php:332
+msgid "Added at: "
+msgstr ""
+
+#: templates/recipe-card.php:377
+#: templates/recipe-card.php:559
+msgid "days"
+msgstr ""
+
+#: templates/recipe-card.php:377
+#: templates/recipe-card.php:464
+#: templates/recipe-card.php:479
+#: templates/recipe-card.php:490
+msgid "min"
+msgstr ""
+
+#: templates/recipe-card.php:558
+msgid "Pressure Ferment @"
+msgstr ""
+
+#: templates/recipe-card.php:560
+msgid "day ramp"
+msgstr ""
+
+#: assets/js/block.js:38
+msgid "Select a recipe…"
+msgstr ""
+
+#: assets/js/block.js:41
+msgid "(no title)"
+msgstr ""
+
+#: assets/js/block.js:66
+#: assets/js/block.js:76
+msgid "BrewLab Recipe"
+msgstr ""
+
+#: assets/js/block.js:70
+msgid "No recipe selected yet."
+msgstr ""
