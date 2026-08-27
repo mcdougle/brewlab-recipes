@@ -81,8 +81,24 @@ $boil_hops = array_values( array_filter( $hops, function ( $h ) {
 } ) );
 
 $has_ingredients  = ! empty( $fermentables ) || ! empty( $hops ) || ! empty( $yeasts ) || ! empty( $additions );
+// Unlike the old plugin (which always showed a Method tab, empty or not —
+// a mead/cider/wine with no mash and no boil just showed "No method steps
+// added yet." forever), this only shows Method when there's actually a
+// mash section or a boil section to show.
+$has_method       = ( $show_mash && ! empty( $mash_steps ) ) || ( $show_hops && ( $recipe['boil_time'] || ! empty( $boil_hops ) ) );
 $has_fermentation = ! empty( $ferm_steps );
 $has_notes        = ! empty( $recipe['notes'] );
+
+// Whichever of the four tabs is first available starts active, rather
+// than assuming Ingredients-else-Method — a recipe could plausibly have
+// none of those two but still have Fermentation or Notes.
+$default_tab = 'notes';
+foreach ( [ 'ingredients' => $has_ingredients, 'method' => $has_method, 'fermentation' => $has_fermentation, 'notes' => $has_notes ] as $tab => $present ) {
+	if ( $present ) {
+		$default_tab = $tab;
+		break;
+	}
+}
 
 // Weight-unit target for a given original unit + display system — large
 // units (fermentables' lb/kg) stay large, small units (hops/yeast's oz/g)
@@ -197,20 +213,22 @@ $metric_weight_unit = function ( $unit ) {
 
 		<div class="brewlab-recipes-tabs__nav" role="tablist">
 			<?php if ( $has_ingredients ) : ?>
-				<button class="brewlab-recipes-tab-btn is-active" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-ingredients" aria-selected="true"><?php esc_html_e( 'Ingredients', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-tab-btn<?php echo 'ingredients' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-ingredients" aria-selected="<?php echo 'ingredients' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Ingredients', 'brewlab-recipes' ); ?></button>
 			<?php endif; ?>
-			<button class="brewlab-recipes-tab-btn<?php echo ! $has_ingredients ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-method" aria-selected="<?php echo ! $has_ingredients ? 'true' : 'false'; ?>"><?php esc_html_e( 'Method', 'brewlab-recipes' ); ?></button>
+			<?php if ( $has_method ) : ?>
+				<button class="brewlab-recipes-tab-btn<?php echo 'method' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-method" aria-selected="<?php echo 'method' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Method', 'brewlab-recipes' ); ?></button>
+			<?php endif; ?>
 			<?php if ( $has_fermentation ) : ?>
-				<button class="brewlab-recipes-tab-btn" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-fermentation" aria-selected="false"><?php esc_html_e( 'Fermentation', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-tab-btn<?php echo 'fermentation' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-fermentation" aria-selected="<?php echo 'fermentation' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Fermentation', 'brewlab-recipes' ); ?></button>
 			<?php endif; ?>
 			<?php if ( $has_notes ) : ?>
-				<button class="brewlab-recipes-tab-btn" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-notes" aria-selected="false"><?php esc_html_e( 'Notes', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-tab-btn<?php echo 'notes' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-notes" aria-selected="<?php echo 'notes' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Notes', 'brewlab-recipes' ); ?></button>
 			<?php endif; ?>
 		</div>
 
 		<?php // ── Ingredients tab: Fermentables + Other Additions + Hops + Yeast ?>
 		<?php if ( $has_ingredients ) : ?>
-			<div class="brewlab-recipes-tab-panel is-active" id="<?php echo esc_attr( $uid ); ?>-ingredients">
+			<div class="brewlab-recipes-tab-panel<?php echo 'ingredients' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-ingredients">
 
 				<?php if ( ! empty( $fermentables ) ) :
 					$ferm_icon = 'barley';
@@ -410,7 +428,8 @@ $metric_weight_unit = function ( $unit ) {
 		<?php endif; ?>
 
 		<?php // ── Method tab: Mash + Boil ?>
-		<div class="brewlab-recipes-tab-panel<?php echo ! $has_ingredients ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-method">
+		<?php if ( $has_method ) : ?>
+		<div class="brewlab-recipes-tab-panel<?php echo 'method' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-method">
 
 			<?php if ( $show_mash && ! empty( $mash_steps ) ) : ?>
 				<div class="brewlab-recipes-group">
@@ -489,15 +508,12 @@ $metric_weight_unit = function ( $unit ) {
 				</div>
 			<?php endif; ?>
 
-			<?php if ( ( ! $show_mash || empty( $mash_steps ) ) && ( ! $show_hops || ( ! $recipe['boil_time'] && empty( $boil_hops ) ) ) ) : ?>
-				<p class="brewlab-recipes-empty-tab"><?php esc_html_e( 'No method steps added yet.', 'brewlab-recipes' ); ?></p>
-			<?php endif; ?>
-
 		</div>
+		<?php endif; ?>
 
 		<?php // ── Fermentation tab ?>
 		<?php if ( $has_fermentation ) : ?>
-			<div class="brewlab-recipes-tab-panel" id="<?php echo esc_attr( $uid ); ?>-fermentation">
+			<div class="brewlab-recipes-tab-panel<?php echo 'fermentation' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-fermentation">
 
 				<div class="brewlab-recipes-group">
 					<h3 class="brewlab-recipes-group__title brewlab-recipes-section-heading">
@@ -548,7 +564,7 @@ $metric_weight_unit = function ( $unit ) {
 
 		<?php // ── Notes tab ?>
 		<?php if ( $has_notes ) : ?>
-			<div class="brewlab-recipes-tab-panel" id="<?php echo esc_attr( $uid ); ?>-notes">
+			<div class="brewlab-recipes-tab-panel<?php echo 'notes' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-notes">
 				<div class="brewlab-recipes-notes"><?php echo nl2br( esc_html( $recipe['notes'] ) ); ?></div>
 			</div>
 		<?php endif; ?>
