@@ -6,7 +6,7 @@
  * Version:           1.0.0
  * Requires at least: 6.0
  * Requires PHP:      7.4
- * Tested up to:      6.8
+ * Tested up to:      7.1
  * Author:            mcdougle
  * Author URI:        https://brewlab.app
  * License:           Proprietary
