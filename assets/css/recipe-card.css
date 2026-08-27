@@ -588,11 +588,39 @@
 		width: 100%;
 		height: 200px;
 	}
-	.brewlab-recipes-card .brewlab-recipes-stat {
-		min-width: 70px;
-		padding: 12px 6px;
+	.brewlab-recipes-card .brewlab-recipes-toolbar {
+		padding: 10px 16px;
 	}
-	.brewlab-recipes-card .brewlab-recipes-stat__value { font-size: 15px; }
+	/* 70px + 12px padding per column doesn't leave room for all 5 stat
+	   columns (ABV/OG/FG/IBU/SRM) at phone widths — they wrapped, leaving
+	   SRM stranded alone on its own row. Shrunk to fit five across. */
+	.brewlab-recipes-card .brewlab-recipes-stat {
+		min-width: 56px;
+		padding: 10px 3px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-stat__value {
+		font-size: 14px;
+		gap: 3px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-stat__label { font-size: 9px; }
 	.brewlab-recipes-card .brewlab-recipes-tab-btn { padding: 12px 14px; }
-	.brewlab-recipes-card .brewlab-recipes-tab-panel { padding: 16px; }
+
+	/* Every group/item/etc. below already carries its own 24px horizontal
+	   padding — a flat `.tab-panel { padding: 16px }` here used to stack on
+	   top of that (40px effective each side), squeezing the ingredient row
+	   name column so far that ordinary names like "American Pilsen" wrapped
+	   onto two lines. Narrow each of these to 16px directly instead of
+	   padding the shared panel wrapper. */
+	.brewlab-recipes-card .brewlab-recipes-group__title,
+	.brewlab-recipes-card .brewlab-recipes-subheading,
+	.brewlab-recipes-card .brewlab-recipes-item,
+	.brewlab-recipes-card .brewlab-recipes-steps,
+	.brewlab-recipes-card .brewlab-recipes-empty-tab {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-notes {
+		margin-left: 16px;
+		margin-right: 16px;
+	}
 }
