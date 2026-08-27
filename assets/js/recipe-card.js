@@ -134,16 +134,24 @@
 			if ( batchInput ) {
 				var baseVal  = parseFloat( batchInput.dataset.base );
 				var baseUnit = batchInput.dataset.baseUnit || 'gallons';
-				var dispVal;
-				if ( sys === 'author' ) {
-					dispVal = baseVal;
-					batchInput.step = 0.5;
-				} else {
-					var toVol = ( res === 'us' ) ? 'gallons' : 'litres';
-					dispVal = convertVolume( baseVal, baseUnit, toVol );
-					batchInput.step = res === 'metric' ? 1 : 0.5;
-				}
-				batchInput.value = fmt( dispVal );
+				var newUnit  = ( sys === 'author' ) ? baseUnit : ( res === 'us' ? 'gallons' : 'litres' );
+
+				// Re-express whatever batch size is CURRENTLY showing — which
+				// may be a size the reader typed in, not the recipe's
+				// original one — in the newly selected unit, rather than
+				// resetting to the recipe's original size. A reader who
+				// dialed the scaler up to "20 gallons" and then clicks
+				// Metric should see ~75.7 L, not the original batch size
+				// converted to litres.
+				var currentVal  = parseFloat( batchInput.value );
+				var currentUnit = batchInput.dataset.currentUnit || baseUnit;
+				var dispVal     = ( ! currentVal || currentVal <= 0 )
+					? ( sys === 'author' ? baseVal : convertVolume( baseVal, baseUnit, newUnit ) )
+					: convertVolume( currentVal, currentUnit, newUnit );
+
+				batchInput.value               = fmt( dispVal );
+				batchInput.dataset.currentUnit = newUnit;
+				batchInput.step                = ( sys === 'author' ) ? 0.5 : ( res === 'metric' ? 1 : 0.5 );
 			}
 
 			card.querySelectorAll( '.brewlab-recipes-unit-btn' ).forEach( function ( btn ) {
