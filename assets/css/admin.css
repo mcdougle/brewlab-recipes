@@ -459,12 +459,23 @@
 	color: #a0a5aa;
 }
 
+/* No min-width:0 here (unlike -item-summary above it) — that would opt
+   this box out of the CSS flexbox spec's default "never shrink a flex item
+   below its own content's natural size" protection. With it set (as it
+   was), Chrome and Firefox disagreed on what happens once the row doesn't
+   fit: Chrome effectively lets this box's painted size grow back to fit
+   its non-shrinking chip child, so nothing visibly collides; Firefox
+   holds it at the (too-small) shrunk size and lets the chip's content
+   spill out of it, which also threw off where -item-meta got positioned,
+   overflowing it out of the metabox on the right. Leaving the default
+   (content-sized) minimum in place makes both browsers correctly treat
+   the whole row as not fitting when it doesn't, which is what actually
+   lets -item-summary's flex-wrap (above) do its job. */
 .brewlab-recipes-repeater__item-primary {
 	display: flex;
 	flex: 1;
 	align-items: baseline;
 	gap: 8px;
-	min-width: 0;
 }
 
 /* Every chip below is flex:0 0 (auto or a fixed px width) — none of them
