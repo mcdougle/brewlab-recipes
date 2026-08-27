@@ -48,21 +48,24 @@ function brewlab_recipes_save_meta( $post_id ) {
 add_action( 'save_post_brewlab_recipe', 'brewlab_recipes_save_meta' );
 
 //------------------------------------------------------------------------------
-//   brewlab_recipes_save_simple_field()
+//   brewlab_recipes_sanitize_simple_field_from_post()
 //------------------------------------------------------------------------------
-function brewlab_recipes_save_simple_field( $post_id, $key, $field ) {
-	$name     = 'brewlab_recipes_' . $key;
-	$meta_key = '_brewlab_recipes_' . $key;
+// Pulls one simple field's value out of $_POST and sanitizes it per its
+// schema type — the read half of brewlab_recipes_save_simple_field(), split
+// out so the live preview builder (brewlab_recipes_build_preview_data() in
+// render.php) reads $_POST the exact same way a real save does, instead of a
+// second copy of this switch that could quietly drift from it. Returns null
+// when the field is absent from $_POST entirely — a checkbox never returns
+// null, since an absent checkbox is meaningfully "0", not "leave it alone".
+function brewlab_recipes_sanitize_simple_field_from_post( $key, $field ) {
+	$name = 'brewlab_recipes_' . $key;
 
-	// Unchecked checkboxes never appear in $_POST at all, so this has to be
-	// handled before the generic isset() guard below.
 	if ( 'checkbox' === $field['type'] ) {
-		update_post_meta( $post_id, $meta_key, isset( $_POST[ $name ] ) ? '1' : '0' );
-		return;
+		return isset( $_POST[ $name ] ) ? '1' : '0';
 	}
 
 	if ( ! isset( $_POST[ $name ] ) ) {
-		return;
+		return null;
 	}
 
 	$raw = wp_unslash( $_POST[ $name ] );
@@ -74,41 +77,47 @@ function brewlab_recipes_save_simple_field( $post_id, $key, $field ) {
 			// latter strips line breaks, which would silently break the
 			// notes field the way it did in the old plugin (it was never
 			// actually wired up to a form field, so the bug never fired).
-			$value = sanitize_textarea_field( $raw );
-			break;
+			return sanitize_textarea_field( $raw );
 
 		case 'number':
 			// floatval(), not sanitize_text_field() — the old plugin ran
 			// every field through sanitize_text_field() including numeric
 			// ones, which stores whatever text was typed rather than a
 			// validated number.
-			$value = '' === $raw ? '' : (string) floatval( $raw );
-			break;
+			return '' === $raw ? '' : (string) floatval( $raw );
 
 		case 'select':
-			$value = array_key_exists( $raw, $field['options'] ?? [] ) ? $raw : '';
-			break;
+			return array_key_exists( $raw, $field['options'] ?? [] ) ? $raw : '';
 
 		case 'media':
 			$attachment_id = intval( $raw );
-			if ( $attachment_id > 0 ) {
-				update_post_meta( $post_id, $meta_key, $attachment_id );
-			} else {
-				delete_post_meta( $post_id, $meta_key );
-			}
-			return;
+			return $attachment_id > 0 ? (string) $attachment_id : '';
 
 		case 'color':
-			$color = sanitize_hex_color( $raw );
-			if ( $color ) {
-				update_post_meta( $post_id, $meta_key, $color );
-			} else {
-				delete_post_meta( $post_id, $meta_key );
-			}
-			return;
+			return sanitize_hex_color( $raw ) ?: '';
 
 		default:
-			$value = sanitize_text_field( $raw );
+			return sanitize_text_field( $raw );
+	}
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_save_simple_field()
+//------------------------------------------------------------------------------
+function brewlab_recipes_save_simple_field( $post_id, $key, $field ) {
+	$meta_key = '_brewlab_recipes_' . $key;
+	$value    = brewlab_recipes_sanitize_simple_field_from_post( $key, $field );
+
+	if ( null === $value ) {
+		return;
+	}
+
+	// Media/color are the two types stored as "absent" rather than "empty
+	// string" when cleared — everything else (including an emptied text
+	// field) is fine stored as ''.
+	if ( '' === $value && in_array( $field['type'], [ 'media', 'color' ], true ) ) {
+		delete_post_meta( $post_id, $meta_key );
+		return;
 	}
 
 	update_post_meta( $post_id, $meta_key, $value );

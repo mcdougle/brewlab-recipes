@@ -51,6 +51,65 @@ function brewlab_recipes_get_recipe_data( $recipe_id ) {
 }
 
 //------------------------------------------------------------------------------
+//   brewlab_recipes_build_preview_data()
+//------------------------------------------------------------------------------
+// Same shape as brewlab_recipes_get_recipe_data(), but built from the
+// current $_POST (the edit screen's live, possibly-unsaved field values)
+// instead of the database — powers the admin "Preview Recipe Card" button
+// (includes/admin/preview.php) so a change can be checked without saving
+// first and then hunting down wherever the recipe happens to be embedded.
+// Falls back to the saved value for anything absent from $_POST (e.g. a
+// field POSTed unmodified isn't always present, and this only ever runs
+// against a real, previously-saved recipe post). Reuses save.php's own
+// field-level sanitizers so a previewed value is sanitized exactly the way
+// a saved one would be, not a second, possibly-looser copy of the same
+// rules.
+function brewlab_recipes_build_preview_data( $post_id ) {
+	$post_id = absint( $post_id );
+
+	$data = [
+		'id'    => $post_id,
+		'title' => isset( $_POST['post_title'] ) ? sanitize_text_field( wp_unslash( $_POST['post_title'] ) ) : get_the_title( $post_id ),
+	];
+
+	foreach ( brewlab_recipes_simple_fields() as $section ) {
+		foreach ( $section['fields'] as $key => $field ) {
+			$value          = brewlab_recipes_sanitize_simple_field_from_post( $key, $field );
+			$data[ $key ]   = null !== $value ? $value : get_post_meta( $post_id, '_brewlab_recipes_' . $key, true );
+		}
+	}
+
+	foreach ( brewlab_recipes_repeater_schemas() as $section_key => $schema ) {
+		$posted = $_POST['brewlab_recipes_repeater'][ $section_key ] ?? null;
+
+		if ( is_array( $posted ) ) {
+			$rows = [];
+			foreach ( $posted as $raw_row ) {
+				if ( ! is_array( $raw_row ) ) {
+					continue;
+				}
+				$row = brewlab_recipes_sanitize_repeater_row( wp_unslash( $raw_row ), $schema['fields'] );
+				if ( ! brewlab_recipes_repeater_row_is_empty( $row ) ) {
+					$rows[] = $row;
+				}
+			}
+			$data[ $section_key ] = $rows;
+		} else {
+			$data[ $section_key ] = brewlab_recipes_get_repeater_rows( $post_id, $section_key );
+		}
+
+		if ( isset( $schema['profile_label'] ) ) {
+			$profile_name = 'brewlab_recipes_' . $section_key . '_profile_name';
+			$data[ $section_key . '_profile_name' ] = isset( $_POST[ $profile_name ] )
+				? sanitize_text_field( wp_unslash( $_POST[ $profile_name ] ) )
+				: get_post_meta( $post_id, '_' . $profile_name, true );
+		}
+	}
+
+	return $data;
+}
+
+//------------------------------------------------------------------------------
 //   brewlab_recipes_render_recipe()
 //------------------------------------------------------------------------------
 function brewlab_recipes_render_recipe( $recipe_id ) {
@@ -80,6 +139,18 @@ function brewlab_recipes_recipe_was_rendered( $set = null ) {
 		$rendered = $rendered || $set;
 	}
 	return $rendered;
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_fonts_url()
+//------------------------------------------------------------------------------
+// Single source of truth for the card's Google Fonts URL (Playfair Display +
+// Source Sans 3) — enqueue.php's normal wp_footer output and the print-button
+// data attribute in templates/recipe-card.php (an isolated print window can't
+// rely on the host page's own <head>) both need it, and it must stay one URL,
+// not two copies that could drift.
+function brewlab_recipes_fonts_url() {
+	return 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap';
 }
 
 //------------------------------------------------------------------------------

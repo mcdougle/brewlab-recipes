@@ -444,12 +444,23 @@
 	background: #f6f7f7;
 }
 
+/* Grid, not flex, after three flex-based attempts (flex-wrap in various
+   places, dropping min-width:0, then a min-width:max-content floor on
+   -item-meta) all failed to fix a real Firefox-only overflow — Firefox
+   DevTools showed -item-meta getting sized at ~120px despite ~240px of
+   non-shrinking chip content and a min-width:max-content rule that WAS
+   confirmed active, meaning Firefox was resolving that floor after
+   already deciding the row fit on one line, not before. A `1fr auto` grid
+   sidesteps that whole class of ordering ambiguity: the auto column is
+   sized to its content's max-content width as part of track sizing
+   itself, not as a clamp applied on top of some other decision, and the
+   1fr column only ever gets whatever's left over — so -item-meta can't
+   end up undersized relative to its own children by construction. */
 .brewlab-recipes-repeater__item-summary {
-	display: flex;
-	flex: 1;
+	display: grid;
+	grid-template-columns: 1fr auto;
 	align-items: baseline;
-	gap: 10px;
-	min-width: 0;
+	column-gap: 10px;
 }
 
 .brewlab-recipes-repeater__item-empty {
@@ -460,15 +471,14 @@
 
 .brewlab-recipes-repeater__item-primary {
 	display: flex;
-	flex: 1;
 	align-items: baseline;
 	gap: 8px;
 	min-width: 0;
+	flex-wrap: wrap;
 }
 
 .brewlab-recipes-repeater__item-meta {
 	display: flex;
-	flex: 0 0 auto;
 	align-items: baseline;
 	gap: 10px;
 }
@@ -485,6 +495,17 @@
 
 .brewlab-recipes-repeater__chip--muted {
 	font-size: 12px;
+	color: #787c82;
+}
+
+/* Affiliate-link audit indicator — a row with a link set shows this next to
+   its name, so which ingredients have one is visible at a glance across a
+   whole section instead of only discoverable by opening each row's modal. */
+.brewlab-recipes-repeater__item-link-badge {
+	flex: 0 0 auto;
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
 	color: #787c82;
 }
 
@@ -654,4 +675,71 @@
 .column-used_in,
 .column-stats {
 	color: #50575e;
+}
+
+/* ── Preview modal ── */
+.brewlab-recipes-preview-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 100000;
+	width: 100%;
+	height: 100%;
+}
+
+.brewlab-recipes-preview-modal__backdrop {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.brewlab-recipes-preview-modal__dialog {
+	position: relative;
+	width: 760px;
+	max-width: calc(100vw - 32px);
+	max-height: 88vh;
+	margin: 6vh auto;
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 4px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+	animation: brewlab-recipes-modal-in 0.12s ease-out;
+}
+
+.brewlab-recipes-preview-modal__close {
+	position: absolute;
+	top: 0.6em;
+	right: 0.6em;
+	z-index: 1;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	background: #fff;
+	border: none;
+	border-radius: 3px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+	color: #787c82;
+	font-size: 22px;
+	line-height: 1;
+	cursor: pointer;
+}
+
+.brewlab-recipes-preview-modal__close:hover {
+	background: #e0e0e0;
+	color: #23282d;
+}
+
+.brewlab-recipes-preview-modal__body {
+	padding: 8px;
+}
+
+/* The card's own margin (2rem auto) fights the modal's own spacing/sizing
+   when nested inside it — collapse it here rather than in recipe-card.css,
+   which shouldn't know it's ever rendered inside this modal. */
+.brewlab-recipes-preview-modal__body .brewlab-recipes-card {
+	margin: 0;
+	max-width: none;
 }

@@ -31,6 +31,11 @@ $brew_type_label = 'other' === $brew_type && ! empty( $recipe['brew_type_other']
 	? $recipe['brew_type_other']
 	: brewlab_recipes_field_option_label( 'recipe_details', 'brew_type', $brew_type );
 
+// Style badge is redundant noise when it's empty or just repeats the type
+// badge (e.g. style "Mead" on a type-"Mead" recipe) — collapse to one badge
+// rather than showing "MEAD" / "Mead" side by side.
+$show_style_badge = ! empty( $recipe['style'] ) && 0 !== strcasecmp( $recipe['style'], $brew_type_label );
+
 $image_id  = (int) ( $recipe['image_id'] ?? 0 );
 $image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'large' ) : '';
 
@@ -76,8 +81,24 @@ $boil_hops = array_values( array_filter( $hops, function ( $h ) {
 } ) );
 
 $has_ingredients  = ! empty( $fermentables ) || ! empty( $hops ) || ! empty( $yeasts ) || ! empty( $additions );
+// Unlike the old plugin (which always showed a Method tab, empty or not —
+// a mead/cider/wine with no mash and no boil just showed "No method steps
+// added yet." forever), this only shows Method when there's actually a
+// mash section or a boil section to show.
+$has_method       = ( $show_mash && ! empty( $mash_steps ) ) || ( $show_hops && ( $recipe['boil_time'] || ! empty( $boil_hops ) ) );
 $has_fermentation = ! empty( $ferm_steps );
 $has_notes        = ! empty( $recipe['notes'] );
+
+// Whichever of the four tabs is first available starts active, rather
+// than assuming Ingredients-else-Method — a recipe could plausibly have
+// none of those two but still have Fermentation or Notes.
+$default_tab = 'notes';
+foreach ( [ 'ingredients' => $has_ingredients, 'method' => $has_method, 'fermentation' => $has_fermentation, 'notes' => $has_notes ] as $tab => $present ) {
+	if ( $present ) {
+		$default_tab = $tab;
+		break;
+	}
+}
 
 // Weight-unit target for a given original unit + display system — large
 // units (fermentables' lb/kg) stay large, small units (hops/yeast's oz/g)
@@ -107,7 +128,7 @@ $metric_weight_unit = function ( $unit ) {
 				<?php if ( $brew_type_label ) : ?>
 					<span class="brewlab-recipes-tag"><?php echo esc_html( $brew_type_label ); ?></span>
 				<?php endif; ?>
-				<?php if ( ! empty( $recipe['style'] ) ) : ?>
+				<?php if ( $show_style_badge ) : ?>
 					<span class="brewlab-recipes-tag brewlab-recipes-tag--muted"><?php echo esc_html( $recipe['style'] ); ?></span>
 				<?php endif; ?>
 			</div>
@@ -118,43 +139,49 @@ $metric_weight_unit = function ( $unit ) {
 				<p class="brewlab-recipes-card__summary"><?php echo esc_html( $recipe['summary'] ); ?></p>
 			<?php endif; ?>
 
-			<div class="brewlab-recipes-card__footer-row">
-				<div class="brewlab-recipes-footer-left">
-					<?php if ( $author_name ) : ?>
-						<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf( __( 'by %s', 'brewlab-recipes' ), $author_name ) ); ?></p>
-					<?php endif; ?>
-					<?php if ( $batch_size > 0 ) : ?>
-						<div class="brewlab-recipes-batch-scaler">
-							<label class="brewlab-recipes-batch-scaler__label" for="<?php echo esc_attr( $uid ); ?>-batch"><?php esc_html_e( 'Batch', 'brewlab-recipes' ); ?></label>
-							<div class="brewlab-recipes-batch-scaler__control">
-								<input type="number" id="<?php echo esc_attr( $uid ); ?>-batch"
-									class="brewlab-recipes-batch-input"
-									value="<?php echo esc_attr( $batch_size ); ?>"
-									min="0.1" step="0.5"
-									data-base="<?php echo esc_attr( $batch_size ); ?>"
-									data-base-unit="<?php echo esc_attr( $batch_unit ); ?>" />
-								<span class="brewlab-recipes-batch-scaler__unit brewlab-recipes-unit-label"
-									data-author="<?php echo esc_attr( $batch_unit ); ?>"
-									data-us="<?php echo esc_attr( 'litres' === $batch_unit ? 'gallons' : $batch_unit ); ?>"
-									data-metric="<?php echo esc_attr( 'gallons' === $batch_unit ? 'litres' : $batch_unit ); ?>"
-								><?php echo esc_html( $batch_unit ); ?></span>
-							</div>
-						</div>
-					<?php endif; ?>
-				</div>
-				<div class="brewlab-recipes-footer-right">
-					<div class="brewlab-recipes-unit-toggle">
-						<span class="brewlab-recipes-unit-toggle__label"><?php esc_html_e( 'Units', 'brewlab-recipes' ); ?></span>
-						<button class="brewlab-recipes-unit-btn" data-system="author"><?php esc_html_e( 'Default', 'brewlab-recipes' ); ?></button>
-						<button class="brewlab-recipes-unit-btn" data-system="us"><?php esc_html_e( 'US', 'brewlab-recipes' ); ?></button>
-						<button class="brewlab-recipes-unit-btn" data-system="metric"><?php esc_html_e( 'Metric', 'brewlab-recipes' ); ?></button>
+			<?php if ( $author_name ) : ?>
+				<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf( __( 'by %s', 'brewlab-recipes' ), $author_name ) ); ?></p>
+			<?php endif; ?>
+		</div>
+	</div>
+
+	<?php // ── Toolbar — functional controls live on a neutral strip, not the
+	// per-recipe-colored header, so they stay readable regardless of what
+	// color a recipe's author picked. ?>
+	<div class="brewlab-recipes-toolbar">
+		<div class="brewlab-recipes-toolbar__left">
+			<?php if ( $batch_size > 0 ) : ?>
+				<div class="brewlab-recipes-batch-scaler">
+					<label class="brewlab-recipes-batch-scaler__label" for="<?php echo esc_attr( $uid ); ?>-batch"><?php esc_html_e( 'Batch', 'brewlab-recipes' ); ?></label>
+					<div class="brewlab-recipes-batch-scaler__control">
+						<input type="number" id="<?php echo esc_attr( $uid ); ?>-batch"
+							class="brewlab-recipes-batch-input"
+							value="<?php echo esc_attr( $batch_size ); ?>"
+							min="0.1" step="0.5"
+							data-base="<?php echo esc_attr( $batch_size ); ?>"
+							data-base-unit="<?php echo esc_attr( $batch_unit ); ?>" />
+						<span class="brewlab-recipes-batch-scaler__unit brewlab-recipes-unit-label"
+							data-author="<?php echo esc_attr( $batch_unit ); ?>"
+							data-us="<?php echo esc_attr( 'litres' === $batch_unit ? 'gallons' : $batch_unit ); ?>"
+							data-metric="<?php echo esc_attr( 'gallons' === $batch_unit ? 'litres' : $batch_unit ); ?>"
+						><?php echo esc_html( $batch_unit ); ?></span>
 					</div>
-					<button class="brewlab-recipes-print-btn" onclick="window.print()">
-						<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-						<?php esc_html_e( 'Print', 'brewlab-recipes' ); ?>
-					</button>
 				</div>
+			<?php endif; ?>
+		</div>
+		<div class="brewlab-recipes-toolbar__right">
+			<div class="brewlab-recipes-unit-toggle">
+				<span class="brewlab-recipes-unit-toggle__label"><?php esc_html_e( 'Units', 'brewlab-recipes' ); ?></span>
+				<button class="brewlab-recipes-unit-btn" data-system="author"><?php esc_html_e( 'Original', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-unit-btn" data-system="us"><?php esc_html_e( 'US', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-unit-btn" data-system="metric"><?php esc_html_e( 'Metric', 'brewlab-recipes' ); ?></button>
 			</div>
+			<button type="button" class="brewlab-recipes-print-btn"
+				data-print-css="<?php echo esc_url( BREWLAB_RECIPES_URL . 'assets/css/recipe-card.css?ver=' . BREWLAB_RECIPES_VERSION ); ?>"
+				data-print-fonts="<?php echo esc_url( brewlab_recipes_fonts_url() ); ?>">
+				<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+				<?php esc_html_e( 'Print', 'brewlab-recipes' ); ?>
+			</button>
 		</div>
 	</div>
 
@@ -188,20 +215,22 @@ $metric_weight_unit = function ( $unit ) {
 
 		<div class="brewlab-recipes-tabs__nav" role="tablist">
 			<?php if ( $has_ingredients ) : ?>
-				<button class="brewlab-recipes-tab-btn is-active" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-ingredients" aria-selected="true"><?php esc_html_e( 'Ingredients', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-tab-btn<?php echo 'ingredients' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-ingredients" aria-selected="<?php echo 'ingredients' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Ingredients', 'brewlab-recipes' ); ?></button>
 			<?php endif; ?>
-			<button class="brewlab-recipes-tab-btn<?php echo ! $has_ingredients ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-method" aria-selected="<?php echo ! $has_ingredients ? 'true' : 'false'; ?>"><?php esc_html_e( 'Method', 'brewlab-recipes' ); ?></button>
+			<?php if ( $has_method ) : ?>
+				<button class="brewlab-recipes-tab-btn<?php echo 'method' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-method" aria-selected="<?php echo 'method' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Method', 'brewlab-recipes' ); ?></button>
+			<?php endif; ?>
 			<?php if ( $has_fermentation ) : ?>
-				<button class="brewlab-recipes-tab-btn" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-fermentation" aria-selected="false"><?php esc_html_e( 'Fermentation', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-tab-btn<?php echo 'fermentation' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-fermentation" aria-selected="<?php echo 'fermentation' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Fermentation', 'brewlab-recipes' ); ?></button>
 			<?php endif; ?>
 			<?php if ( $has_notes ) : ?>
-				<button class="brewlab-recipes-tab-btn" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-notes" aria-selected="false"><?php esc_html_e( 'Notes', 'brewlab-recipes' ); ?></button>
+				<button class="brewlab-recipes-tab-btn<?php echo 'notes' === $default_tab ? ' is-active' : ''; ?>" role="tab" data-tab="<?php echo esc_attr( $uid ); ?>-notes" aria-selected="<?php echo 'notes' === $default_tab ? 'true' : 'false'; ?>"><?php esc_html_e( 'Notes', 'brewlab-recipes' ); ?></button>
 			<?php endif; ?>
 		</div>
 
 		<?php // ── Ingredients tab: Fermentables + Other Additions + Hops + Yeast ?>
 		<?php if ( $has_ingredients ) : ?>
-			<div class="brewlab-recipes-tab-panel is-active" id="<?php echo esc_attr( $uid ); ?>-ingredients">
+			<div class="brewlab-recipes-tab-panel<?php echo 'ingredients' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-ingredients">
 
 				<?php if ( ! empty( $fermentables ) ) :
 					$ferm_icon = 'barley';
@@ -365,8 +394,21 @@ $metric_weight_unit = function ( $unit ) {
 								?>
 								<div class="brewlab-recipes-item">
 									<span class="brewlab-recipes-item__amt">
-										<span class="brewlab-recipes-scalable" data-base="<?php echo esc_attr( $base_amt ); ?>"><?php echo esc_html( $base_amt ); ?></span>
-										<?php echo esc_html( $orig_unit ); ?>
+										<?php
+										// data-type="yeast" (not "weight") — the unit set mixes
+										// weight/volume/count/cell-count with no shared conversion
+										// basis, so this never joins the US/Metric unit toggle (see
+										// applySystem() in recipe-card.js, which just redisplays the
+										// base value for this type regardless of system). It does
+										// join the batch scaler, but rounded to the nearest half
+										// packet rather than scaled to arbitrary precision — yeast
+										// pitch isn't a linear function of batch size (one packet
+										// covers a range of batch sizes; doubling for a high-ABV or
+										// lager recipe is a deliberate brewer choice, not a ratio to
+										// preserve) — see fmtYeast() in recipe-card.js.
+										?>
+										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="yeast"><?php echo esc_html( $base_amt ); ?></span>
+										<?php echo esc_html( brewlab_recipes_repeater_cell_value( 'yeast', 'unit', $orig_unit ) ); ?>
 									</span>
 									<span class="brewlab-recipes-item__name"><?php
 										$link = $y['link'] ?? '';
@@ -388,7 +430,8 @@ $metric_weight_unit = function ( $unit ) {
 		<?php endif; ?>
 
 		<?php // ── Method tab: Mash + Boil ?>
-		<div class="brewlab-recipes-tab-panel<?php echo ! $has_ingredients ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-method">
+		<?php if ( $has_method ) : ?>
+		<div class="brewlab-recipes-tab-panel<?php echo 'method' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-method">
 
 			<?php if ( $show_mash && ! empty( $mash_steps ) ) : ?>
 				<div class="brewlab-recipes-group">
@@ -467,15 +510,12 @@ $metric_weight_unit = function ( $unit ) {
 				</div>
 			<?php endif; ?>
 
-			<?php if ( ( ! $show_mash || empty( $mash_steps ) ) && ( ! $show_hops || ( ! $recipe['boil_time'] && empty( $boil_hops ) ) ) ) : ?>
-				<p class="brewlab-recipes-empty-tab"><?php esc_html_e( 'No method steps added yet.', 'brewlab-recipes' ); ?></p>
-			<?php endif; ?>
-
 		</div>
+		<?php endif; ?>
 
 		<?php // ── Fermentation tab ?>
 		<?php if ( $has_fermentation ) : ?>
-			<div class="brewlab-recipes-tab-panel" id="<?php echo esc_attr( $uid ); ?>-fermentation">
+			<div class="brewlab-recipes-tab-panel<?php echo 'fermentation' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-fermentation">
 
 				<div class="brewlab-recipes-group">
 					<h3 class="brewlab-recipes-group__title brewlab-recipes-section-heading">
@@ -526,7 +566,7 @@ $metric_weight_unit = function ( $unit ) {
 
 		<?php // ── Notes tab ?>
 		<?php if ( $has_notes ) : ?>
-			<div class="brewlab-recipes-tab-panel" id="<?php echo esc_attr( $uid ); ?>-notes">
+			<div class="brewlab-recipes-tab-panel<?php echo 'notes' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-notes">
 				<div class="brewlab-recipes-notes"><?php echo nl2br( esc_html( $recipe['notes'] ) ); ?></div>
 			</div>
 		<?php endif; ?>

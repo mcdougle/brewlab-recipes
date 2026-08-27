@@ -131,22 +131,28 @@
 	font-style: italic;
 }
 
-/* Footer row: author · batch scaler · print — all in one line */
-.brewlab-recipes-card .brewlab-recipes-card__footer-row {
+/* ── Toolbar ──────────────────────────────────────────────── */
+/* A neutral strip between the (per-recipe-colored) header and the stat
+   strip — batch scaler, unit toggle, and print live here instead of on
+   the header so they stay legible no matter what header color a recipe
+   author picks. */
+.brewlab-recipes-card .brewlab-recipes-toolbar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
-	flex-wrap: nowrap;
-	margin-top: 4px;
+	flex-wrap: wrap;
+	padding: 10px 24px;
+	background: var(--c-surface);
+	border-bottom: 1px solid var(--c-border);
 }
-.brewlab-recipes-card .brewlab-recipes-footer-left {
+.brewlab-recipes-card .brewlab-recipes-toolbar__left {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 	flex-shrink: 0;
 }
-.brewlab-recipes-card .brewlab-recipes-footer-right {
+.brewlab-recipes-card .brewlab-recipes-toolbar__right {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -162,16 +168,16 @@
 	font-weight: 700;
 	letter-spacing: .08em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, .4);
+	color: var(--c-muted);
 	margin-right: 3px;
 	white-space: nowrap;
 }
 .brewlab-recipes-card .brewlab-recipes-unit-btn {
 	padding: 2px 8px;
 	border-radius: 3px;
-	border: 1px solid rgba(255, 255, 255, .15);
+	border: 1px solid var(--c-border);
 	background: transparent;
-	color: rgba(255, 255, 255, .55);
+	color: var(--c-muted);
 	cursor: pointer;
 	font-size: 11px;
 	font-family: sans-serif;
@@ -181,13 +187,13 @@
 	transition: background .15s, color .15s, border-color .15s;
 }
 .brewlab-recipes-card .brewlab-recipes-unit-btn:hover {
-	border-color: rgba(255, 255, 255, .3);
-	color: rgba(255, 255, 255, .8);
+	border-color: var(--c-accent);
+	color: var(--c-text);
 }
 .brewlab-recipes-card .brewlab-recipes-unit-btn.is-active {
-	background: rgba(255, 255, 255, .25);
+	background: var(--c-accent);
 	color: #fff;
-	border-color: rgba(255, 255, 255, .4);
+	border-color: var(--c-accent);
 	font-weight: 600;
 }
 
@@ -202,15 +208,15 @@
 	font-weight: 700;
 	letter-spacing: .08em;
 	text-transform: uppercase;
-	color: rgba(255, 255, 255, .45);
+	color: var(--c-muted);
 	white-space: nowrap;
 }
 .brewlab-recipes-card .brewlab-recipes-batch-scaler__control {
 	display: flex;
 	align-items: center;
 	gap: 5px;
-	background: rgba(255, 255, 255, .1);
-	border: 1px solid rgba(255, 255, 255, .2);
+	background: var(--c-bg);
+	border: 1px solid var(--c-border);
 	border-radius: 4px;
 	padding: 4px 10px 4px 6px;
 }
@@ -219,7 +225,7 @@
 	background: transparent;
 	border: none;
 	outline: none;
-	color: #fff;
+	color: var(--c-text);
 	font-family: var(--font-body);
 	font-size: 14px;
 	font-weight: 700;
@@ -230,7 +236,7 @@
 .brewlab-recipes-card .brewlab-recipes-batch-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 .brewlab-recipes-card .brewlab-recipes-batch-scaler__unit {
 	font-size: 13px;
-	color: rgba(255, 255, 255, .6);
+	color: var(--c-muted);
 	white-space: nowrap;
 }
 
@@ -240,9 +246,9 @@
 	gap: 6px;
 	padding: 7px 16px;
 	border-radius: 4px;
-	border: 1px solid rgba(255, 255, 255, .25);
-	background: rgba(255, 255, 255, .08);
-	color: rgba(255, 255, 255, .85);
+	border: 1px solid var(--c-border);
+	background: var(--c-bg);
+	color: var(--c-text);
 	font-family: var(--font-body);
 	font-size: 13px;
 	font-weight: 600;
@@ -250,8 +256,8 @@
 	transition: background .15s, border-color .15s;
 }
 .brewlab-recipes-card .brewlab-recipes-print-btn:hover {
-	background: rgba(255, 255, 255, .16);
-	border-color: rgba(255, 255, 255, .45);
+	background: var(--c-accent-lt);
+	border-color: var(--c-accent);
 }
 
 /* ── Stat Strip ───────────────────────────────────────────── */
@@ -582,11 +588,39 @@
 		width: 100%;
 		height: 200px;
 	}
-	.brewlab-recipes-card .brewlab-recipes-stat {
-		min-width: 70px;
-		padding: 12px 6px;
+	.brewlab-recipes-card .brewlab-recipes-toolbar {
+		padding: 10px 16px;
 	}
-	.brewlab-recipes-card .brewlab-recipes-stat__value { font-size: 15px; }
+	/* 70px + 12px padding per column doesn't leave room for all 5 stat
+	   columns (ABV/OG/FG/IBU/SRM) at phone widths — they wrapped, leaving
+	   SRM stranded alone on its own row. Shrunk to fit five across. */
+	.brewlab-recipes-card .brewlab-recipes-stat {
+		min-width: 56px;
+		padding: 10px 3px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-stat__value {
+		font-size: 14px;
+		gap: 3px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-stat__label { font-size: 9px; }
 	.brewlab-recipes-card .brewlab-recipes-tab-btn { padding: 12px 14px; }
-	.brewlab-recipes-card .brewlab-recipes-tab-panel { padding: 16px; }
+
+	/* Every group/item/etc. below already carries its own 24px horizontal
+	   padding — a flat `.tab-panel { padding: 16px }` here used to stack on
+	   top of that (40px effective each side), squeezing the ingredient row
+	   name column so far that ordinary names like "American Pilsen" wrapped
+	   onto two lines. Narrow each of these to 16px directly instead of
+	   padding the shared panel wrapper. */
+	.brewlab-recipes-card .brewlab-recipes-group__title,
+	.brewlab-recipes-card .brewlab-recipes-subheading,
+	.brewlab-recipes-card .brewlab-recipes-item,
+	.brewlab-recipes-card .brewlab-recipes-steps,
+	.brewlab-recipes-card .brewlab-recipes-empty-tab {
+		padding-left: 16px;
+		padding-right: 16px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-notes {
+		margin-left: 16px;
+		margin-right: 16px;
+	}
 }

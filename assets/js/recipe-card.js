@@ -52,6 +52,20 @@
 		return ( Math.round( val * 100 ) / 100 ).toString();
 	}
 
+	// Yeast pitch amount isn't a linear function of batch size, so scaling
+	// it to arbitrary decimal precision like a weight would imply a false
+	// exactness. For packets specifically, round to the nearest half — good
+	// enough to stop a big batch-size change from leaving the reader with a
+	// laughably undersized pitch, without pretending "1.37 packets" means
+	// anything. Never round down to zero packets. Other yeast units (grams,
+	// mL, billion cells) scale like any other weight/volume quantity.
+	function fmtYeast( val, unit ) {
+		if ( unit === 'pkg' ) {
+			return Math.max( Math.round( val * 2 ) / 2, 0.5 ).toString();
+		}
+		return fmt( val );
+	}
+
 	function initRecipeCard( card ) {
 		var authorSystem  = card.dataset.authorSystem || 'us';
 		var currentSystem = 'author';
@@ -73,6 +87,66 @@
 				if ( panel ) panel.classList.add( 'is-active' );
 			} );
 		} );
+
+		// ── Print ───────────────────────────────────────────────────────
+		// window.print() on the host page prints the whole page — in a
+		// real theme that can mean the card gets split across pages
+		// alongside nav/sidebar/footer content, or the theme's own print
+		// stylesheet fights ours. Instead, open a blank window containing
+		// only a clone of this card plus recipe-card.css (loaded fresh
+		// since the print window has no <head> of its own to inherit
+		// from), print just that, then close it. cloneNode(true) carries
+		// over whatever the reader currently has selected — batch size,
+		// unit system — since those are live DOM state (text/attributes),
+		// not something re-read from data- attributes.
+		var printBtn = card.querySelector( '.brewlab-recipes-print-btn' );
+		if ( printBtn ) {
+			printBtn.addEventListener( 'click', function () {
+				var printWin = window.open( '', '_blank', 'width=800,height=1000' );
+				if ( ! printWin ) return;
+
+				var title = card.querySelector( '.brewlab-recipes-card__title' );
+				var doc   = printWin.document;
+
+				doc.open();
+				doc.write(
+					'<!DOCTYPE html><html><head><meta charset="utf-8">' +
+					'<link rel="stylesheet" href="' + printBtn.dataset.printFonts + '">' +
+					'<link rel="stylesheet" href="' + printBtn.dataset.printCss + '">' +
+					'<style>body{margin:0;background:#fff;}</style>' +
+					'</head><body></body></html>'
+				);
+				doc.close();
+
+				// Set via textContent rather than concatenated into the
+				// doc.write() markup above — a title with "&"/"<" in it
+				// (e.g. "Stout & Porter Blend") would otherwise be parsed
+				// as markup instead of text.
+				if ( title ) {
+					var titleEl = doc.createElement( 'title' );
+					titleEl.textContent = title.textContent;
+					doc.head.appendChild( titleEl );
+				}
+
+				doc.body.appendChild( card.cloneNode( true ) );
+
+				printWin.onafterprint = function () { printWin.close(); };
+
+				// Give the stylesheets a moment to load before the browser
+				// paginates for print — printing before recipe-card.css
+				// applies would print unstyled markup.
+				var cardCss = doc.querySelector( 'link[href="' + printBtn.dataset.printCss + '"]' );
+				var fired   = false;
+				var go      = function () {
+					if ( fired ) return;
+					fired = true;
+					printWin.focus();
+					printWin.print();
+				};
+				if ( cardCss ) cardCss.addEventListener( 'load', go );
+				setTimeout( go, 500 );
+			} );
+		}
 
 		function resolvedSystem( sys ) {
 			return sys === 'author' ? authorSystem : sys;
@@ -96,6 +170,15 @@
 					el.textContent = fmt( convertWeight( base, unit, targetWeightUnit( unit, res ) ) );
 					return;
 				}
+				if ( type === 'yeast' ) {
+					// Not part of the US/Metric toggle — the unit set mixes
+					// weight/volume/count/cell-count with no shared conversion
+					// basis — so this always just redisplays the base value here.
+					// The batch scaler (scaleAll(), below) is what actually
+					// changes it.
+					el.textContent = fmt( base );
+					return;
+				}
 			} );
 
 			card.querySelectorAll( '.brewlab-recipes-unit-label' ).forEach( function ( el ) {
@@ -111,16 +194,24 @@
 			if ( batchInput ) {
 				var baseVal  = parseFloat( batchInput.dataset.base );
 				var baseUnit = batchInput.dataset.baseUnit || 'gallons';
-				var dispVal;
-				if ( sys === 'author' ) {
-					dispVal = baseVal;
-					batchInput.step = 0.5;
-				} else {
-					var toVol = ( res === 'us' ) ? 'gallons' : 'litres';
-					dispVal = convertVolume( baseVal, baseUnit, toVol );
-					batchInput.step = res === 'metric' ? 1 : 0.5;
-				}
-				batchInput.value = fmt( dispVal );
+				var newUnit  = ( sys === 'author' ) ? baseUnit : ( res === 'us' ? 'gallons' : 'litres' );
+
+				// Re-express whatever batch size is CURRENTLY showing — which
+				// may be a size the reader typed in, not the recipe's
+				// original one — in the newly selected unit, rather than
+				// resetting to the recipe's original size. A reader who
+				// dialed the scaler up to "20 gallons" and then clicks
+				// Metric should see ~75.7 L, not the original batch size
+				// converted to litres.
+				var currentVal  = parseFloat( batchInput.value );
+				var currentUnit = batchInput.dataset.currentUnit || baseUnit;
+				var dispVal     = ( ! currentVal || currentVal <= 0 )
+					? ( sys === 'author' ? baseVal : convertVolume( baseVal, baseUnit, newUnit ) )
+					: convertVolume( currentVal, currentUnit, newUnit );
+
+				batchInput.value               = fmt( dispVal );
+				batchInput.dataset.currentUnit = newUnit;
+				batchInput.step                = ( sys === 'author' ) ? 0.5 : ( res === 'metric' ? 1 : 0.5 );
 			}
 
 			card.querySelectorAll( '.brewlab-recipes-unit-btn' ).forEach( function ( btn ) {
@@ -147,10 +238,17 @@
 				var res   = resolvedSystem( currentSystem );
 
 				card.querySelectorAll( '.brewlab-recipes-qty' ).forEach( function ( el ) {
-					if ( el.dataset.type === 'temp' ) return;
+					var type = el.dataset.type;
+					if ( type === 'temp' ) return;
 					var base = parseFloat( el.dataset.base );
 					var unit = el.dataset.unit;
 					if ( isNaN( base ) ) return;
+
+					if ( type === 'yeast' ) {
+						el.textContent = fmtYeast( base * ratio, unit );
+						return;
+					}
+
 					var converted = ( currentSystem === 'author' )
 						? base
 						: convertWeight( base, unit, targetWeightUnit( unit, res ) );
@@ -190,4 +288,11 @@
 	document.addEventListener( 'DOMContentLoaded', function () {
 		document.querySelectorAll( '.brewlab-recipes-card' ).forEach( initRecipeCard );
 	} );
+
+	// Exposed so anything that injects a card into the DOM after page load
+	// — the admin "Preview Recipe Card" modal (admin-preview.js), so far
+	// the only such case — can wire it up the same way, instead of a
+	// second copy of this file's init logic or the card silently sitting
+	// there with no tabs/toggle/scaler working.
+	window.brewlabRecipesInitCard = initRecipeCard;
 } )();

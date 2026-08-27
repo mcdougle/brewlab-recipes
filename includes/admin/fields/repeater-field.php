@@ -202,13 +202,53 @@ function brewlab_recipes_render_repeater_item_summary( $section, $fields, $row )
 
 	echo '<span class="brewlab-recipes-repeater__item-primary">';
 	array_map( 'brewlab_recipes_render_repeater_summary_chip', $primary );
+	// Affiliate-link audit indicator — lets a section be scanned for which
+	// rows have a link set without opening each one's modal to check.
+	if ( isset( $fields['link'] ) && ! empty( $row['link'] ) ) {
+		printf(
+			'<span class="brewlab-recipes-repeater__item-link-badge dashicons dashicons-admin-links" title="%s"></span>',
+			esc_attr__( 'Affiliate link set', 'brewlab-recipes' )
+		);
+	}
 	echo '</span>';
 
 	if ( $meta ) {
-		echo '<span class="brewlab-recipes-repeater__item-meta">';
+		// Firefox DevTools showed this cluster's own intrinsic width being
+		// miscalculated as far smaller than its chips actually need (a
+		// flex container nested as a grid/flex item, apparently a genuine
+		// Firefox sizing bug rather than anything fixable by choosing
+		// different layout properties on the containers around it — three
+		// different attempts at that came out identically wrong). Since
+		// every chip's width is already known from the schema, computing
+		// this explicitly in PHP and setting it as a min-width sidesteps
+		// the browser's intrinsic-sizing calculation entirely instead of
+		// depending on it.
+		printf( '<span class="brewlab-recipes-repeater__item-meta" style="min-width:%dpx;">', brewlab_recipes_estimate_chip_cluster_width( $meta ) );
 		array_map( 'brewlab_recipes_render_repeater_summary_chip', $meta );
 		echo '</span>';
 	}
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_estimate_chip_cluster_width()
+//------------------------------------------------------------------------------
+// Sums a slot's chip widths plus the gaps between them (matching
+// .brewlab-recipes-repeater__item-meta's own `gap: 10px`) — exact for
+// every chip with a schema-configured fixed width, which covers the meta
+// slot everywhere except hops' 'use' label (no fixed width, since it's
+// rendered alone with no partner amount/unit to line up against): for
+// that one case, estimate from character count. An estimate that's a
+// little off is still far better than depending on the browser to work
+// out this cluster's width on its own — see the call site's comment.
+function brewlab_recipes_estimate_chip_cluster_width( array $chips ) {
+	$gap   = 10;
+	$total = ( count( $chips ) - 1 ) * $gap;
+
+	foreach ( $chips as $chip ) {
+		$total += $chip['width'] ? $chip['width'] : max( 40, strlen( $chip['value'] ) * 7 );
+	}
+
+	return $total;
 }
 
 //------------------------------------------------------------------------------
@@ -306,7 +346,11 @@ function brewlab_recipes_render_repeater_modal_fields( $fields ) {
 			continue;
 		}
 
-		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s</label>', esc_html( $field['label'] ) );
+		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s', esc_html( $field['label'] ) );
+		if ( ! empty( $field['hint'] ) ) {
+			printf( '<span class="brewlab-recipes-hint">%s</span>', esc_html( $field['hint'] ) );
+		}
+		echo '</label>';
 		brewlab_recipes_render_repeater_modal_input( $key, $field );
 		echo '</div>';
 	}

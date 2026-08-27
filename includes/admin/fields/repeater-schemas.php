@@ -356,6 +356,7 @@ function brewlab_recipes_repeater_schemas() {
 				'pressure'  => [
 					'type'    => 'text',
 					'label'   => __( 'Pressure', 'brewlab-recipes' ),
+					'hint'    => 'PSI',
 					'summary' => [ 'slot' => 'meta', 'muted' => true, 'width' => 70, 'suffix' => ' PSI', 'order' => 2 ],
 				],
 			],

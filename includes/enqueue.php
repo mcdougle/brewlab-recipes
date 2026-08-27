@@ -31,7 +31,7 @@ function brewlab_recipes_maybe_print_recipe_styles() {
 
 	printf(
 		'<link rel="stylesheet" id="brewlab-recipes-card-fonts-css" href="%s" media="all" />' . "\n",
-		esc_url( 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap' )
+		esc_url( brewlab_recipes_fonts_url() )
 	);
 	printf(
 		'<link rel="stylesheet" id="brewlab-recipes-card-css" href="%s" media="all" />' . "\n",
