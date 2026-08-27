@@ -459,29 +459,31 @@
 	color: #a0a5aa;
 }
 
-/* Every chip below is flex:0 0 (auto or a fixed px width) — none of them
-   shrink on their own, so with enough content (a long name plus several
-   meta values, or just a wide number like "1000 days") a single unbroken
-   line has no way to fit and was overflowing past the metabox's right
-   edge. flex-wrap here and on -primary/-meta lets the meta cluster (and,
-   if it's ever that tight, individual chips within it) drop to their own
-   line instead of spilling out. */
 .brewlab-recipes-repeater__item-primary {
 	display: flex;
 	flex: 1;
-	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 8px;
 	min-width: 0;
 }
 
+/* Every chip below is flex:0 0 (auto or a fixed px width) — none of them
+   shrink, so with enough content (a long name plus several meta values, or
+   just a wide number like "1000 days") a single unbroken line has no way
+   to fit and was overflowing past the metabox's right edge in Firefox
+   (reproducible there, not in Chrome — the two apparently disagree on the
+   available width for this nested flex structure). flex-wrap on
+   -item-summary above lets this whole cluster drop to its own line as a
+   unit when it doesn't fit next to the name. Deliberately NOT wrapping or
+   max-width-ing -item-meta itself: that caused every individual chip
+   (temp/pressure/days) to wrap onto its own separate line instead, since
+   Firefox computed its available width as near-zero rather than "the rest
+   of the row" — worse than the bug it was meant to fix. */
 .brewlab-recipes-repeater__item-meta {
 	display: flex;
 	flex: 0 0 auto;
-	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 10px;
-	max-width: 100%;
 }
 
 .brewlab-recipes-repeater__chip {
