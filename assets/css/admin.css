@@ -444,13 +444,23 @@
 	background: #f6f7f7;
 }
 
+/* Grid, not flex, after three flex-based attempts (flex-wrap in various
+   places, dropping min-width:0, then a min-width:max-content floor on
+   -item-meta) all failed to fix a real Firefox-only overflow — Firefox
+   DevTools showed -item-meta getting sized at ~120px despite ~240px of
+   non-shrinking chip content and a min-width:max-content rule that WAS
+   confirmed active, meaning Firefox was resolving that floor after
+   already deciding the row fit on one line, not before. A `1fr auto` grid
+   sidesteps that whole class of ordering ambiguity: the auto column is
+   sized to its content's max-content width as part of track sizing
+   itself, not as a clamp applied on top of some other decision, and the
+   1fr column only ever gets whatever's left over — so -item-meta can't
+   end up undersized relative to its own children by construction. */
 .brewlab-recipes-repeater__item-summary {
-	display: flex;
-	flex: 1 1 auto;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: 1fr auto;
 	align-items: baseline;
-	gap: 10px;
-	min-width: 0;
+	column-gap: 10px;
 }
 
 .brewlab-recipes-repeater__item-empty {
@@ -459,44 +469,18 @@
 	color: #a0a5aa;
 }
 
-/* No min-width:0 here (unlike -item-summary above it) — that would opt
-   this box out of the CSS flexbox spec's default "never shrink a flex item
-   below its own content's natural size" protection. With it set (as it
-   was), Chrome and Firefox disagreed on what happens once the row doesn't
-   fit: Chrome effectively lets this box's painted size grow back to fit
-   its non-shrinking chip child, so nothing visibly collides; Firefox
-   holds it at the (too-small) shrunk size and lets the chip's content
-   spill out of it, which also threw off where -item-meta got positioned,
-   overflowing it out of the metabox on the right. Leaving the default
-   (content-sized) minimum in place makes both browsers correctly treat
-   the whole row as not fitting when it doesn't, which is what actually
-   lets -item-summary's flex-wrap (above) do its job. */
 .brewlab-recipes-repeater__item-primary {
 	display: flex;
-	flex: 1 1 auto;
 	align-items: baseline;
 	gap: 8px;
+	min-width: 0;
+	flex-wrap: wrap;
 }
 
-/* Firefox DevTools showed the actual mechanism here (Chrome and Firefox
-   disagree on it): -item-primary is `flex: 1`, shorthand for
-   `flex-basis: 0%` — with an indefinite-size ancestor chain (-item-summary
-   is also flex:1/basis:0%), Firefox resolved -item-meta's own auto-basis
-   size at only ~120px despite `flex: 0 0 auto` supposedly protecting it
-   from shrinking below its ~240px of non-shrinking chip content (three
-   fixed-width chips + gaps) — so the chips it contains rendered past its
-   own (undersized) box and out of the metabox on the right, while
-   -item-primary's box was measured at ~1229px, having grown into space
-   that should have been reserved for -item-meta's real content first.
-   min-width: max-content is a hard floor that isn't subject to that
-   ambiguity — it can't come out smaller than the sum of this cluster's
-   chips regardless of how the surrounding flex-basis chain resolves. */
 .brewlab-recipes-repeater__item-meta {
 	display: flex;
-	flex: 0 0 auto;
 	align-items: baseline;
 	gap: 10px;
-	min-width: max-content;
 }
 
 .brewlab-recipes-repeater__chip {
