@@ -1,0 +1,37 @@
+BrewLab Recipes
+Copyright (c) 2026 mcdougle. All rights reserved.
+
+TERMS AND CONDITIONS
+
+1. GRANT OF USE
+   Permission is granted to install and use this software on any number of
+   WordPress installations you own or operate. This grant does not transfer
+   any ownership rights in the software.
+
+2. RESTRICTIONS
+   You may not, without prior written permission from the copyright holder:
+   a. Redistribute, sell, sublicense, or otherwise transfer this software
+      or any portion of it to any third party;
+   b. Modify, adapt, translate, or create derivative works based on this
+      software;
+   c. Remove or alter any copyright, trademark, or proprietary notices
+      contained in the software;
+   d. Claim authorship or ownership of this software or any portion of it.
+
+3. NO WARRANTY
+   This software is provided "as is", without warranty of any kind, express
+   or implied, including but not limited to the warranties of merchantability,
+   fitness for a particular purpose, and non-infringement. In no event shall
+   the copyright holder be liable for any claim, damages, or other liability
+   arising from the use of this software.
+
+4. TERMINATION
+   This license is effective until terminated. Your rights under this license
+   will terminate automatically without notice if you fail to comply with any
+   of its terms.
+
+5. GOVERNING LAW
+   This license shall be governed by and construed in accordance with
+   applicable law, without regard to conflict of law principles.
+
+For permissions beyond the scope of this license, contact the copyright holder.
