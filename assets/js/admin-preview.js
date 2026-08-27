@@ -18,7 +18,18 @@
 		if ( ! modal ) {
 			return;
 		}
-		modal.querySelector( '.brewlab-recipes-preview-modal__body' ).innerHTML = html;
+		var body = modal.querySelector( '.brewlab-recipes-preview-modal__body' );
+		body.innerHTML = html;
+
+		// recipe-card.js only wires up cards present at DOMContentLoaded —
+		// one just got injected well after that, so its tabs, unit toggle,
+		// and batch scaler need to be initialized here explicitly or none
+		// of them would do anything.
+		var card = body.querySelector( '.brewlab-recipes-card' );
+		if ( card && window.brewlabRecipesInitCard ) {
+			window.brewlabRecipesInitCard( card );
+		}
+
 		modal.style.display = 'block';
 	}
 

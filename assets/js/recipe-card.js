@@ -228,4 +228,11 @@
 	document.addEventListener( 'DOMContentLoaded', function () {
 		document.querySelectorAll( '.brewlab-recipes-card' ).forEach( initRecipeCard );
 	} );
+
+	// Exposed so anything that injects a card into the DOM after page load
+	// — the admin "Preview Recipe Card" modal (admin-preview.js), so far
+	// the only such case — can wire it up the same way, instead of a
+	// second copy of this file's init logic or the card silently sitting
+	// there with no tabs/toggle/scaler working.
+	window.brewlabRecipesInitCard = initRecipeCard;
 } )();
