@@ -447,6 +447,7 @@
 .brewlab-recipes-repeater__item-summary {
 	display: flex;
 	flex: 1;
+	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 10px;
 	min-width: 0;
@@ -458,9 +459,17 @@
 	color: #a0a5aa;
 }
 
+/* Every chip below is flex:0 0 (auto or a fixed px width) — none of them
+   shrink on their own, so with enough content (a long name plus several
+   meta values, or just a wide number like "1000 days") a single unbroken
+   line has no way to fit and was overflowing past the metabox's right
+   edge. flex-wrap here and on -primary/-meta lets the meta cluster (and,
+   if it's ever that tight, individual chips within it) drop to their own
+   line instead of spilling out. */
 .brewlab-recipes-repeater__item-primary {
 	display: flex;
 	flex: 1;
+	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 8px;
 	min-width: 0;
@@ -469,8 +478,10 @@
 .brewlab-recipes-repeater__item-meta {
 	display: flex;
 	flex: 0 0 auto;
+	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 10px;
+	max-width: 100%;
 }
 
 .brewlab-recipes-repeater__chip {
