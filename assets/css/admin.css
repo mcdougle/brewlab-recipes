@@ -446,7 +446,7 @@
 
 .brewlab-recipes-repeater__item-summary {
 	display: flex;
-	flex: 1;
+	flex: 1 1 auto;
 	flex-wrap: wrap;
 	align-items: baseline;
 	gap: 10px;
@@ -473,28 +473,30 @@
    lets -item-summary's flex-wrap (above) do its job. */
 .brewlab-recipes-repeater__item-primary {
 	display: flex;
-	flex: 1;
+	flex: 1 1 auto;
 	align-items: baseline;
 	gap: 8px;
 }
 
-/* Every chip below is flex:0 0 (auto or a fixed px width) — none of them
-   shrink, so with enough content (a long name plus several meta values, or
-   just a wide number like "1000 days") a single unbroken line has no way
-   to fit and was overflowing past the metabox's right edge in Firefox
-   (reproducible there, not in Chrome — the two apparently disagree on the
-   available width for this nested flex structure). flex-wrap on
-   -item-summary above lets this whole cluster drop to its own line as a
-   unit when it doesn't fit next to the name. Deliberately NOT wrapping or
-   max-width-ing -item-meta itself: that caused every individual chip
-   (temp/pressure/days) to wrap onto its own separate line instead, since
-   Firefox computed its available width as near-zero rather than "the rest
-   of the row" — worse than the bug it was meant to fix. */
+/* Firefox DevTools showed the actual mechanism here (Chrome and Firefox
+   disagree on it): -item-primary is `flex: 1`, shorthand for
+   `flex-basis: 0%` — with an indefinite-size ancestor chain (-item-summary
+   is also flex:1/basis:0%), Firefox resolved -item-meta's own auto-basis
+   size at only ~120px despite `flex: 0 0 auto` supposedly protecting it
+   from shrinking below its ~240px of non-shrinking chip content (three
+   fixed-width chips + gaps) — so the chips it contains rendered past its
+   own (undersized) box and out of the metabox on the right, while
+   -item-primary's box was measured at ~1229px, having grown into space
+   that should have been reserved for -item-meta's real content first.
+   min-width: max-content is a hard floor that isn't subject to that
+   ambiguity — it can't come out smaller than the sum of this cluster's
+   chips regardless of how the surrounding flex-basis chain resolves. */
 .brewlab-recipes-repeater__item-meta {
 	display: flex;
 	flex: 0 0 auto;
 	align-items: baseline;
 	gap: 10px;
+	min-width: max-content;
 }
 
 .brewlab-recipes-repeater__chip {
