@@ -88,6 +88,66 @@
 			} );
 		} );
 
+		// ── Print ───────────────────────────────────────────────────────
+		// window.print() on the host page prints the whole page — in a
+		// real theme that can mean the card gets split across pages
+		// alongside nav/sidebar/footer content, or the theme's own print
+		// stylesheet fights ours. Instead, open a blank window containing
+		// only a clone of this card plus recipe-card.css (loaded fresh
+		// since the print window has no <head> of its own to inherit
+		// from), print just that, then close it. cloneNode(true) carries
+		// over whatever the reader currently has selected — batch size,
+		// unit system — since those are live DOM state (text/attributes),
+		// not something re-read from data- attributes.
+		var printBtn = card.querySelector( '.brewlab-recipes-print-btn' );
+		if ( printBtn ) {
+			printBtn.addEventListener( 'click', function () {
+				var printWin = window.open( '', '_blank', 'width=800,height=1000' );
+				if ( ! printWin ) return;
+
+				var title = card.querySelector( '.brewlab-recipes-card__title' );
+				var doc   = printWin.document;
+
+				doc.open();
+				doc.write(
+					'<!DOCTYPE html><html><head><meta charset="utf-8">' +
+					'<link rel="stylesheet" href="' + printBtn.dataset.printFonts + '">' +
+					'<link rel="stylesheet" href="' + printBtn.dataset.printCss + '">' +
+					'<style>body{margin:0;background:#fff;}</style>' +
+					'</head><body></body></html>'
+				);
+				doc.close();
+
+				// Set via textContent rather than concatenated into the
+				// doc.write() markup above — a title with "&"/"<" in it
+				// (e.g. "Stout & Porter Blend") would otherwise be parsed
+				// as markup instead of text.
+				if ( title ) {
+					var titleEl = doc.createElement( 'title' );
+					titleEl.textContent = title.textContent;
+					doc.head.appendChild( titleEl );
+				}
+
+				doc.body.appendChild( card.cloneNode( true ) );
+
+				printWin.onafterprint = function () { printWin.close(); };
+
+				// Give the stylesheets a moment to load before the browser
+				// paginates for print — printing before recipe-card.css
+				// applies would print unstyled markup.
+				var cardCss = doc.querySelector( 'link[href="' + printBtn.dataset.printCss + '"]' );
+				var fired   = false;
+				var go      = function () {
+					if ( fired ) return;
+					fired = true;
+					printWin.focus();
+					printWin.print();
+				};
+				if ( cardCss ) cardCss.addEventListener( 'load', go );
+				setTimeout( go, 500 );
+			} );
+		}
+
 		function resolvedSystem( sys ) {
 			return sys === 'author' ? authorSystem : sys;
 		}

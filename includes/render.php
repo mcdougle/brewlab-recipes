@@ -142,6 +142,18 @@ function brewlab_recipes_recipe_was_rendered( $set = null ) {
 }
 
 //------------------------------------------------------------------------------
+//   brewlab_recipes_fonts_url()
+//------------------------------------------------------------------------------
+// Single source of truth for the card's Google Fonts URL (Playfair Display +
+// Source Sans 3) — enqueue.php's normal wp_footer output and the print-button
+// data attribute in templates/recipe-card.php (an isolated print window can't
+// rely on the host page's own <head>) both need it, and it must stay one URL,
+// not two copies that could drift.
+function brewlab_recipes_fonts_url() {
+	return 'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap';
+}
+
+//------------------------------------------------------------------------------
 //   brewlab_recipes_field_option_label()
 //------------------------------------------------------------------------------
 // Reads a select field's option label straight from simple-fields.php's

@@ -176,7 +176,9 @@ $metric_weight_unit = function ( $unit ) {
 				<button class="brewlab-recipes-unit-btn" data-system="us"><?php esc_html_e( 'US', 'brewlab-recipes' ); ?></button>
 				<button class="brewlab-recipes-unit-btn" data-system="metric"><?php esc_html_e( 'Metric', 'brewlab-recipes' ); ?></button>
 			</div>
-			<button class="brewlab-recipes-print-btn" onclick="window.print()">
+			<button type="button" class="brewlab-recipes-print-btn"
+				data-print-css="<?php echo esc_url( BREWLAB_RECIPES_URL . 'assets/css/recipe-card.css?ver=' . BREWLAB_RECIPES_VERSION ); ?>"
+				data-print-fonts="<?php echo esc_url( brewlab_recipes_fonts_url() ); ?>">
 				<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
 				<?php esc_html_e( 'Print', 'brewlab-recipes' ); ?>
 			</button>
