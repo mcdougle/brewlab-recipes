@@ -2,18 +2,17 @@
  * Recipe Card
  *
  * Front-end styling for one embedded recipe (templates/recipe-card.php).
- * Aesthetic, structure, and values are ported field-for-field from
- * wp-brewtools-recipes/assets/css/recipe-card.css — dark header band, warm
- * parchment tones, tabs, ingredient groups, step timelines, notes callout,
- * print styles.
+ * Dark header band, warm parchment tones, tabs, ingredient groups, step
+ * timelines, notes callout, print styles.
  *
  * --brewlab-recipes-header-bg is set inline per-recipe from the Media
  * metabox's color field, so the header can't be themed from here.
  *
  * The Google Fonts import is NOT an @import in this file — see
  * includes/enqueue.php, which wp_enqueue_style()s Playfair Display /
- * Source Sans 3 as their own stylesheet instead, matching this project's
- * enqueue convention rather than the old plugin's @import.
+ * Source Sans 3 as their own stylesheet instead, so the font request loads
+ * in parallel with this stylesheet rather than being discovered only after
+ * it downloads.
  *
  * Every selector is scoped under .brewlab-recipes-card (two classes,
  * specificity 0,2,0) rather than a bare single class — found the hard way

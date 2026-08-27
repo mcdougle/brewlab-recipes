@@ -11,11 +11,12 @@
 // Every row's real submittable fields are hidden <input>s inside its <li> —
 // admin-repeater.js only ever edits those directly; the modal's visible
 // fields are a template it clones into itself and copies values to/from.
-// That keeps the $_POST shape (brewlab_recipes_repeater[section][index][field])
-// identical to before this rewrite, so save.php didn't need any changes for
-// the row data itself. Clicking anywhere on a row opens it in the modal —
-// there's no separate Edit button; Delete lives in the modal footer instead
-// of on the row, matching the old plugin's interaction model.
+// save.php reads $_POST['brewlab_recipes_repeater'][section][index][field]
+// without caring what UI produced it, so the row markup here can change
+// freely as long as that shape stays the same. Clicking anywhere on a row
+// opens it in the modal — there's no separate Edit button; Delete lives in
+// the modal footer instead of on the row, keeping each row's own click
+// target unambiguous.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -57,8 +58,8 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 	}
 	echo '</ul>';
 
-	// Hidden template for a brand-new row's hidden inputs — cloned on Add,
-	// same role admin-repeater.js's row-template played before this rewrite.
+	// Hidden template for a brand-new row's hidden inputs — admin-repeater.js
+	// clones this on Add and gives the clone the next available index.
 	echo '<template class="brewlab-recipes-repeater__item-template">';
 	brewlab_recipes_render_repeater_item( $section, $fields, '__INDEX__', [] );
 	echo '</template>';
@@ -321,8 +322,8 @@ add_action( 'wp_ajax_brewlab_recipes_render_repeater_summary', 'brewlab_recipes_
 // Unlike brewlab_recipes_render_repeater_item()'s hidden inputs, these carry
 // no name/value — they're a template the modal clones and populates
 // per-open, never submitted directly. Label-above-field (not label-beside,
-// the way the admin form-table rows work) — matches the old plugin's modal
-// layout, and reads more like a compact form than a settings table.
+// the way the admin form-table rows work) reads more like a compact form
+// than a settings table, which suits a modal better than a wide table row.
 //
 // A field with an 'inline_with' key (e.g. amount → unit, temp → temp_unit)
 // renders paired with the field it names in one row instead of two,

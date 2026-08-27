@@ -2,13 +2,12 @@
  * Media & Color Pickers
  *
  * Wires the Media metabox's two fields: wp.media for the recipe image, and
- * a hand-rolled canvas HSV picker for the recipe color — the old plugin's
- * exact picker (SV square + hue strip + hex + presets), ported faithfully
- * rather than rebuilt from scratch, since it's real interaction code (drag
- * handling, HSV math) worth getting right the first time. Neither field's
- * name/value contract changes — save.php already expects a hidden input
- * holding an attachment ID and a hidden input holding a hex string, so this
- * file only has to keep those inputs in sync with the picker UI.
+ * a hand-rolled canvas HSV picker for the recipe color (SV square + hue
+ * strip + hex input + preset swatches) rather than WP core's bundled Iris
+ * picker, for full control over that exact layout. Each field's job is
+ * just to keep its hidden input in sync with the picker UI — save.php
+ * expects a hidden input holding an attachment ID and a hidden input
+ * holding a hex string, and neither of those contracts changes here.
  */
 ( function () {
 	'use strict';

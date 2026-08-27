@@ -4,8 +4,8 @@
 //------------------------------------------------------------------------------
 // Turns a recipe post ID into markup. brewlab_recipes_render_recipe() is the
 // only entry point anything outside this file should call — the shortcode
-// and block render callbacks (Phase 5) both go through it instead of talking
-// to templates/recipe-card.php directly. The helper functions below exist
+// and block render callbacks both go through it instead of talking to
+// templates/recipe-card.php directly. The helper functions below exist
 // because templates/recipe-card.php is include()'d fresh on every call (a
 // post can embed more than one recipe), so any function it needed would be
 // redeclared on the second include and fatal — they have to live here,
@@ -168,10 +168,10 @@ function brewlab_recipes_field_option_label( $section_key, $field_key, $value ) 
 //   brewlab_recipes_srm_color()
 //------------------------------------------------------------------------------
 // Standard SRM-to-hex approximation (the same beer-color scale used across
-// most homebrewing software) for the stat strip's color swatch. Values are
-// old-plugin-exact (wpbtr_srm_to_hex()) rather than a fresh approximation,
-// so a recipe's swatch doesn't shift color on migration. Returns '' for
-// anything blank/non-numeric rather than guessing at a color.
+// most homebrewing software) for the stat strip's color swatch. This is a
+// fixed lookup table, not something to recompute — changing the values
+// would shift the displayed color of every existing recipe's SRM swatch.
+// Returns '' for anything blank/non-numeric rather than guessing at a color.
 function brewlab_recipes_srm_color( $srm ) {
 	static $scale = [
 		1  => '#FFE699', 2  => '#FFD878', 3  => '#FFCA5A', 4  => '#FFBF42',

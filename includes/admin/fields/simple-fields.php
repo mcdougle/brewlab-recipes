@@ -253,8 +253,8 @@ function brewlab_recipes_render_media_box( $post_id ) {
 //------------------------------------------------------------------------------
 // Rendered once in the footer (same pattern as the repeater modal in
 // repeater-field.php) — a hand-rolled canvas HSV picker, not WP core's
-// bundled Iris picker, matching the old plugin's exact UI. The SV
-// square/hue strip/hex/preset interaction is all in admin-media-color.js;
+// bundled Iris picker, for full control over the SV square/hue strip/hex/
+// preset layout. The interaction logic is all in admin-media-color.js;
 // this only needs to emit the DOM it operates on.
 function brewlab_recipes_render_color_picker_modal() {
 	$screen = get_current_screen();

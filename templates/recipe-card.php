@@ -9,12 +9,12 @@
 // file must stay function-definition-free (see the note atop render.php for
 // why) — anything reusable belongs there instead.
 //
-// Structure, grouping rules, and unit-conversion data attributes are ported
-// from wp-brewtools-recipes/templates/recipe-card.php field-for-field (see
-// assets/js/recipe-card.js for the client-side conversion engine that reads
-// the data-base/data-unit/data-type attributes this file writes). Grouping
-// labels are read from repeater-schemas.php's own field options instead of
-// a second hardcoded copy, so a label only ever needs to change in one place.
+// Every quantity is written with data-base/data-unit/data-type attributes
+// (see assets/js/recipe-card.js for the client-side conversion engine that
+// reads them) so the unit toggle and batch scaler can recompute displayed
+// values without a page reload. Grouping labels are read from
+// repeater-schemas.php's own field options instead of a second hardcoded
+// copy, so a label only ever needs to change in one place.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -81,10 +81,7 @@ $boil_hops = array_values( array_filter( $hops, function ( $h ) {
 } ) );
 
 $has_ingredients  = ! empty( $fermentables ) || ! empty( $hops ) || ! empty( $yeasts ) || ! empty( $additions );
-// Unlike the old plugin (which always showed a Method tab, empty or not —
-// a mead/cider/wine with no mash and no boil just showed "No method steps
-// added yet." forever), this only shows Method when there's actually a
-// mash section or a boil section to show.
+// this only shows Method when there's actually a mash section or a boil section to show.
 $has_method       = ( $show_mash && ! empty( $mash_steps ) ) || ( $show_hops && ( $recipe['boil_time'] || ! empty( $boil_hops ) ) );
 $has_fermentation = ! empty( $ferm_steps );
 $has_notes        = ! empty( $recipe['notes'] );

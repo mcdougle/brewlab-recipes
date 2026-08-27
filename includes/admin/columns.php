@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 //   brewlab_recipes_track_recipe_usage()
 //------------------------------------------------------------------------------
 // First post to embed a recipe wins — deliberately never overwritten once
-// set, matching the old plugin's semantics (a recipe usually has one "home"
-// post even if reused elsewhere later).
+// set, so a recipe keeps one "home" post for the "Used In" column even if
+// it gets embedded elsewhere later.
 function brewlab_recipes_track_recipe_usage( $post_id, $post ) {
 	if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
 		return;

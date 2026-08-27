@@ -2,13 +2,10 @@
  * Recipe Card
  *
  * Tab switching, the unit-conversion engine (weight/volume/temp), and the
- * live batch-size scaler for the front-end recipe card. Ported from
- * wp-brewtools-recipes/templates/recipe-card.php's inline <script>, split
- * into an external file (wp_enqueue_script, see includes/enqueue.php)
- * instead of an inline block per card — this project enqueues assets
- * rather than printing them inline. Since one page can embed more than one
- * recipe, initRecipeCard() runs once per .brewlab-recipes-card found,
- * instead of the old plugin's single per-card inline closure.
+ * live batch-size scaler for the front-end recipe card. Loaded once as an
+ * external file (see includes/enqueue.php) rather than printed inline per
+ * card. Since one page can embed more than one recipe, initRecipeCard()
+ * runs once per .brewlab-recipes-card found on the page.
  *
  * Reads the data-base/data-unit/data-type attributes templates/recipe-card.php
  * writes onto .brewlab-recipes-qty and .brewlab-recipes-unit-label elements —

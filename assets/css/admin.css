@@ -3,11 +3,10 @@
  *
  * General visual pass over the recipe edit screen — the grid-style form
  * rows, the Media box, the repeater list/modal, and the Recipes list
- * table's two custom columns. Values (font, metabox header treatment, row
- * layout, hover states) match the old plugin's admin.css deliberately,
- * since the old plugin's admin UI already looked considered and there was
- * no reason to reinvent it. The front-end card (assets/css/recipe-card.css)
- * is where the actual BrewLab visual identity lives, not here.
+ * table's two custom columns. Deliberately understated (compact uppercase
+ * metabox headers, muted grays) since this is a working admin screen, not
+ * brand surface — the front-end card (assets/css/recipe-card.css) is where
+ * the actual BrewLab visual identity lives, not here.
  */
 
 /* WP's native title field is replaced by the "Name" proxy row inside
@@ -25,8 +24,9 @@
 }
 
 /* Metabox headers — every box this plugin registers has an id starting
-   brewlab_recipes_, so one attribute selector covers all ten instead of
-   repeating a rule per box id the way the old plugin did. */
+   brewlab_recipes_, so one attribute selector covers all of them instead of
+   a separate rule per box id (and automatically covers any box added
+   later, with no CSS change needed). */
 [id^="brewlab_recipes_"] > .postbox-header,
 [id^="brewlab_recipes_"] > .postbox-header h2,
 [id^="brewlab_recipes_"] > .postbox-header .hndle {

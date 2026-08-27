@@ -5,8 +5,8 @@
 // Registers the brewlab_recipe edit-screen metaboxes from one config array
 // (brewlab_recipes_metabox_config()) instead of a separate add_meta_box()
 // call per box, and enforces box order every load — WordPress persists a
-// user's drag-and-drop order to user_meta, which drifts from the intended
-// order over time; the old plugin hit this directly.
+// user's drag-and-drop order to user_meta, which would otherwise drift from
+// the intended order the first time someone reorders a box.
 //
 // Config entries carry a 'type' of 'simple' or 'repeater', which the render
 // dispatcher below uses to pick simple-fields.php or repeater-field.php.
@@ -204,8 +204,8 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 		$admin_css_deps = [ 'brewlab-recipes-admin-repeater', 'brewlab-recipes-admin-media' ];
 	}
 
-	// Source Sans 3 — matches the old plugin's admin UI (and WP Recipe
-	// Maker's, which it was matching in turn).
+	// Source Sans 3 — matches the front-end card's body font (see
+	// recipe-card.css) so admin and front-end typography stay consistent.
 	wp_enqueue_style(
 		'brewlab-recipes-source-sans',
 		'https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&display=swap',
@@ -231,8 +231,9 @@ add_action( 'admin_enqueue_scripts', 'brewlab_recipes_enqueue_admin_assets' );
 //   brewlab_recipes_enforce_metabox_order()
 //------------------------------------------------------------------------------
 // Rebuilds the order from the config array on every load instead of trusting
-// WordPress's persisted per-user order, grouped by context so a future
-// 'side' box (Phase 3's Options box) is handled without changes here.
+// WordPress's persisted per-user order, grouped by context ('normal'/'side')
+// so the side Options box is ordered independently of the normal-column
+// boxes without any extra handling here.
 function brewlab_recipes_enforce_metabox_order() {
 	$by_context = [];
 	foreach ( brewlab_recipes_metabox_config() as $box ) {

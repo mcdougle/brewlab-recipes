@@ -74,16 +74,13 @@ function brewlab_recipes_sanitize_simple_field_from_post( $key, $field ) {
 
 		case 'textarea':
 			// sanitize_textarea_field(), not sanitize_text_field() — the
-			// latter strips line breaks, which would silently break the
-			// notes field the way it did in the old plugin (it was never
-			// actually wired up to a form field, so the bug never fired).
+			// latter strips line breaks, which would silently break a
+			// multi-line field like Notes.
 			return sanitize_textarea_field( $raw );
 
 		case 'number':
-			// floatval(), not sanitize_text_field() — the old plugin ran
-			// every field through sanitize_text_field() including numeric
-			// ones, which stores whatever text was typed rather than a
-			// validated number.
+			// floatval(), not sanitize_text_field() — stores a validated
+			// number rather than whatever text was typed into the field.
 			return '' === $raw ? '' : (string) floatval( $raw );
 
 		case 'select':

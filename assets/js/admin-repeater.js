@@ -9,10 +9,9 @@
  *
  * Each row's real submittable values live in hidden inputs inside its <li>
  * — this file only ever edits those directly; the modal's visible fields
- * are a template cloned into it and copied to/from on open/save. That keeps
- * every field's POSTed name (brewlab_recipes_repeater[section][index][field])
- * exactly what it was before this rewrite, so includes/admin/save.php needed
- * no changes for the row data itself.
+ * are a template cloned into it and copied to/from on open/save. Every
+ * field's POSTed name is brewlab_recipes_repeater[section][index][field],
+ * which includes/admin/save.php reads without caring what UI produced it.
  *
  * The index counter only ever increments, even across deletions — reusing a
  * removed row's index would make a later row's inputs share its array index

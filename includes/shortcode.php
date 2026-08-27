@@ -2,8 +2,8 @@
 //------------------------------------------------------------------------------
 //   Shortcode
 //------------------------------------------------------------------------------
-// Registers [brewlab_recipe id="123"], the first of the two ways a recipe
-// gets embedded in a post (the block is the other, Phase 5's next step).
+// Registers [brewlab_recipe id="123"], one of two ways a recipe gets
+// embedded in a post (the Gutenberg block in block.php is the other).
 // Both funnel through render_recipe() — this file's callback is a thin
 // wrapper around it, not a second render path.
 

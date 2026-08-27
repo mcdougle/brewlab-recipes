@@ -7,8 +7,8 @@
 // This is the single source of truth for those six data shapes — the admin
 // repeater UI, the front-end template, and the save handler should all read
 // field definitions and select-option labels from here instead of each
-// redefining their own copy (that duplication is what made the old plugin's
-// meta-fields.php unmaintainable).
+// redefining their own copy, which would let the six sections drift out of
+// sync with each other over time.
 //
 // A field's 'summary' key drives the admin row summary (see
 // brewlab_recipes_render_repeater_item() in repeater-field.php): 'slot' is
@@ -21,17 +21,16 @@
 // ingredient section leads its primary chips with amount+unit, not name,
 // even though name is declared first for the modal's sake). No individual
 // chip grows to fill space — only the primary/meta containers do (see the
-// CSS) — matching the old plugin's actual mechanism: its own name/variety
-// span has no flex property at all, only the row's left-hand wrapper does,
-// which is what keeps a 3-chip primary group (hops: amount, variety,
-// alpha) packed tightly together instead of the middle chip stretching and
-// shoving the one after it away. A primary/meta field that's also the
-// first half of an inline_with pair (e.g. amount+unit) renders as one
-// combined chip using both fields' values — reusing that existing
-// relationship instead of a second "these two go together" key. This is
-// old-plugin-exact per-section styling (bold varies by field, hops bolds
+// CSS): each chip's own span has no flex property, only the row's
+// left-hand/right-hand wrapper does, which keeps a multi-chip group (e.g.
+// hops: amount, variety, alpha) packed tightly together instead of one
+// chip stretching and shoving the ones after it away. A primary/meta field
+// that's also the first half of an inline_with pair (e.g. amount+unit)
+// renders as one combined chip using both fields' values — reusing that
+// existing relationship instead of a second "these two go together" key.
+// Per-section styling varies by design (bold varies by field, hops bolds
 // two fields where every other section bolds one, chip widths and order
-// differ), expressed as schema data instead of six hand-written
+// differ) — expressed as schema data here instead of six hand-written
 // summary-building functions.
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -210,9 +209,8 @@ function brewlab_recipes_repeater_schemas() {
 					// doesn't fit a static suffix, handled directly in
 					// brewlab_recipes_repeater_item_summary().
 					//
-					// order:1 (before 'use') matches the old plugin's
-					// composite string reading as "60 min · Boil" — time,
-					// then use.
+					// order:1 (before 'use') so the composite summary string
+					// reads "60 min · Boil" — time first, then use.
 					'summary' => [ 'slot' => 'meta', 'muted' => true, 'order' => 1 ],
 				],
 			],
@@ -342,8 +340,9 @@ function brewlab_recipes_repeater_schemas() {
 						'c' => '°C',
 					],
 				],
-				// order 2/3 (pressure before days) matches the old plugin's
-				// DOM sequence, even though days is declared first here.
+				// order 2/3 (pressure before days) sets the summary's display
+				// order deliberately — days is declared first in this array
+				// only because that's the modal's field order.
 				'days'      => [
 					'type'    => 'number',
 					'label'   => __( 'Days', 'brewlab-recipes' ),
