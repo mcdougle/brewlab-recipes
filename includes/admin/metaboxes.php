@@ -166,6 +166,41 @@ function brewlab_recipes_enqueue_admin_assets( $hook ) {
 			true
 		);
 
+		// The front-end card's own stylesheet/script/fonts, loaded here too
+		// so the "Preview Recipe Card" modal (includes/admin/preview.php)
+		// renders and behaves identically to the real front end instead of
+		// a second, unstyled approximation of it.
+		wp_enqueue_style(
+			'brewlab-recipes-card-fonts',
+			'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Source+Sans+3:wght@400;600;700&display=swap',
+			[],
+			null
+		);
+		wp_enqueue_style(
+			'brewlab-recipes-card',
+			BREWLAB_RECIPES_URL . 'assets/css/recipe-card.css',
+			[ 'brewlab-recipes-card-fonts' ],
+			BREWLAB_RECIPES_VERSION
+		);
+		wp_enqueue_script(
+			'brewlab-recipes-card',
+			BREWLAB_RECIPES_URL . 'assets/js/recipe-card.js',
+			[],
+			BREWLAB_RECIPES_VERSION,
+			true
+		);
+		wp_enqueue_script(
+			'brewlab-recipes-admin-preview',
+			BREWLAB_RECIPES_URL . 'assets/js/admin-preview.js',
+			[],
+			BREWLAB_RECIPES_VERSION,
+			true
+		);
+		wp_localize_script( 'brewlab-recipes-admin-preview', 'brewlabRecipesPreview', [
+			'loadingText' => __( 'Loading…', 'brewlab-recipes' ),
+			'errorText'   => __( 'Preview failed. Please try again.', 'brewlab-recipes' ),
+		] );
+
 		$admin_css_deps = [ 'brewlab-recipes-admin-repeater', 'brewlab-recipes-admin-media' ];
 	}
 

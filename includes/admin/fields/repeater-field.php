@@ -202,6 +202,14 @@ function brewlab_recipes_render_repeater_item_summary( $section, $fields, $row )
 
 	echo '<span class="brewlab-recipes-repeater__item-primary">';
 	array_map( 'brewlab_recipes_render_repeater_summary_chip', $primary );
+	// Affiliate-link audit indicator — lets a section be scanned for which
+	// rows have a link set without opening each one's modal to check.
+	if ( isset( $fields['link'] ) && ! empty( $row['link'] ) ) {
+		printf(
+			'<span class="brewlab-recipes-repeater__item-link-badge dashicons dashicons-admin-links" title="%s"></span>',
+			esc_attr__( 'Affiliate link set', 'brewlab-recipes' )
+		);
+	}
 	echo '</span>';
 
 	if ( $meta ) {

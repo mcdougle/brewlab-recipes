@@ -43,6 +43,7 @@ require_once BREWLAB_RECIPES_PATH . 'includes/admin/fields/simple-fields.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/metaboxes.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/admin/save.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/render.php';
+require_once BREWLAB_RECIPES_PATH . 'includes/admin/preview.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/shortcode.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/block.php';
 require_once BREWLAB_RECIPES_PATH . 'includes/enqueue.php';
