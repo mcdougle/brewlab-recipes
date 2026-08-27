@@ -104,10 +104,10 @@ foreach ( [ 'ingredients' => $has_ingredients, 'method' => $has_method, 'ferment
 // units (fermentables' lb/kg) stay large, small units (hops/yeast's oz/g)
 // stay small, mirroring assets/js/recipe-card.js's targetWeightUnit().
 $us_weight_unit  = function ( $unit, $small_only = false ) {
-	if ( ! $small_only && in_array( $unit, [ 'kg', 'g' ], true ) ) {
-		return 'lb';
+	if ( $small_only ) {
+		return 'oz';
 	}
-	return in_array( $unit, [ 'kg', 'g', 'lb' ], true ) ? 'oz' : $unit;
+	return in_array( $unit, [ 'lb', 'kg' ], true ) ? 'lb' : 'oz';
 };
 $metric_weight_unit = function ( $unit ) {
 	return in_array( $unit, [ 'lb', 'oz' ], true ) ? ( 'lb' === $unit ? 'kg' : 'g' ) : $unit;
