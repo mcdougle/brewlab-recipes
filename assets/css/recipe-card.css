@@ -60,6 +60,9 @@
 	font-size: 11px;
 }
 .brewlab-recipes-wrap .brewlab-recipes-credit a {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
 	color: var(--c-muted, #7a736a);
 	opacity: .7;
 	text-decoration: none;
@@ -68,6 +71,14 @@
 	color: var(--c-accent, #8b6914);
 	opacity: 1;
 	text-decoration: underline;
+}
+.brewlab-recipes-wrap .brewlab-recipes-credit__logo {
+	display: inline-flex;
+}
+.brewlab-recipes-wrap .brewlab-recipes-credit__logo svg {
+	display: block;
+	width: 11px;
+	height: 13px;
 }
 
 /* ── Header ───────────────────────────────────────────────── */
