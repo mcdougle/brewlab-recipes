@@ -578,6 +578,6 @@ $metric_weight_unit = function ( $unit ) {
 
 </div>
 
-<p class="brewlab-recipes-credit"><a href="https://brewlab.app" target="_blank" rel="noopener noreferrer"><span class="brewlab-recipes-credit__logo"><?php echo brewlab_recipes_menu_icon_svg( 'currentColor', 'currentColor', 'currentColor' ); // phpcs:ignore -- static SVG, no user input ?></span>Powered by BrewLab</a></p>
+<p class="brewlab-recipes-credit"><a href="https://brewlab.app" target="_blank" rel="noopener noreferrer">Powered by <span class="brewlab-recipes-credit__logo"><?php echo brewlab_recipes_menu_icon_svg( 'currentColor', 'currentColor', 'currentColor' ); // phpcs:ignore -- static SVG, no user input ?></span>BrewLab</a></p>
 
 </div>
