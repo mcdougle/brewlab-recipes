@@ -3,7 +3,7 @@
  * Plugin Name:       BrewLab Recipes
  * Plugin URI:        https://brewlab.app
  * Description:       Homebrew recipe cards for beer, mead, cider, and wine — embedded in WordPress posts via shortcode or Gutenberg block.
- * Version:           1.0.1
+ * Version:           1.0.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Tested up to:      7.1
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 //------------------------------------------------------------------------------
 //   Constants
 //------------------------------------------------------------------------------
-define( 'BREWLAB_RECIPES_VERSION', '1.0.1' );
+define( 'BREWLAB_RECIPES_VERSION', '1.0.2' );
 define( 'BREWLAB_RECIPES_PATH', plugin_dir_path( __FILE__ ) );
 define( 'BREWLAB_RECIPES_URL', plugin_dir_url( __FILE__ ) );
 

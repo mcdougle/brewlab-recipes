@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+- Added a small "Powered by BrewLab" credit line below the recipe card,
+  linking back to brewlab.app.
+
 ## 1.0.1
 - Added this changelog.
 
