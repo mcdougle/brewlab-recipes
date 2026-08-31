@@ -736,10 +736,10 @@
 	padding: 8px;
 }
 
-/* The card's own margin (2rem auto) fights the modal's own spacing/sizing
+/* The wrap's own margin (2rem auto) fights the modal's own spacing/sizing
    when nested inside it — collapse it here rather than in recipe-card.css,
    which shouldn't know it's ever rendered inside this modal. */
-.brewlab-recipes-preview-modal__body .brewlab-recipes-card {
+.brewlab-recipes-preview-modal__body .brewlab-recipes-wrap {
 	margin: 0;
 	max-width: none;
 }

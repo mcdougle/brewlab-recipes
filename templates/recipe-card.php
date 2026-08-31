@@ -110,6 +110,8 @@ $metric_weight_unit = function ( $unit ) {
 	return in_array( $unit, [ 'lb', 'oz' ], true ) ? ( 'lb' === $unit ? 'kg' : 'g' ) : $unit;
 };
 ?>
+<div class="brewlab-recipes-wrap">
+
 <div class="brewlab-recipes-card" id="<?php echo esc_attr( $uid ); ?>" data-author-system="<?php echo esc_attr( $author_system ); ?>" style="--brewlab-recipes-header-bg: <?php echo esc_attr( $header_color ); ?>">
 
 	<?php // ── Header ?>
@@ -573,5 +575,9 @@ $metric_weight_unit = function ( $unit ) {
 		<?php endif; ?>
 
 	</div>
+
+</div>
+
+<p class="brewlab-recipes-credit"><a href="https://brewlab.app" target="_blank" rel="noopener noreferrer">Powered by <span class="brewlab-recipes-credit__logo"><?php echo brewlab_recipes_menu_icon_svg( 'currentColor', 'currentColor', 'currentColor' ); // phpcs:ignore -- static SVG, no user input ?></span>BrewLab</a></p>
 
 </div>
