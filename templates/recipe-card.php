@@ -109,6 +109,26 @@ $us_weight_unit  = function ( $unit, $small_only = false ) {
 $metric_weight_unit = function ( $unit ) {
 	return in_array( $unit, [ 'lb', 'oz' ], true ) ? ( 'lb' === $unit ? 'kg' : 'g' ) : $unit;
 };
+
+// Fermentables can be dry (lb/oz/kg/g) or liquid (L/gal — juice, wort, honey by
+// volume), and the two can't be added or compared without a density we don't
+// have. Each unit maps to a dimension plus its factor to that dimension's base
+// (grams / litres), so a row's share and the total are only computed when every
+// row sits in the same dimension. Mirrors TO_G / TO_L in recipe-card.js.
+$ferm_unit_info = [
+	'g'   => [ 'weight', 1 ],
+	'kg'  => [ 'weight', 1000 ],
+	'oz'  => [ 'weight', 28.3495 ],
+	'lb'  => [ 'weight', 453.592 ],
+	'l'   => [ 'volume', 1 ],
+	'gal' => [ 'volume', 3.78541 ],
+];
+$us_ferm_unit     = function ( $unit ) use ( $ferm_unit_info, $us_weight_unit ) {
+	return 'volume' === ( $ferm_unit_info[ $unit ][0] ?? '' ) ? 'gal' : $us_weight_unit( $unit );
+};
+$metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_unit ) {
+	return 'volume' === ( $ferm_unit_info[ $unit ][0] ?? '' ) ? 'L' : $metric_weight_unit( $unit );
+};
 ?>
 <div class="brewlab-recipes-wrap">
 
@@ -249,9 +269,23 @@ $metric_weight_unit = function ( $unit ) {
 						$ferm_grouped[ $f['type'] ?? '' ][] = $f;
 					}
 					$ferm_has_multiple_types = count( $ferm_grouped ) > 1;
-					$ferm_total              = array_sum( array_map( function ( $f ) {
-						return floatval( $f['amount'] ?? 0 );
+
+					// Total and per-row share, but only when every row's unit is known
+					// and shares one dimension (all weight or all volume); mixed rows
+					// (e.g. 2 gal juice + 12 oz concentrate) get neither, since adding
+					// raw numbers across units is meaningless.
+					$ferm_dims  = array_unique( array_map( function ( $f ) use ( $ferm_unit_info ) {
+						return $ferm_unit_info[ $f['unit'] ?? '' ][0] ?? '';
 					}, $fermentables ) );
+					$ferm_dim   = ( 1 === count( $ferm_dims ) ) ? reset( $ferm_dims ) : '';
+					$ferm_total = 0;
+					if ( $ferm_dim ) {
+						$ferm_total_base = array_sum( array_map( function ( $f ) use ( $ferm_unit_info ) {
+							return floatval( $f['amount'] ?? 0 ) * $ferm_unit_info[ $f['unit'] ][1];
+						}, $fermentables ) );
+						$tot_u           = $fermentables[0]['unit'];
+						$ferm_total      = $ferm_total_base / $ferm_unit_info[ $tot_u ][1];
+					}
 					?>
 					<div class="brewlab-recipes-group">
 						<h3 class="brewlab-recipes-group__title brewlab-recipes-section-heading"><?php echo brewlab_recipes_icon( $ferm_icon, 'brewlab-recipes-icon' ); ?><?php esc_html_e( 'Fermentables', 'brewlab-recipes' ); ?></h3>
@@ -264,12 +298,13 @@ $metric_weight_unit = function ( $unit ) {
 								<?php foreach ( $ferm_grouped[ $type_key ] as $f ) :
 									$base_amt  = floatval( $f['amount'] ?? 0 );
 									$orig_unit = $f['unit'] ?? '';
-									$pct       = $ferm_total > 0 ? round( $base_amt / $ferm_total * 100 ) : 0;
+									$row_dim   = $ferm_unit_info[ $orig_unit ][0] ?? 'weight';
+									$pct       = $ferm_total > 0 ? round( $base_amt * $ferm_unit_info[ $orig_unit ][1] / $ferm_total_base * 100 ) : null;
 									?>
 									<div class="brewlab-recipes-item">
 										<span class="brewlab-recipes-item__amt">
-											<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="weight"><?php echo esc_html( $base_amt ); ?></span>
-											<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $orig_unit ); ?>" data-us="<?php echo esc_attr( $us_weight_unit( $orig_unit ) ); ?>" data-metric="<?php echo esc_attr( $metric_weight_unit( $orig_unit ) ); ?>"><?php echo esc_html( $orig_unit ); ?></span>
+											<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="<?php echo esc_attr( $row_dim ); ?>"><?php echo esc_html( $base_amt ); ?></span>
+											<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $orig_unit ); ?>" data-us="<?php echo esc_attr( $us_ferm_unit( $orig_unit ) ); ?>" data-metric="<?php echo esc_attr( $metric_ferm_unit( $orig_unit ) ); ?>"><?php echo esc_html( 'l' === $orig_unit ? 'L' : $orig_unit ); ?></span>
 										</span>
 										<span class="brewlab-recipes-item__name"><?php
 											$link = $f['link'] ?? '';
@@ -280,18 +315,17 @@ $metric_weight_unit = function ( $unit ) {
 												echo esc_html( $name );
 											}
 										?></span>
-										<span class="brewlab-recipes-item__pct"><?php echo esc_html( $pct ); ?>%</span>
+										<span class="brewlab-recipes-item__pct"><?php echo null === $pct ? '' : esc_html( $pct ) . '%'; ?></span>
 									</div>
 								<?php endforeach; ?>
 							<?php endforeach; ?>
-							<?php if ( $ferm_total ) :
-								$tot_u = $fermentables[0]['unit'] ?? ''; ?>
+							<?php if ( $ferm_total ) : ?>
 								<div class="brewlab-recipes-item brewlab-recipes-item--total">
 									<span class="brewlab-recipes-item__name"></span>
 									<span class="brewlab-recipes-item__amt brewlab-recipes-item__total-label">
 										<?php esc_html_e( 'Total:', 'brewlab-recipes' ); ?>
-										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $ferm_total ); ?>" data-unit="<?php echo esc_attr( $tot_u ); ?>" data-type="weight"><?php echo esc_html( $ferm_total ); ?></span>
-										<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $tot_u ); ?>" data-us="<?php echo esc_attr( $us_weight_unit( $tot_u ) ); ?>" data-metric="<?php echo esc_attr( $metric_weight_unit( $tot_u ) ); ?>"><?php echo esc_html( $tot_u ); ?></span>
+										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( round( $ferm_total, 4 ) ); ?>" data-unit="<?php echo esc_attr( $tot_u ); ?>" data-type="<?php echo esc_attr( $ferm_dim ); ?>"><?php echo esc_html( round( $ferm_total, 2 ) ); ?></span>
+										<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $tot_u ); ?>" data-us="<?php echo esc_attr( $us_ferm_unit( $tot_u ) ); ?>" data-metric="<?php echo esc_attr( $metric_ferm_unit( $tot_u ) ); ?>"><?php echo esc_html( 'l' === $tot_u ? 'L' : $tot_u ); ?></span>
 									</span>
 								</div>
 							<?php endif; ?>
