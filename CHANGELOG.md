@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+- Fixed OG and FG losing their trailing zeros: "1.040" was shown as "1.04"
+  and "1.000" as "1". Gravity now always displays to at least three
+  decimals, on the recipe card and in the recipes list, including for
+  recipes saved before this fix.
+
 ## 1.0.3
 - Fixed the Fermentables total and percentages when ingredients use
   different units. A recipe listing 2 gal of juice plus 12 oz of concentrate
