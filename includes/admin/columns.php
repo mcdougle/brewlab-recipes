@@ -109,7 +109,7 @@ function brewlab_recipes_render_admin_column( $column, $post_id ) {
 				$parts[] = $abv . '% ABV';
 			}
 			if ( '' !== $og ) {
-				$parts[] = 'OG ' . $og;
+				$parts[] = 'OG ' . brewlab_recipes_format_gravity( $og );
 			}
 			if ( '' !== $ibu ) {
 				$parts[] = $ibu . ' IBU';
