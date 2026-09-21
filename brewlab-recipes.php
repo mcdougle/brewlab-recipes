@@ -7,7 +7,7 @@
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Tested up to:      7.1
- * Author:            mcdougle
+ * Author:            BrewLab
  * Author URI:        https://brewlab.app
  * License:           Proprietary
  * Text Domain:       brewlab-recipes
