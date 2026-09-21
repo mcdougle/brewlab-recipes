@@ -38,6 +38,14 @@
 		if ( ! fromUnit || ! toUnit || fromUnit === toUnit ) return val;
 		return val * ( TO_L[ fromUnit ] || 1 ) * ( FROM_L[ toUnit ] || 1 );
 	}
+	// Liquid fermentables (juice, wort) are stored as 'l' / 'gal' but the volume
+	// tables above are keyed 'litres' / 'gallons' (the batch-size scaler's names).
+	var VOLUME_ALIAS = { l: 'litres', gal: 'gallons' };
+
+	// Convert a data-type="volume" quantity to the unit the given system shows.
+	function convertFermVolume( val, fromUnit, system ) {
+		return convertVolume( val, VOLUME_ALIAS[ fromUnit ] || fromUnit, system === 'us' ? 'gallons' : 'litres' );
+	}
 	function convertTemp( valF, system ) {
 		return system === 'metric' ? Math.round( ( valF - 32 ) * 5 / 9 * 10 ) / 10 : valF;
 	}
@@ -167,6 +175,11 @@
 					el.textContent = fmt( convertWeight( base, unit, targetWeightUnit( unit, res ) ) );
 					return;
 				}
+				if ( type === 'volume' ) {
+					if ( sys === 'author' ) { el.textContent = fmt( base ); return; }
+					el.textContent = fmt( convertFermVolume( base, unit, res ) );
+					return;
+				}
 				if ( type === 'yeast' ) {
 					// Not part of the US/Metric toggle — the unit set mixes
 					// weight/volume/count/cell-count with no shared conversion
@@ -246,9 +259,14 @@
 						return;
 					}
 
-					var converted = ( currentSystem === 'author' )
-						? base
-						: convertWeight( base, unit, targetWeightUnit( unit, res ) );
+					var converted;
+					if ( currentSystem === 'author' ) {
+						converted = base;
+					} else if ( type === 'volume' ) {
+						converted = convertFermVolume( base, unit, res );
+					} else {
+						converted = convertWeight( base, unit, targetWeightUnit( unit, res ) );
+					}
 					el.textContent = fmt( converted * ratio );
 				} );
 			};
