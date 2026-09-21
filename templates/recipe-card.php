@@ -212,8 +212,8 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 	<?php
 	$stats = [];
 	if ( '' !== $recipe['abv'] )                     $stats[] = [ __( 'ABV', 'brewlab-recipes' ), $recipe['abv'] . '%', '' ];
-	if ( '' !== $recipe['original_gravity'] )        $stats[] = [ __( 'OG', 'brewlab-recipes' ), $recipe['original_gravity'], '' ];
-	if ( '' !== $recipe['final_gravity'] )           $stats[] = [ __( 'FG', 'brewlab-recipes' ), $recipe['final_gravity'], '' ];
+	if ( '' !== $recipe['original_gravity'] )        $stats[] = [ __( 'OG', 'brewlab-recipes' ), brewlab_recipes_format_gravity( $recipe['original_gravity'] ), '' ];
+	if ( '' !== $recipe['final_gravity'] )           $stats[] = [ __( 'FG', 'brewlab-recipes' ), brewlab_recipes_format_gravity( $recipe['final_gravity'] ), '' ];
 	if ( $show_hops && '' !== $recipe['ibu'] )       $stats[] = [ __( 'IBU', 'brewlab-recipes' ), $recipe['ibu'], '' ];
 	if ( $srm )                                      $stats[] = [ __( 'SRM', 'brewlab-recipes' ), $srm, $srm_hex ];
 	?>

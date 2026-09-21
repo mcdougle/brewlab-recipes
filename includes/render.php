@@ -197,3 +197,23 @@ function brewlab_recipes_srm_color( $srm ) {
 
 	return $scale[ min( $step, 40 ) ];
 }
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_format_gravity()
+//------------------------------------------------------------------------------
+// Gravity is conventionally written to three decimals (1.040, 1.000), but the
+// save handler stores every number field as a float string, which drops the
+// trailing zeros ("1.040" -> "1.04", "1.000" -> "1"). Padding back to three
+// at display time repairs recipes already saved that way without re-entry;
+// a fourth decimal someone actually typed (1.0405) is kept. Returns blank or
+// non-numeric input untouched rather than inventing a value.
+function brewlab_recipes_format_gravity( $value ) {
+	if ( ! is_numeric( $value ) ) {
+		return $value;
+	}
+
+	$dot      = strpos( (string) $value, '.' );
+	$decimals = false === $dot ? 0 : strlen( (string) $value ) - $dot - 1;
+
+	return number_format( (float) $value, max( 3, $decimals ), '.', '' );
+}
