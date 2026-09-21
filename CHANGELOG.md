@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.3
+- Fixed the Fermentables total and percentages when ingredients use
+  different units. A recipe listing 2 gal of juice plus 12 oz of concentrate
+  showed "Total: 14 gal" and shares of 14% / 86%, because the raw numbers
+  were added together. Totals and percentages are now computed only when
+  every fermentable is a weight or every one is a volume, converted to a
+  common unit first (10 lb + 8 oz is 10.5 lb). Mixed weight-and-volume
+  lists show no total or percentages instead of a wrong one.
+- Fermentables listed in litres or gallons now convert correctly with the
+  US/Metric toggle and the batch scaler. They were previously relabelled as
+  ounces.
+
 ## 1.0.2
 - Added a small "Powered by BrewLab" credit line below the recipe card,
   linking back to brewlab.app.
