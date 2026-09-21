@@ -202,8 +202,14 @@ function brewlab_recipes_repeater_schemas() {
 					'summary' => [ 'slot' => 'meta', 'muted' => true, 'order' => 2 ],
 				],
 				'time'    => [
-					'type'    => 'number',
-					'label'   => __( 'Time (min)', 'brewlab-recipes' ),
+					'type'     => 'number',
+					'label'    => __( 'Time (min)', 'brewlab-recipes' ),
+					// Modal label follows the 'use' field: dry hop is measured
+					// in days, everything else keeps the default label above.
+					'label_by' => [
+						'field'  => 'use',
+						'labels' => [ 'dry_hop' => __( 'Time (days)', 'brewlab-recipes' ) ],
+					],
 					// Suffix depends on 'use' (dry hop is measured in days,
 					// everything else in minutes) — the one case that
 					// doesn't fit a static suffix, handled directly in
@@ -211,7 +217,7 @@ function brewlab_recipes_repeater_schemas() {
 					//
 					// order:1 (before 'use') so the composite summary string
 					// reads "60 min · Boil" — time first, then use.
-					'summary' => [ 'slot' => 'meta', 'muted' => true, 'order' => 1 ],
+					'summary'  => [ 'slot' => 'meta', 'muted' => true, 'order' => 1 ],
 				],
 			],
 		],

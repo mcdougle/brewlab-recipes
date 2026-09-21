@@ -350,7 +350,22 @@ function brewlab_recipes_render_repeater_modal_fields( $fields ) {
 			continue;
 		}
 
-		printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s', esc_html( $field['label'] ) );
+		// A field with 'label_by' has a label that changes with another field's
+		// value (hops' Time: "min" normally, "days" for a dry hop). The label
+		// text sits in a span carrying the source field, the default text, and
+		// the per-value overrides, which admin-repeater.js reads to keep it in
+		// sync as that field changes.
+		if ( ! empty( $field['label_by'] ) ) {
+			printf(
+				'<div class="brewlab-recipes-repeater-modal-field"><label><span data-label-by="%s" data-label-default="%s" data-label-variants="%s">%s</span>',
+				esc_attr( $field['label_by']['field'] ),
+				esc_attr( $field['label'] ),
+				esc_attr( wp_json_encode( $field['label_by']['labels'] ) ),
+				esc_html( $field['label'] )
+			);
+		} else {
+			printf( '<div class="brewlab-recipes-repeater-modal-field"><label>%s', esc_html( $field['label'] ) );
+		}
 		if ( ! empty( $field['hint'] ) ) {
 			printf( '<span class="brewlab-recipes-hint">%s</span>', esc_html( $field['hint'] ) );
 		}

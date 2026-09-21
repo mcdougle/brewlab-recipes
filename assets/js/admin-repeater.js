@@ -89,7 +89,23 @@
 			syncToggleButtons( modalBody );
 		}
 
+		syncDynamicLabels( modalBody );
+
 		modal.style.display = 'block';
+	}
+
+	// Sets each label that follows another field (a span with data-label-by,
+	// e.g. hops' Time: "Time (min)", or "Time (days)" for a dry hop) to that
+	// field's current value's variant, falling back to the default text — run
+	// when the modal opens (the value may come from an existing row) and again
+	// whenever the source field changes.
+	function syncDynamicLabels( scope ) {
+		scope.querySelectorAll( '[data-label-by]' ).forEach( function ( span ) {
+			var source   = scope.querySelector( '[data-field="' + span.getAttribute( 'data-label-by' ) + '"]' );
+			var variants = JSON.parse( span.getAttribute( 'data-label-variants' ) || '{}' );
+			var value    = source ? source.value : '';
+			span.textContent = variants[ value ] || span.getAttribute( 'data-label-default' );
+		} );
 	}
 
 	// Makes every .brewlab-recipes-toggle's active button (and its hidden
@@ -201,6 +217,12 @@
 		var item = event.target.closest( '.brewlab-recipes-repeater__item' );
 		if ( item ) {
 			openModal( item.closest( '.brewlab-recipes-repeater' ), item );
+		}
+	} );
+
+	document.addEventListener( 'change', function ( event ) {
+		if ( modalBody && modalBody.contains( event.target ) ) {
+			syncDynamicLabels( modalBody );
 		}
 	} );
 
