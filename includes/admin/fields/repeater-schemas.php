@@ -178,7 +178,7 @@ function brewlab_recipes_repeater_schemas() {
 				'alpha'   => [
 					'type'    => 'number',
 					'label'   => __( 'Alpha Acid %', 'brewlab-recipes' ),
-					'summary' => [ 'slot' => 'primary', 'muted' => true, 'suffix' => '%', 'order' => 3 ],
+					'summary' => [ 'slot' => 'primary', 'muted' => true, 'suffix' => '% AA', 'order' => 3 ],
 				],
 				'ibu'     => [
 					'type'    => 'number',
