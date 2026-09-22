@@ -299,12 +299,13 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 									$base_amt  = floatval( $f['amount'] ?? 0 );
 									$orig_unit = $f['unit'] ?? '';
 									$row_dim   = $ferm_unit_info[ $orig_unit ][0] ?? 'weight';
+									$row_label = 'l' === $orig_unit ? 'L' : $orig_unit;
 									$pct       = $ferm_total > 0 ? round( $base_amt * $ferm_unit_info[ $orig_unit ][1] / $ferm_total_base * 100 ) : null;
 									?>
 									<div class="brewlab-recipes-item">
 										<span class="brewlab-recipes-item__amt">
 											<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="<?php echo esc_attr( $row_dim ); ?>"><?php echo esc_html( $base_amt ); ?></span>
-											<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $orig_unit ); ?>" data-us="<?php echo esc_attr( $us_ferm_unit( $orig_unit ) ); ?>" data-metric="<?php echo esc_attr( $metric_ferm_unit( $orig_unit ) ); ?>"><?php echo esc_html( 'l' === $orig_unit ? 'L' : $orig_unit ); ?></span>
+											<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $row_label ); ?>" data-us="<?php echo esc_attr( $us_ferm_unit( $orig_unit ) ); ?>" data-metric="<?php echo esc_attr( $metric_ferm_unit( $orig_unit ) ); ?>"><?php echo esc_html( $row_label ); ?></span>
 										</span>
 										<span class="brewlab-recipes-item__name"><?php
 											$link = $f['link'] ?? '';
@@ -325,7 +326,7 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 									<span class="brewlab-recipes-item__amt brewlab-recipes-item__total-label">
 										<?php esc_html_e( 'Total:', 'brewlab-recipes' ); ?>
 										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( round( $ferm_total, 4 ) ); ?>" data-unit="<?php echo esc_attr( $tot_u ); ?>" data-type="<?php echo esc_attr( $ferm_dim ); ?>"><?php echo esc_html( round( $ferm_total, 2 ) ); ?></span>
-										<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( $tot_u ); ?>" data-us="<?php echo esc_attr( $us_ferm_unit( $tot_u ) ); ?>" data-metric="<?php echo esc_attr( $metric_ferm_unit( $tot_u ) ); ?>"><?php echo esc_html( 'l' === $tot_u ? 'L' : $tot_u ); ?></span>
+										<span class="brewlab-recipes-unit-label" data-author="<?php echo esc_attr( 'l' === $tot_u ? 'L' : $tot_u ); ?>" data-us="<?php echo esc_attr( $us_ferm_unit( $tot_u ) ); ?>" data-metric="<?php echo esc_attr( $metric_ferm_unit( $tot_u ) ); ?>"><?php echo esc_html( 'l' === $tot_u ? 'L' : $tot_u ); ?></span>
 									</span>
 								</div>
 							<?php endif; ?>
