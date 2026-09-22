@@ -400,6 +400,9 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 											<?php if ( ! empty( $h['alpha'] ) ) : ?>
 												<span class="brewlab-recipes-item__detail"><?php echo esc_html( $h['alpha'] ); ?>% AA</span>
 											<?php endif; ?>
+											<?php if ( ! empty( $h['ibu'] ) ) : ?>
+												<span class="brewlab-recipes-item__detail"><?php echo esc_html( $h['ibu'] ); ?> IBU</span>
+											<?php endif; ?>
 										</span>
 										<span class="brewlab-recipes-item__pct brewlab-recipes-item__use">
 											<?php
@@ -534,6 +537,9 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 										?>
 										<?php if ( ! empty( $h['alpha'] ) ) : ?>
 											<span class="brewlab-recipes-item__detail"><?php echo esc_html( $h['alpha'] ); ?>% AA</span>
+										<?php endif; ?>
+										<?php if ( ! empty( $h['ibu'] ) ) : ?>
+											<span class="brewlab-recipes-item__detail"><?php echo esc_html( $h['ibu'] ); ?> IBU</span>
 										<?php endif; ?>
 									</span>
 									<span class="brewlab-recipes-item__pct">
