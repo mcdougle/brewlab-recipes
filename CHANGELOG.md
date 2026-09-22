@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.5
+- Plugin author now shows as "BrewLab" instead of "mcdougle" on the Plugins
+  page and in "View details".
+- The hop "Add Hop" modal now labels the time field "Time (days)" when Use
+  is set to Dry Hop, instead of always showing "Time (min)".
+- Added a per-addition IBU field for hops. Enter the IBU an addition
+  contributes (like a 60 minute Perle addition at ~30 IBU) and it shows
+  next to the alpha acid on the card and in the admin row summary. Not
+  calculated, entered directly, consistent with the rest of the plugin.
+- The admin hop row summary now labels alpha acid "5.5% AA" instead of a
+  bare "5.5%", so it isn't confused with the new IBU figure next to it.
+- Fixed fermentables stored in litres showing a lowercase "l" instead of
+  "L" once the front-end script ran, from the 1.0.3 fermentable-totals fix.
+
 ## 1.0.4
 - Fixed OG and FG losing their trailing zeros: "1.040" was shown as "1.04"
   and "1.000" as "1". Gravity now always displays to at least three
