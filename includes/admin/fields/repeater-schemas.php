@@ -180,6 +180,12 @@ function brewlab_recipes_repeater_schemas() {
 					'label'   => __( 'Alpha Acid %', 'brewlab-recipes' ),
 					'summary' => [ 'slot' => 'primary', 'muted' => true, 'suffix' => '%', 'order' => 3 ],
 				],
+				'ibu'     => [
+					'type'    => 'number',
+					'label'   => __( 'IBU', 'brewlab-recipes' ),
+					'hint'    => __( 'this addition', 'brewlab-recipes' ),
+					'summary' => [ 'slot' => 'primary', 'muted' => true, 'suffix' => ' IBU', 'order' => 4 ],
+				],
 				'type'    => [
 					'type'    => 'select',
 					'label'   => __( 'Form', 'brewlab-recipes' ),
