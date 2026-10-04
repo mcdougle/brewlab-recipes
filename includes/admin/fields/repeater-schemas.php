@@ -3,11 +3,11 @@
 //   Repeater Schemas
 //------------------------------------------------------------------------------
 // Declares the field shape for every JSON-array meta field on a recipe:
-// fermentables, additions, hops, yeast, mash steps, and fermentation steps.
-// This is the single source of truth for those six data shapes — the admin
+// fermentables, additions, water, hops, yeast, mash steps, and fermentation
+// steps. This is the single source of truth for those data shapes — the admin
 // repeater UI, the front-end template, and the save handler should all read
 // field definitions and select-option labels from here instead of each
-// redefining their own copy, which would let the six sections drift out of
+// redefining their own copy, which would let the sections drift out of
 // sync with each other over time.
 //
 // A field's 'summary' key drives the admin row summary (see
@@ -30,8 +30,8 @@
 // existing relationship instead of a second "these two go together" key.
 // Per-section styling varies by design (bold varies by field, hops bolds
 // two fields where every other section bolds one, chip widths and order
-// differ) — expressed as schema data here instead of six hand-written
-// summary-building functions.
+// differ) — expressed as schema data here instead of one hand-written
+// summary-building function per section.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -138,6 +138,73 @@ function brewlab_recipes_repeater_schemas() {
 						'secondary'   => __( 'Secondary', 'brewlab-recipes' ),
 						'bulk_aging'  => __( 'Bulk Aging', 'brewlab-recipes' ),
 						'packaging'   => __( 'Packaging', 'brewlab-recipes' ),
+					],
+					'summary' => [ 'slot' => 'meta', 'muted' => true, 'order' => 1 ],
+				],
+			],
+		],
+
+		// Salts and acids only — the optional source/target water profile is
+		// a separate, non-repeating set of fields (simple-fields.php's
+		// water_profile section). Name is free text like every other section;
+		// no maintained list of water agents.
+		'water' => [
+			'label'      => __( 'Water', 'brewlab-recipes' ),
+			'item_label' => __( 'Water Addition', 'brewlab-recipes' ),
+			'fields'     => [
+				'name'   => [
+					'type'     => 'text',
+					'label'    => __( 'Name', 'brewlab-recipes' ),
+					'required' => true,
+					'summary'  => [ 'slot' => 'primary', 'order' => 2 ],
+				],
+				'link'   => [
+					'type'  => 'url',
+					'label' => __( 'Affiliate Link', 'brewlab-recipes' ),
+				],
+				'amount' => [
+					'type'        => 'number',
+					'label'       => __( 'Amount', 'brewlab-recipes' ),
+					'required'    => true,
+					'inline_with' => 'unit',
+					'summary'     => [ 'slot' => 'primary', 'bold' => true, 'width' => 80, 'order' => 1 ],
+				],
+				// short_labels so the row summary and card read "2 %", while
+				// the modal's dropdown spells out what the percentage is of.
+				'unit'   => [
+					'type'         => 'select',
+					'label'        => __( 'Unit', 'brewlab-recipes' ),
+					'options'      => [
+						'g'    => __( 'g', 'brewlab-recipes' ),
+						'oz'   => __( 'oz', 'brewlab-recipes' ),
+						'tsp'  => __( 'tsp', 'brewlab-recipes' ),
+						'tbsp' => __( 'tbsp', 'brewlab-recipes' ),
+						'ml'   => __( 'ml', 'brewlab-recipes' ),
+						'drop' => __( 'drop(s)', 'brewlab-recipes' ),
+						'each' => __( 'each', 'brewlab-recipes' ),
+						'pct'  => __( '% of grist', 'brewlab-recipes' ),
+					],
+					'short_labels' => [
+						'g'    => __( 'g', 'brewlab-recipes' ),
+						'oz'   => __( 'oz', 'brewlab-recipes' ),
+						'tsp'  => __( 'tsp', 'brewlab-recipes' ),
+						'tbsp' => __( 'tbsp', 'brewlab-recipes' ),
+						'ml'   => __( 'ml', 'brewlab-recipes' ),
+						'drop' => __( 'drop(s)', 'brewlab-recipes' ),
+						'each' => __( 'each', 'brewlab-recipes' ),
+						'pct'  => '%',
+					],
+				],
+				'stage'  => [
+					'type'    => 'select',
+					'label'   => __( 'Added To', 'brewlab-recipes' ),
+					'widget'  => 'toggle',
+					'options' => [
+						'mash'      => __( 'Mash', 'brewlab-recipes' ),
+						'sparge'    => __( 'Sparge', 'brewlab-recipes' ),
+						'boil'      => __( 'Boil', 'brewlab-recipes' ),
+						'all'       => __( 'All Water', 'brewlab-recipes' ),
+						'fermenter' => __( 'Fermenter', 'brewlab-recipes' ),
 					],
 					'summary' => [ 'slot' => 'meta', 'muted' => true, 'order' => 1 ],
 				],

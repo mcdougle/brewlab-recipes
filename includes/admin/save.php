@@ -2,7 +2,7 @@
 //------------------------------------------------------------------------------
 //   Save Handler
 //------------------------------------------------------------------------------
-// Saves every field from simple-fields.php's schema, plus the six repeater
+// Saves every field from simple-fields.php's schema, plus the repeater
 // sections from repeater-schemas.php (fermentables, hops, etc.), on
 // save_post_brewlab_recipe. Repeater rows are sanitized per-field the same
 // way the simple fields are, then stored as one JSON-encoded array per

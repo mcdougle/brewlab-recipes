@@ -458,7 +458,7 @@ function brewlab_recipes_render_repeater_modal_toggle( $key, $field ) {
 //------------------------------------------------------------------------------
 //   brewlab_recipes_render_repeater_modal()
 //------------------------------------------------------------------------------
-// One shared modal for all six sections, rendered once in the footer rather
+// One shared modal for every repeater section, rendered once in the footer rather
 // than once per metabox — its body gets swapped to whichever section's
 // fields-template triggered it. Scoped to the recipe edit screen the same
 // way the nonce field in metaboxes.php is.

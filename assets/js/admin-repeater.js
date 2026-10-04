@@ -1,7 +1,7 @@
 /**
  * Admin Repeater Rows
  *
- * Add/edit/delete behavior for the six repeater metaboxes (fermentables,
+ * Add/edit/delete behavior for the repeater metaboxes (fermentables,
  * hops, etc.) on the recipe edit screen, backed by one shared modal instead
  * of live inline table inputs. Clicking anywhere on a row opens it in the
  * modal — there's no separate Edit button — and Delete lives in the modal

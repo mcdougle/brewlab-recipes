@@ -10,7 +10,7 @@
 //
 // Config entries carry a 'type' of 'simple' or 'repeater', which the render
 // dispatcher below uses to pick simple-fields.php or repeater-field.php.
-// The six repeater boxes are built straight from repeater-schemas.php so
+// The repeater boxes are built straight from repeater-schemas.php so
 // their titles/order can't drift out of sync with the schema itself.
 
 if ( ! defined( 'ABSPATH' ) ) {

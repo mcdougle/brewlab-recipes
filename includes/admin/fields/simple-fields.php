@@ -3,7 +3,7 @@
 //   Simple Fields
 //------------------------------------------------------------------------------
 // Schema and render functions for every recipe meta field that isn't one of
-// the six repeaters (see repeater-schemas.php for those): media, recipe
+// the repeaters (see repeater-schemas.php for those): media, recipe
 // details, batch details, and the brew-type-conditional options. Mirrors
 // that file's plain-data-schema shape so save.php can walk both the same
 // way instead of hardcoding a separate field list.
