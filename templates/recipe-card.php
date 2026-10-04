@@ -163,9 +163,18 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 	return 'volume' === ( $ferm_unit_info[ $unit ][0] ?? '' ) ? 'L' : $metric_weight_unit( $unit );
 };
 ?>
-<div class="brewlab-recipes-wrap">
+<?php
+// ez_video-off is Ezoic's documented opt-out class for its auto-inserted
+// video player (Humix / Open.Video), which otherwise picks its own spot after
+// page load and has landed inside the ingredient list. On both the wrapper
+// and the card in case Ezoic only checks the element it's inserting into
+// rather than every ancestor. Harmless on sites without Ezoic. Regular Ezoic
+// ads have no in-page opt-out class (dashboard Exclusion Filters only); the
+// card already avoids their paragraph-based placements by containing no <p>.
+?>
+<div class="brewlab-recipes-wrap ez_video-off">
 
-<div class="brewlab-recipes-card" id="<?php echo esc_attr( $uid ); ?>" data-author-system="<?php echo esc_attr( $author_system ); ?>" style="--brewlab-recipes-header-bg: <?php echo esc_attr( $header_color ); ?>">
+<div class="brewlab-recipes-card ez_video-off" id="<?php echo esc_attr( $uid ); ?>" data-author-system="<?php echo esc_attr( $author_system ); ?>" style="--brewlab-recipes-header-bg: <?php echo esc_attr( $header_color ); ?>">
 
 	<?php // ── Header ?>
 	<div class="brewlab-recipes-card__header<?php echo $image_url ? ' has-image' : ''; ?>">
