@@ -57,21 +57,23 @@
 		return ( Math.round( val * 100 ) / 100 ).toString();
 	}
 
-	// Rounding for data-type="scale" quantities (yeast, water additions) —
+	// Rounding for data-type="scale" quantities (yeast, water, and other
+	// additions) —
 	// amounts that follow the batch scaler but whose units are things you
 	// count or spoon out, where "1.37 packets" or "1.37 tsp" implies an
 	// exactness nobody can measure. Yeast pitch especially isn't a linear
 	// function of batch size, so half-packet rounding is "good enough to stop
 	// a big batch-size change leaving a laughably undersized pitch", not a
-	// precise ratio. Packets and countable items (Campden tablets) round to
-	// the nearest half, spoons to the nearest quarter, drops to whole drops —
+	// precise ratio. Packets and countable items (Campden tablets, vanilla
+	// beans) round to the nearest half, spoons and cups to the nearest
+	// quarter, drops to whole drops —
 	// never down to zero. Everything else (grams, mL, billion cells) scales
 	// like any other weight/volume quantity.
 	function fmtScaled( val, unit ) {
 		if ( unit === 'pkg' || unit === 'each' ) {
 			return Math.max( Math.round( val * 2 ) / 2, 0.5 ).toString();
 		}
-		if ( unit === 'tsp' || unit === 'tbsp' ) {
+		if ( unit === 'tsp' || unit === 'tbsp' || unit === 'cup' ) {
 			return Math.max( Math.round( val * 4 ) / 4, 0.25 ).toString();
 		}
 		if ( unit === 'drop' ) {
@@ -223,13 +225,20 @@
 				// dialed the scaler up to "20 gallons" and then clicks
 				// Metric should see ~75.7 L, not the original batch size
 				// converted to litres.
-				var currentVal  = parseFloat( batchInput.value );
+				//
+				// Reads and writes the unrounded size in data-exact, not the
+				// input's displayed value: the box shows 5 gal as "18.9" L
+				// (really 18.927), and scaling from that rounded figure
+				// nudged every amount on the card — 4 g became 3.99 g,
+				// 10 lb became 4.53 kg instead of 4.54.
+				var currentVal  = parseFloat( batchInput.dataset.exact || batchInput.value );
 				var currentUnit = batchInput.dataset.currentUnit || baseUnit;
 				var dispVal     = ( ! currentVal || currentVal <= 0 )
 					? ( sys === 'author' ? baseVal : convertVolume( baseVal, baseUnit, newUnit ) )
 					: convertVolume( currentVal, currentUnit, newUnit );
 
 				batchInput.value               = fmt( dispVal );
+				batchInput.dataset.exact       = dispVal;
 				batchInput.dataset.currentUnit = newUnit;
 				batchInput.step                = ( sys === 'author' ) ? 0.5 : ( res === 'metric' ? 1 : 0.5 );
 			}
@@ -281,20 +290,33 @@
 				} );
 			};
 
+			// data-exact holds the batch size unrounded (see applySystem()).
+			// A size the reader types is exact as typed; a cleared box drops
+			// it, so a unit switch falls back to the recipe's own size the
+			// same way it always has.
 			batchInput.addEventListener( 'input', function () {
 				var v = parseFloat( batchInput.value );
-				if ( v > 0 ) scaleAll( v );
+				if ( v > 0 ) {
+					batchInput.dataset.exact = v;
+					scaleAll( v );
+				} else {
+					delete batchInput.dataset.exact;
+				}
 			} );
 			batchInput.addEventListener( 'blur', function () {
 				var v = parseFloat( batchInput.value );
-				if ( ! v || v <= 0 ) { batchInput.value = fmt( getDisplayBase() ); scaleAll( getDisplayBase() ); }
+				if ( ! v || v <= 0 ) {
+					batchInput.value         = fmt( getDisplayBase() );
+					batchInput.dataset.exact = getDisplayBase();
+					scaleAll( getDisplayBase() );
+				}
 			} );
 
 			card.querySelectorAll( '.brewlab-recipes-unit-btn' ).forEach( function ( btn ) {
 				btn.addEventListener( 'click', function () {
 					currentSystem = btn.dataset.system;
 					applySystem( currentSystem );
-					var v = parseFloat( batchInput.value );
+					var v = parseFloat( batchInput.dataset.exact );
 					if ( v > 0 ) scaleAll( v );
 				} );
 			} );

@@ -386,7 +386,22 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 								<?php endif; ?>
 								<?php foreach ( $additions_by_stage[ $stage_key ] as $a ) : ?>
 									<div class="brewlab-recipes-item">
-										<span class="brewlab-recipes-item__amt"><?php echo $a['amount'] ? esc_html( $a['amount'] ) . ' ' . esc_html( $a['unit'] ) : '&mdash;'; ?></span>
+										<span class="brewlab-recipes-item__amt"><?php
+											if ( ! $a['amount'] ) {
+												echo '&mdash;';
+											} else {
+												// data-type="scale", same as water additions: follows the
+												// batch scaler, never the US/Metric toggle. See fmtScaled()
+												// in recipe-card.js for the per-unit rounding.
+												printf(
+													'<span class="brewlab-recipes-qty" data-base="%s" data-unit="%s" data-type="scale">%s</span> %s',
+													esc_attr( floatval( $a['amount'] ) ),
+													esc_attr( $a['unit'] ?? '' ),
+													esc_html( floatval( $a['amount'] ) ),
+													esc_html( brewlab_recipes_repeater_cell_value( 'additions', 'unit', $a['unit'] ?? '' ) )
+												);
+											}
+										?></span>
 										<span class="brewlab-recipes-item__name"><?php
 											$link = $a['link'] ?? '';
 											$name = $a['name'] ?? '';
