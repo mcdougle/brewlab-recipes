@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.2
+- Fixed ad networks inserting ads inside the recipe card. Services that
+  automatically place ads after paragraphs (like Ezoic's "Longest Content"
+  placement) could put ads in the card's header when a recipe's summary
+  was the longest paragraph in the post. The card no longer contains any
+  paragraphs for them to target, and looks exactly the same.
+
 ## 1.1.1
 - Other Additions now scale with the batch-size scaler, like water
   additions: they follow the batch size but stay in their own units when
