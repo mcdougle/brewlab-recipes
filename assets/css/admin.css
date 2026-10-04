@@ -595,7 +595,9 @@
 	transition: background 0.12s, color 0.12s;
 }
 
-.brewlab-recipes-toggle__option:first-child {
+/* first-of-type, not first-child: the toggle's hidden value input is its
+   first child, so :first-child never matched any button. */
+.brewlab-recipes-toggle__option:first-of-type {
 	border-left: none;
 }
 
@@ -665,6 +667,119 @@
 .brewlab-recipes-repeater-modal__close:hover {
 	background: #e0e0e0;
 	color: #23282d;
+}
+
+/* ── Water profile (inside the Water box) ── */
+/* Closed: just the "Add water profile" button. Open (.is-open — set by PHP
+   on load when anything is saved, then by admin-conditional.js): the full
+   panel. Both states live in the markup; the class only picks which shows. */
+.brewlab-recipes-water-profile {
+	border-top: 1px solid #f0f0f1;
+	background: #fbfbfb;
+}
+
+.brewlab-recipes-water-profile__closed {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+}
+
+.brewlab-recipes-water-profile.is-open .brewlab-recipes-water-profile__closed {
+	display: none;
+}
+
+.brewlab-recipes-water-profile__open.button {
+	border-style: dashed;
+}
+
+.brewlab-recipes-water-profile__hint {
+	font-size: 12px;
+	color: #646970;
+}
+
+.brewlab-recipes-water-profile__panel {
+	display: none;
+	padding-bottom: 14px;
+}
+
+.brewlab-recipes-water-profile.is-open .brewlab-recipes-water-profile__panel {
+	display: block;
+}
+
+.brewlab-recipes-water-profile__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px 0;
+}
+
+.brewlab-recipes-water-profile__title {
+	font-size: 12px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #646970;
+}
+
+.brewlab-recipes-water-profile__remove.button-link {
+	font-size: 13px;
+	color: #b32d2e;
+}
+
+.brewlab-recipes-water-profile__remove.button-link:hover,
+.brewlab-recipes-water-profile__remove.button-link:focus {
+	color: #8a2424;
+}
+
+/* Header row + Source/Target rows, each a row label then six ion inputs. */
+.brewlab-recipes-water-ions {
+	display: grid;
+	grid-template-columns: 60px repeat(6, minmax(0, 1fr));
+	gap: 6px 8px;
+	align-items: center;
+	margin-bottom: 6px;
+}
+
+.brewlab-recipes-water-ions__head {
+	font-size: 12px;
+	font-weight: 700;
+	text-align: center;
+	color: #646970;
+}
+
+.brewlab-recipes-water-ions__row-label {
+	font-size: 13px;
+	font-weight: 600;
+	color: #23282d;
+}
+
+.brewlab-recipes-input .brewlab-recipes-water-ions input[type="number"] {
+	min-width: 0;
+	padding: 7px 4px;
+	text-align: center;
+}
+
+.brewlab-recipes-water-ph {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.brewlab-recipes-input.brewlab-recipes-water-ph input[type="number"] {
+	flex: 0 0 90px;
+	width: 90px;
+}
+
+.brewlab-recipes-water-profile__note {
+	margin: 4px 16px 0;
+	padding: 8px 12px;
+	font-size: 13px;
+	color: #3c434a;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 3px;
 }
 
 /* ── Recipes list table columns ── */

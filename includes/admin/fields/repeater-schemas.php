@@ -146,11 +146,14 @@ function brewlab_recipes_repeater_schemas() {
 
 		// Salts and acids only — the optional source/target water profile is
 		// a separate, non-repeating set of fields (simple-fields.php's
-		// water_profile section). Name is free text like every other section;
-		// no maintained list of water agents.
+		// water_profile section), rendered in this section's box via
+		// 'companion' (see brewlab_recipes_render_repeater_field()). Name is
+		// free text like every other section; no maintained list of water
+		// agents.
 		'water' => [
 			'label'      => __( 'Water', 'brewlab-recipes' ),
 			'item_label' => __( 'Water Addition', 'brewlab-recipes' ),
+			'companion'  => 'water_profile',
 			'fields'     => [
 				'name'   => [
 					'type'     => 'text',

@@ -81,6 +81,15 @@ function brewlab_recipes_render_repeater_field( $post_id, $section ) {
 	);
 
 	echo '</div>';
+
+	// A section's 'companion' names a simple-fields.php section rendered in
+	// this same metabox, below the rows (currently water → water_profile).
+	// Outside the .brewlab-recipes-repeater wrapper on purpose, so none of
+	// admin-repeater.js's row handling ever reaches into it. Its fields save
+	// through save.php's normal simple-field loop, not as repeater rows.
+	if ( ! empty( $schemas[ $section ]['companion'] ) ) {
+		brewlab_recipes_render_simple_fields( $post_id, $schemas[ $section ]['companion'] );
+	}
 }
 
 //------------------------------------------------------------------------------

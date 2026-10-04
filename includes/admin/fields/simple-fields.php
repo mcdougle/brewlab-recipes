@@ -4,15 +4,18 @@
 //------------------------------------------------------------------------------
 // Schema and render functions for every recipe meta field that isn't one of
 // the repeaters (see repeater-schemas.php for those): media, recipe
-// details, batch details, and the brew-type-conditional options. Mirrors
-// that file's plain-data-schema shape so save.php can walk both the same
-// way instead of hardcoding a separate field list.
+// details, batch details, the brew-type-conditional options, and the
+// optional water profile. Mirrors that file's plain-data-schema shape so
+// save.php can walk both the same way instead of hardcoding a separate
+// field list.
 //
-// Media and Batch Details render with dedicated functions instead of the
-// generic schema loop, since their layout (an inline image/color row; a few
-// inline field pairs like Batch Size+Unit and O.G./F.G.) doesn't fit a
-// one-row-per-field pattern. Recipe Details and Options still loop
-// generically — every field they have is a plain single-row field.
+// Media, Batch Details, and Water Profile render with dedicated functions
+// instead of the generic schema loop, since their layout (an inline
+// image/color row; inline field pairs like Batch Size+Unit and O.G./F.G.;
+// a collapsible panel with an ion grid) doesn't fit a one-row-per-field
+// pattern. Recipe Details and Options still loop generically — every field
+// they have is a plain single-row field. Water Profile has no metabox of
+// its own: the Water repeater's box renders it as its 'companion'.
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -152,7 +155,91 @@ function brewlab_recipes_simple_fields() {
 			],
 		],
 
+		'water_profile' => [
+			'label'  => __( 'Water Profile', 'brewlab-recipes' ),
+			'fields' => brewlab_recipes_water_profile_fields(),
+		],
+
 	];
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_water_ions()
+//------------------------------------------------------------------------------
+// The six ions a water profile lists, in the order brewing water reports and
+// calculators use. Key is the meta-key suffix, value the display symbol.
+// Shared by the admin grid and the card's ion table.
+function brewlab_recipes_water_ions() {
+	return [
+		'ca'   => 'Ca',
+		'mg'   => 'Mg',
+		'na'   => 'Na',
+		'so4'  => 'SO₄',
+		'cl'   => 'Cl',
+		'hco3' => 'HCO₃',
+	];
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_water_profile_fields()
+//------------------------------------------------------------------------------
+// Built here rather than written out inline above because the 12 ion fields
+// (source + target × six ions) are generated from brewlab_recipes_water_ions().
+// Everything is optional and display-only: these are numbers copied from the
+// brewer's own water calculator, never computed from the additions.
+//
+// water_source has an explicit '' option so an untouched profile saves as
+// empty instead of silently defaulting to the first option. mash_ph_kind
+// always has a value (its toggle defaults to 'target'), so it never counts
+// as "the profile has data" on its own.
+function brewlab_recipes_water_profile_fields() {
+	$fields = [
+		'water_source'      => [
+			'type'    => 'select',
+			'label'   => __( 'Source Water', 'brewlab-recipes' ),
+			'options' => [
+				''             => '—',
+				'tap'          => __( 'Tap', 'brewlab-recipes' ),
+				'filtered_tap' => __( 'Filtered Tap', 'brewlab-recipes' ),
+				'spring'       => __( 'Spring', 'brewlab-recipes' ),
+				'ro'           => __( 'RO', 'brewlab-recipes' ),
+				'distilled'    => __( 'Distilled', 'brewlab-recipes' ),
+				'blend'        => __( 'Blend', 'brewlab-recipes' ),
+			],
+		],
+		'water_source_note' => [
+			'type'  => 'text',
+			'label' => __( 'Source Water Note', 'brewlab-recipes' ),
+		],
+		'water_target_name' => [
+			'type'  => 'text',
+			'label' => __( 'Target Name', 'brewlab-recipes' ),
+		],
+	];
+
+	foreach ( [ 'source' => __( 'Source', 'brewlab-recipes' ), 'target' => __( 'Target', 'brewlab-recipes' ) ] as $row => $row_label ) {
+		foreach ( brewlab_recipes_water_ions() as $ion => $symbol ) {
+			$fields[ 'water_' . $row . '_' . $ion ] = [
+				'type'  => 'number',
+				'label' => $row_label . ' ' . $symbol,
+			];
+		}
+	}
+
+	$fields['mash_ph']      = [
+		'type'  => 'number',
+		'label' => __( 'Mash pH', 'brewlab-recipes' ),
+	];
+	$fields['mash_ph_kind'] = [
+		'type'    => 'select',
+		'label'   => __( 'Mash pH Is', 'brewlab-recipes' ),
+		'options' => [
+			'target'   => __( 'Target', 'brewlab-recipes' ),
+			'measured' => __( 'Measured', 'brewlab-recipes' ),
+		],
+	];
+
+	return $fields;
 }
 
 //------------------------------------------------------------------------------
@@ -169,6 +256,10 @@ function brewlab_recipes_render_simple_fields( $post_id, $section ) {
 	}
 	if ( 'batch_details' === $section ) {
 		brewlab_recipes_render_batch_details_box( $post_id );
+		return;
+	}
+	if ( 'water_profile' === $section ) {
+		brewlab_recipes_render_water_profile_box( $post_id );
 		return;
 	}
 
@@ -372,6 +463,105 @@ function brewlab_recipes_render_batch_details_box( $post_id ) {
 			<div class="brewlab-recipes-input">
 				<?php brewlab_recipes_render_field_input( 'brewlab-recipes-srm', 'brewlab_recipes_srm', $get( 'srm' ), $fields['srm'] ); ?>
 			</div>
+		</div>
+
+	</div>
+	<?php
+}
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_render_water_profile_box()
+//------------------------------------------------------------------------------
+// Rendered inside the Water box, under its additions list (the water
+// repeater's 'companion' — see repeater-field.php). Collapsed to an "Add
+// water profile" button unless something is already saved; the open/closed
+// state is a class on the wrapper, set here on load and by
+// admin-conditional.js afterwards. Every input submits whether the panel is
+// open or not — "Remove profile" blanks them rather than relying on hidden
+// fields being skipped, so the next save clears the stored values.
+function brewlab_recipes_render_water_profile_box( $post_id ) {
+	$fields = brewlab_recipes_simple_fields()['water_profile']['fields'];
+	$get    = function ( $key ) use ( $post_id ) {
+		return get_post_meta( $post_id, '_brewlab_recipes_' . $key, true );
+	};
+
+	$has_profile = false;
+	foreach ( array_keys( $fields ) as $key ) {
+		if ( 'mash_ph_kind' !== $key && '' !== (string) $get( $key ) ) {
+			$has_profile = true;
+			break;
+		}
+	}
+
+	$ph_kind = $get( 'mash_ph_kind' ) ?: 'target';
+	$rows    = [
+		'source' => __( 'Source', 'brewlab-recipes' ),
+		'target' => __( 'Target', 'brewlab-recipes' ),
+	];
+	?>
+	<div class="brewlab-recipes-water-profile<?php echo $has_profile ? ' is-open' : ''; ?>">
+
+		<div class="brewlab-recipes-water-profile__closed">
+			<button type="button" class="button brewlab-recipes-water-profile__open">+ <?php esc_html_e( 'Add water profile', 'brewlab-recipes' ); ?></button>
+			<span class="brewlab-recipes-water-profile__hint"><?php esc_html_e( 'Optional. Source water, target ions, and mash pH, copied from your water calculator.', 'brewlab-recipes' ); ?></span>
+		</div>
+
+		<div class="brewlab-recipes-water-profile__panel">
+			<div class="brewlab-recipes-water-profile__header">
+				<span class="brewlab-recipes-water-profile__title"><?php esc_html_e( 'Water Profile', 'brewlab-recipes' ); ?></span>
+				<button type="button" class="button-link brewlab-recipes-water-profile__remove"><?php esc_html_e( 'Remove profile', 'brewlab-recipes' ); ?></button>
+			</div>
+
+			<div class="brewlab-recipes-row">
+				<label for="brewlab-recipes-water-source"><?php esc_html_e( 'Source Water', 'brewlab-recipes' ); ?></label>
+				<div class="brewlab-recipes-input brewlab-recipes-input--inline">
+					<?php brewlab_recipes_render_field_input( 'brewlab-recipes-water-source', 'brewlab_recipes_water_source', $get( 'water_source' ), $fields['water_source'] ); ?>
+					<input type="text" id="brewlab-recipes-water-source-note" name="brewlab_recipes_water_source_note" value="<?php echo esc_attr( $get( 'water_source_note' ) ); ?>" placeholder="<?php esc_attr_e( 'Note, e.g. carbon filtered, from the city water report', 'brewlab-recipes' ); ?>" aria-label="<?php esc_attr_e( 'Source water note', 'brewlab-recipes' ); ?>" />
+				</div>
+			</div>
+
+			<div class="brewlab-recipes-row">
+				<label for="brewlab-recipes-water-target-name"><?php esc_html_e( 'Target Name', 'brewlab-recipes' ); ?><span class="brewlab-recipes-hint"><?php esc_html_e( 'Optional', 'brewlab-recipes' ); ?></span></label>
+				<div class="brewlab-recipes-input">
+					<input type="text" id="brewlab-recipes-water-target-name" name="brewlab_recipes_water_target_name" value="<?php echo esc_attr( $get( 'water_target_name' ) ); ?>" placeholder="<?php esc_attr_e( 'e.g. Yellow Balanced', 'brewlab-recipes' ); ?>" class="regular-text" />
+				</div>
+			</div>
+
+			<div class="brewlab-recipes-row">
+				<label><?php esc_html_e( 'Ions', 'brewlab-recipes' ); ?><span class="brewlab-recipes-hint">ppm</span></label>
+				<div class="brewlab-recipes-input">
+					<div class="brewlab-recipes-water-ions">
+						<span></span>
+						<?php foreach ( brewlab_recipes_water_ions() as $symbol ) : ?>
+							<span class="brewlab-recipes-water-ions__head"><?php echo esc_html( $symbol ); ?></span>
+						<?php endforeach; ?>
+						<?php foreach ( $rows as $row => $row_label ) : ?>
+							<span class="brewlab-recipes-water-ions__row-label"><?php echo esc_html( $row_label ); ?></span>
+							<?php foreach ( brewlab_recipes_water_ions() as $ion => $symbol ) :
+								$key = 'water_' . $row . '_' . $ion; ?>
+								<input type="number" step="any" min="0" name="brewlab_recipes_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $get( $key ) ); ?>" aria-label="<?php echo esc_attr( $fields[ $key ]['label'] ); ?>" />
+							<?php endforeach; ?>
+						<?php endforeach; ?>
+					</div>
+					<span class="brewlab-recipes-hint"><?php esc_html_e( 'Leave any box blank. Empty rows and columns are left off the card.', 'brewlab-recipes' ); ?></span>
+				</div>
+			</div>
+
+			<div class="brewlab-recipes-row">
+				<label for="brewlab-recipes-mash-ph"><?php esc_html_e( 'Mash pH', 'brewlab-recipes' ); ?></label>
+				<div class="brewlab-recipes-input brewlab-recipes-water-ph">
+					<input type="number" step="any" min="0" max="14" id="brewlab-recipes-mash-ph" name="brewlab_recipes_mash_ph" value="<?php echo esc_attr( $get( 'mash_ph' ) ); ?>" class="small-text" />
+					<?php // Same segmented-toggle markup the repeater modal uses; admin-repeater.js's click handler is document-wide, so it drives this one too. ?>
+					<div class="brewlab-recipes-toggle">
+						<input type="hidden" name="brewlab_recipes_mash_ph_kind" value="<?php echo esc_attr( $ph_kind ); ?>" />
+						<?php foreach ( $fields['mash_ph_kind']['options'] as $value => $label ) : ?>
+							<button type="button" class="brewlab-recipes-toggle__option<?php echo $value === $ph_kind ? ' is-active' : ''; ?>" data-value="<?php echo esc_attr( $value ); ?>"><?php echo esc_html( $label ); ?></button>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+
+			<p class="brewlab-recipes-water-profile__note"><?php esc_html_e( 'Shown on the recipe card exactly as entered. Nothing here is calculated.', 'brewlab-recipes' ); ?></p>
 		</div>
 
 	</div>
