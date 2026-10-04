@@ -12,6 +12,18 @@
 	var el = element.createElement;
 	var __ = i18n.__;
 
+	// BrewLab logo, path data from block.php (read out of
+	// assets/svg/brewlab-logo.svg). Unfilled outline/bubble paths take
+	// currentColor; the liquid and white highlights keep the logo's colors.
+	var iconData = window.brewlabRecipesBlockIcon;
+	var icon = el(
+		'svg',
+		{ xmlns: 'http://www.w3.org/2000/svg', viewBox: iconData.viewBox, width: 24, height: 24 },
+		iconData.paths.map( function ( path, index ) {
+			return el( 'path', { key: index, fill: path.fill || 'currentColor', d: path.d } );
+		} )
+	);
+
 	function Edit( props ) {
 		var recipeId     = props.attributes.recipeId;
 		var setAttributes = props.setAttributes;
@@ -62,7 +74,7 @@
 			el(
 				components.Placeholder,
 				{
-					icon: 'carrot',
+					icon: icon,
 					label: __( 'BrewLab Recipe', 'brewlab-recipes' ),
 				},
 				selected
@@ -74,7 +86,7 @@
 
 	blocks.registerBlockType( 'brewlab/recipe', {
 		title: __( 'BrewLab Recipe', 'brewlab-recipes' ),
-		icon: 'carrot',
+		icon: icon,
 		category: 'widgets',
 		attributes: {
 			recipeId: {

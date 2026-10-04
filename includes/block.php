@@ -29,6 +29,11 @@ function brewlab_recipes_register_block() {
 		BREWLAB_RECIPES_VERSION,
 		true
 	);
+	wp_add_inline_script(
+		'brewlab-recipes-block',
+		'window.brewlabRecipesBlockIcon = ' . wp_json_encode( brewlab_recipes_block_icon_data() ) . ';',
+		'before'
+	);
 
 	register_block_type( 'brewlab/recipe', [
 		'attributes'      => [
@@ -42,6 +47,36 @@ function brewlab_recipes_register_block() {
 	] );
 }
 add_action( 'init', 'brewlab_recipes_register_block' );
+
+//------------------------------------------------------------------------------
+//   brewlab_recipes_block_icon_data()
+//------------------------------------------------------------------------------
+// The block's inserter/toolbar/placeholder icon is the BrewLab logo, same as
+// the admin menu (see brewlab_recipes_menu_icon_svg() in post-types.php).
+// block.js builds it as a real <svg> element, so instead of duplicating the
+// path data in JS this hands it the viewBox and paths straight out of the
+// one source SVG file. Paths without a fill (the outline and bubbles) come
+// through as null so the JS side can give them currentColor and follow the
+// editor's text color.
+function brewlab_recipes_block_icon_data() {
+	$svg = file_get_contents( BREWLAB_RECIPES_PATH . 'assets/svg/brewlab-logo.svg' );
+
+	preg_match( '/viewBox="([^"]+)"/', $svg, $view_box );
+	preg_match_all( '/<path(?: fill="([^"]*)")? d="([^"]*)"/', $svg, $matches, PREG_SET_ORDER );
+
+	$paths = [];
+	foreach ( $matches as $match ) {
+		$paths[] = [
+			'fill' => '' !== $match[1] ? $match[1] : null,
+			'd'    => $match[2],
+		];
+	}
+
+	return [
+		'viewBox' => $view_box[1],
+		'paths'   => $paths,
+	];
+}
 
 //------------------------------------------------------------------------------
 //   brewlab_recipes_block_render()
