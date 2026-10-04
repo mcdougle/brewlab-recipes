@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.6
+- The BrewLab Recipe block now shows the BrewLab logo in the block
+  inserter, toolbar, and editor placeholder instead of the WordPress
+  carrot icon.
+
 ## 1.0.5
 - Plugin author now shows as "BrewLab" instead of "mcdougle" on the Plugins
   page and in "View details".
