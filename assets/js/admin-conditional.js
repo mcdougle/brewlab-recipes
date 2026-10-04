@@ -1,12 +1,12 @@
 /**
  * Conditional Fields
  *
- * Two independent controllers on the same file since both are "recipe edit
- * screen field visibility reacting to another field's value" — brew-type
- * business logic (hops/mash/boil-time/IBU) below, and a fully generic
- * depends_on mechanism (any field with a 'depends_on' schema key, e.g.
- * "Other Type Name" only mattering when Brew Type is "Other") at the
- * bottom, which isn't specific to brew type at all.
+ * Three independent controllers on the same file since all are "recipe edit
+ * screen field visibility" — brew-type business logic (hops/mash/boil-time/
+ * IBU) below, a fully generic depends_on mechanism (any field with a
+ * 'depends_on' schema key, e.g. "Other Type Name" only mattering when Brew
+ * Type is "Other") after it, which isn't specific to brew type at all, and
+ * the Water box's collapsible water profile panel at the bottom.
  *
  * Brew-Type-Conditional Fields — beer always includes hops and a mash, so
  * Show Hops/Show Mash Profile (the Options sidebar box) only mean anything
@@ -95,6 +95,48 @@
 			controller.addEventListener( 'change', function () {
 				row.style.display = ( controller.value === expected ) ? '' : 'none';
 			} );
+		} );
+	} );
+} )();
+
+//------------------------------------------------------------------------------
+// Water profile panel — the optional source/target profile inside the Water
+// box (see brewlab_recipes_render_water_profile_box()). PHP opens it on load
+// when anything is saved; this only handles opening and removing afterward.
+// Remove blanks every input rather than just hiding the panel, so the next
+// save clears the stored values instead of keeping data nobody can see.
+( function () {
+	'use strict';
+
+	document.addEventListener( 'DOMContentLoaded', function () {
+		var profile = document.querySelector( '.brewlab-recipes-water-profile' );
+		if ( ! profile ) {
+			return;
+		}
+
+		var openButton   = profile.querySelector( '.brewlab-recipes-water-profile__open' );
+		var removeButton = profile.querySelector( '.brewlab-recipes-water-profile__remove' );
+		var panel        = profile.querySelector( '.brewlab-recipes-water-profile__panel' );
+
+		openButton.addEventListener( 'click', function () {
+			profile.classList.add( 'is-open' );
+			panel.querySelector( 'select' ).focus();
+		} );
+
+		removeButton.addEventListener( 'click', function () {
+			panel.querySelectorAll( 'input:not([type="hidden"]), select' ).forEach( function ( field ) {
+				field.value = '';
+			} );
+			// Back to the default Target/Measured choice through a real click,
+			// so admin-repeater.js's toggle handler also moves the active
+			// button highlight, not just the hidden value.
+			var defaultKind = panel.querySelector( '.brewlab-recipes-toggle__option' );
+			if ( defaultKind ) {
+				defaultKind.click();
+			}
+
+			profile.classList.remove( 'is-open' );
+			openButton.focus();
 		} );
 	} );
 } )();

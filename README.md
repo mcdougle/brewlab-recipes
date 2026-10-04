@@ -7,7 +7,8 @@ Part of the [BrewLab](https://brewlab.app) suite.
 ## Features
 
 - Beer, mead, cider, and wine - each gets the fields that actually apply
-- Fermentables, hops, yeast, other additions, mash steps, and fermentation steps, each with their own admin UI
+- Fermentables, hops, yeast, other additions, water, mash steps, and fermentation steps, each with their own admin UI
+- Water chemistry at whatever depth you use it - a single "1 tsp gypsum" line, or a full source/target water profile with mash pH
 - Live batch-size scaler - type in a different batch size and every ingredient amount recalculates
 - US/Metric unit toggle - every quantity on the card converts instantly
 - "Preview Recipe Card" button on the edit screen - see your changes before publishing
@@ -39,7 +40,8 @@ In your WordPress admin, go to **BrewLab Recipes → Add New Recipe**. A recipe 
 - **Media** - a header image and a recipe color (used for the card's header background).
 - **Recipe Details** - brew type (beer/mead/cider/wine/other), a short summary, who to credit as the author, and free-form notes.
 - **Batch Details** - style, batch size, boil time, OG/FG/ABV/IBU/SRM.
-- **Fermentables, Other Additions, Hops, Yeast, Mash Steps, Fermentation Steps** - one section per ingredient/step type. Click **+ Add** to open a modal, fill in the fields, and save. Each item shows up as a row you can click to edit or remove.
+- **Fermentables, Other Additions, Water, Hops, Yeast, Mash Steps, Fermentation Steps** - one section per ingredient/step type. Click **+ Add** to open a modal, fill in the fields, and save. Each item shows up as a row you can click to edit or remove.
+- **Water** also has an optional **Add water profile** panel for your source water, source and target ion levels (ppm), and mash pH. Copy the numbers from whatever water calculator you use. The plugin displays them as entered and doesn't calculate anything.
 
 Fill in whatever sections apply. A mead recipe can skip Hops and Mash Steps entirely, for example. Click **Preview Recipe Card** in the Publish box at any point to see exactly what readers will see, before you publish.
 

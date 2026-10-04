@@ -498,6 +498,80 @@
 	margin: 0;
 }
 
+/* ── Water profile table ──────────────────────────────────── */
+/* Only the ion columns with a value are printed, so this is usually 2–6
+   narrow columns; the wrap scrolls sideways on a phone rather than
+   squeezing a six-ion table into illegible slivers. */
+.brewlab-recipes-card .brewlab-recipes-water-table__unit {
+	font-weight: 400;
+	letter-spacing: normal;
+	text-transform: none;
+	color: var(--c-muted);
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table-wrap {
+	padding: 0 24px 12px;
+	overflow-x: auto;
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table {
+	width: 100%;
+	min-width: 360px;
+	margin: 0;
+	border: 1px solid var(--c-border);
+	border-collapse: collapse;
+	font-size: 14px;
+	line-height: 1.4;
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table th,
+.brewlab-recipes-card .brewlab-recipes-water-table td {
+	padding: 7px 8px;
+	border: 0;
+	border-top: 1px solid var(--c-border);
+	text-align: center;
+	font-weight: 400;
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table thead th,
+.brewlab-recipes-card .brewlab-recipes-water-table thead td {
+	border-top: 0;
+	background: var(--c-bg);
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--c-muted);
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table tbody th {
+	padding-left: 12px;
+	text-align: left;
+	white-space: nowrap;
+}
+
+/* Source is context; Target is what a reader actually needs to build. */
+.brewlab-recipes-card .brewlab-recipes-water-table__row--source th,
+.brewlab-recipes-card .brewlab-recipes-water-table__row--source td {
+	color: var(--c-muted);
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table__row--target th,
+.brewlab-recipes-card .brewlab-recipes-water-table__row--target td {
+	font-weight: 700;
+	color: var(--c-text);
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-table__name {
+	margin-left: 4px;
+	font-size: 13px;
+	font-weight: 400;
+	font-style: italic;
+	color: var(--c-muted);
+}
+
+.brewlab-recipes-card .brewlab-recipes-water-extras {
+	padding-bottom: 6px;
+}
+
 /* ── Step timelines (mash + fermentation) ─────────────────── */
 .brewlab-recipes-card .brewlab-recipes-steps {
 	display: flex;
@@ -657,5 +731,9 @@
 	.brewlab-recipes-card .brewlab-recipes-notes {
 		margin-left: 16px;
 		margin-right: 16px;
+	}
+	.brewlab-recipes-card .brewlab-recipes-water-table-wrap {
+		padding-left: 16px;
+		padding-right: 16px;
 	}
 }

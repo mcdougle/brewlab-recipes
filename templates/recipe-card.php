@@ -69,6 +69,39 @@ $mash_name    = $recipe['mash_steps_profile_name'] ?? '';
 $ferm_steps   = $recipe['fermentation_steps'];
 $ferm_name    = $recipe['fermentation_steps_profile_name'] ?? '';
 
+$water        = $recipe['water'];
+
+// Water profile: only the ion columns and Source/Target rows that have any
+// value make it into the table, so a brewer who only knows their target
+// sulfate and chloride gets a two-column table, not six mostly-empty ones.
+$water_ions      = brewlab_recipes_water_ions();
+$water_ion_rows  = [];
+$water_ion_cols  = [];
+foreach ( [ 'source' => __( 'Source', 'brewlab-recipes' ), 'target' => __( 'Target', 'brewlab-recipes' ) ] as $row => $row_label ) {
+	$values = [];
+	foreach ( $water_ions as $ion => $symbol ) {
+		$value = (string) ( $recipe[ 'water_' . $row . '_' . $ion ] ?? '' );
+		if ( '' !== $value ) {
+			$values[ $ion ]          = $value;
+			$water_ion_cols[ $ion ] = $symbol;
+		}
+	}
+	if ( $values ) {
+		$water_ion_rows[ $row ] = [ 'label' => $row_label, 'values' => $values ];
+	}
+}
+// Keep the columns in the canonical ion order, not first-seen order.
+$water_ion_cols = array_intersect_key( $water_ions, $water_ion_cols );
+
+// Only looked up when set: the field's '' option is labelled "—" for the
+// admin dropdown, which would otherwise print as the card subtitle.
+$water_source       = $recipe['water_source'] ?? '';
+$water_source_label = '' !== $water_source ? brewlab_recipes_field_option_label( 'water_profile', 'water_source', $water_source ) : '';
+$water_source_line  = implode( ' · ', array_filter( [ $water_source_label, $recipe['water_source_note'] ?? '' ] ) );
+$water_target_name  = $recipe['water_target_name'] ?? '';
+$mash_ph            = (string) ( $recipe['mash_ph'] ?? '' );
+$has_water          = ! empty( $water ) || '' !== $water_source_line || $water_ion_rows || '' !== $water_target_name || '' !== $mash_ph;
+
 $ferm_type_labels = $schemas['fermentation_steps']['fields']['type']['options'];
 
 $hop_use_labels = $schemas['hops']['fields']['use']['options'];
@@ -80,7 +113,7 @@ $boil_hops = array_values( array_filter( $hops, function ( $h ) {
 	return 'boil' === ( $h['use'] ?? '' );
 } ) );
 
-$has_ingredients  = ! empty( $fermentables ) || ! empty( $hops ) || ! empty( $yeasts ) || ! empty( $additions );
+$has_ingredients  = ! empty( $fermentables ) || ! empty( $hops ) || ! empty( $yeasts ) || ! empty( $additions ) || $has_water;
 // this only shows Method when there's actually a mash section or a boil section to show.
 $has_method       = ( $show_mash && ! empty( $mash_steps ) ) || ( $show_hops && ( $recipe['boil_time'] || ! empty( $boil_hops ) ) );
 $has_fermentation = ! empty( $ferm_steps );
@@ -251,7 +284,7 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 			<?php endif; ?>
 		</div>
 
-		<?php // ── Ingredients tab: Fermentables + Other Additions + Hops + Yeast ?>
+		<?php // ── Ingredients tab: Fermentables + Other Additions + Water + Hops + Yeast ?>
 		<?php if ( $has_ingredients ) : ?>
 			<div class="brewlab-recipes-tab-panel<?php echo 'ingredients' === $default_tab ? ' is-active' : ''; ?>" id="<?php echo esc_attr( $uid ); ?>-ingredients">
 
@@ -371,6 +404,118 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 					</div>
 				<?php endif; ?>
 
+				<?php // Additions, then the optional profile. Every piece is independent — a brewer who only adds "1 tsp gypsum" gets one row and nothing else. ?>
+				<?php if ( $has_water ) :
+					$water_stage_labels        = $schemas['water']['fields']['stage']['options'];
+					$water_stage_order         = array_merge( array_keys( $water_stage_labels ), [ '' ] );
+					$water_by_stage            = [];
+					foreach ( $water as $w ) {
+						$water_by_stage[ $w['stage'] ?? '' ][] = $w;
+					}
+					$water_has_multiple_stages = count( $water_by_stage ) > 1;
+					$mash_ph_kind_label        = brewlab_recipes_field_option_label( 'water_profile', 'mash_ph_kind', ( $recipe['mash_ph_kind'] ?? '' ) ?: 'target' );
+					?>
+					<div class="brewlab-recipes-group">
+						<h3 class="brewlab-recipes-group__title brewlab-recipes-section-heading"><?php echo brewlab_recipes_icon( 'water', 'brewlab-recipes-icon' ); ?><?php esc_html_e( 'Water', 'brewlab-recipes' ); ?><?php if ( '' !== $water_source_line ) : ?><span class="brewlab-recipes-group__subtitle"><?php echo esc_html( $water_source_line ); ?></span><?php endif; ?></h3>
+
+						<?php if ( ! empty( $water ) ) : ?>
+							<div class="brewlab-recipes-list">
+								<?php foreach ( $water_stage_order as $stage_key ) :
+									if ( empty( $water_by_stage[ $stage_key ] ) ) continue; ?>
+									<?php if ( $water_has_multiple_stages ) : ?>
+										<div class="brewlab-recipes-subheading"><?php echo esc_html( $water_stage_labels[ $stage_key ] ?? __( 'Other', 'brewlab-recipes' ) ); ?></div>
+									<?php endif; ?>
+									<?php foreach ( $water_by_stage[ $stage_key ] as $w ) :
+										$amount = (string) ( $w['amount'] ?? '' );
+										$unit   = $w['unit'] ?? '';
+										?>
+										<div class="brewlab-recipes-item">
+											<span class="brewlab-recipes-item__amt"><?php
+												if ( '' === $amount ) {
+													echo '&mdash;';
+												} elseif ( 'pct' === $unit ) {
+													// A share of the grist, not a quantity — stays the
+													// same at any batch size, so no scaler markup.
+													echo esc_html( $amount ) . '%';
+												} else {
+													// data-type="scale": follows the batch scaler, never the
+													// US/Metric toggle — salts are weighed in grams whatever
+													// system a brewer uses. See fmtScaled() in recipe-card.js
+													// for the per-unit rounding.
+													printf(
+														'<span class="brewlab-recipes-qty" data-base="%s" data-unit="%s" data-type="scale">%s</span> %s',
+														esc_attr( floatval( $amount ) ),
+														esc_attr( $unit ),
+														esc_html( floatval( $amount ) ),
+														esc_html( brewlab_recipes_repeater_cell_value( 'water', 'unit', $unit ) )
+													);
+												}
+											?></span>
+											<span class="brewlab-recipes-item__name"><?php
+												$link = $w['link'] ?? '';
+												$name = $w['name'] ?? '';
+												if ( $link ) {
+													printf( '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>', esc_url( $link ), esc_html( $name ) );
+												} else {
+													echo esc_html( $name );
+												}
+											?></span>
+											<?php // The stage subheading already says where these go when there's more than one. ?>
+											<span class="brewlab-recipes-item__pct brewlab-recipes-item__use"><?php echo $water_has_multiple_stages ? '' : esc_html( $water_stage_labels[ $stage_key ] ?? '' ); ?></span>
+										</div>
+									<?php endforeach; ?>
+								<?php endforeach; ?>
+							</div>
+						<?php endif; ?>
+
+						<?php if ( $water_ion_rows ) : ?>
+							<div class="brewlab-recipes-subheading"><?php esc_html_e( 'Water Profile', 'brewlab-recipes' ); ?> <span class="brewlab-recipes-water-table__unit">(ppm)</span></div>
+							<div class="brewlab-recipes-water-table-wrap">
+								<table class="brewlab-recipes-water-table">
+									<thead>
+										<tr>
+											<td></td>
+											<?php foreach ( $water_ion_cols as $symbol ) : ?>
+												<th scope="col"><?php echo esc_html( $symbol ); ?></th>
+											<?php endforeach; ?>
+										</tr>
+									</thead>
+									<tbody>
+										<?php foreach ( $water_ion_rows as $row => $row_data ) : ?>
+											<tr class="brewlab-recipes-water-table__row--<?php echo esc_attr( $row ); ?>">
+												<th scope="row"><?php echo esc_html( $row_data['label'] ); ?><?php if ( 'target' === $row && '' !== $water_target_name ) : ?> <span class="brewlab-recipes-water-table__name"><?php echo esc_html( $water_target_name ); ?></span><?php endif; ?></th>
+												<?php foreach ( array_keys( $water_ion_cols ) as $ion ) : ?>
+													<td><?php echo isset( $row_data['values'][ $ion ] ) ? esc_html( $row_data['values'][ $ion ] ) : '&mdash;'; ?></td>
+												<?php endforeach; ?>
+											</tr>
+										<?php endforeach; ?>
+									</tbody>
+								</table>
+							</div>
+						<?php endif; ?>
+
+						<?php
+						// A target name with no target ions has no table row to sit in.
+						$show_target_line = '' !== $water_target_name && empty( $water_ion_rows['target'] );
+						if ( $show_target_line || '' !== $mash_ph ) : ?>
+							<div class="brewlab-recipes-list brewlab-recipes-water-extras">
+								<?php if ( $show_target_line ) : ?>
+									<div class="brewlab-recipes-item">
+										<span class="brewlab-recipes-item__amt"><?php esc_html_e( 'Target', 'brewlab-recipes' ); ?></span>
+										<span class="brewlab-recipes-item__name"><?php echo esc_html( $water_target_name ); ?></span>
+									</div>
+								<?php endif; ?>
+								<?php if ( '' !== $mash_ph ) : ?>
+									<div class="brewlab-recipes-item">
+										<span class="brewlab-recipes-item__amt"><?php esc_html_e( 'Mash pH', 'brewlab-recipes' ); ?></span>
+										<span class="brewlab-recipes-item__name"><?php echo esc_html( $mash_ph ); ?> <span class="brewlab-recipes-item__detail"><?php echo esc_html( $mash_ph_kind_label ); ?></span></span>
+									</div>
+								<?php endif; ?>
+							</div>
+						<?php endif; ?>
+					</div>
+				<?php endif; ?>
+
 				<?php if ( $show_hops && ! empty( $hops ) ) : ?>
 					<div class="brewlab-recipes-group">
 						<h3 class="brewlab-recipes-group__title brewlab-recipes-section-heading"><?php echo brewlab_recipes_icon( 'hops', 'brewlab-recipes-icon' ); ?><?php esc_html_e( 'Hops', 'brewlab-recipes' ); ?></h3>
@@ -436,7 +581,7 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 								<div class="brewlab-recipes-item">
 									<span class="brewlab-recipes-item__amt">
 										<?php
-										// data-type="yeast" (not "weight") — the unit set mixes
+										// data-type="scale" (not "weight") — the unit set mixes
 										// weight/volume/count/cell-count with no shared conversion
 										// basis, so this never joins the US/Metric unit toggle (see
 										// applySystem() in recipe-card.js, which just redisplays the
@@ -446,9 +591,9 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 										// pitch isn't a linear function of batch size (one packet
 										// covers a range of batch sizes; doubling for a high-ABV or
 										// lager recipe is a deliberate brewer choice, not a ratio to
-										// preserve) — see fmtYeast() in recipe-card.js.
+										// preserve) — see fmtScaled() in recipe-card.js.
 										?>
-										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="yeast"><?php echo esc_html( $base_amt ); ?></span>
+										<span class="brewlab-recipes-qty" data-base="<?php echo esc_attr( $base_amt ); ?>" data-unit="<?php echo esc_attr( $orig_unit ); ?>" data-type="scale"><?php echo esc_html( $base_amt ); ?></span>
 										<?php echo esc_html( brewlab_recipes_repeater_cell_value( 'yeast', 'unit', $orig_unit ) ); ?>
 									</span>
 									<span class="brewlab-recipes-item__name"><?php

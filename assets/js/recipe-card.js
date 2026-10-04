@@ -57,16 +57,25 @@
 		return ( Math.round( val * 100 ) / 100 ).toString();
 	}
 
-	// Yeast pitch amount isn't a linear function of batch size, so scaling
-	// it to arbitrary decimal precision like a weight would imply a false
-	// exactness. For packets specifically, round to the nearest half — good
-	// enough to stop a big batch-size change from leaving the reader with a
-	// laughably undersized pitch, without pretending "1.37 packets" means
-	// anything. Never round down to zero packets. Other yeast units (grams,
-	// mL, billion cells) scale like any other weight/volume quantity.
-	function fmtYeast( val, unit ) {
-		if ( unit === 'pkg' ) {
+	// Rounding for data-type="scale" quantities (yeast, water additions) —
+	// amounts that follow the batch scaler but whose units are things you
+	// count or spoon out, where "1.37 packets" or "1.37 tsp" implies an
+	// exactness nobody can measure. Yeast pitch especially isn't a linear
+	// function of batch size, so half-packet rounding is "good enough to stop
+	// a big batch-size change leaving a laughably undersized pitch", not a
+	// precise ratio. Packets and countable items (Campden tablets) round to
+	// the nearest half, spoons to the nearest quarter, drops to whole drops —
+	// never down to zero. Everything else (grams, mL, billion cells) scales
+	// like any other weight/volume quantity.
+	function fmtScaled( val, unit ) {
+		if ( unit === 'pkg' || unit === 'each' ) {
 			return Math.max( Math.round( val * 2 ) / 2, 0.5 ).toString();
+		}
+		if ( unit === 'tsp' || unit === 'tbsp' ) {
+			return Math.max( Math.round( val * 4 ) / 4, 0.25 ).toString();
+		}
+		if ( unit === 'drop' ) {
+			return Math.max( Math.round( val ), 1 ).toString();
 		}
 		return fmt( val );
 	}
@@ -180,12 +189,13 @@
 					el.textContent = fmt( convertFermVolume( base, unit, res ) );
 					return;
 				}
-				if ( type === 'yeast' ) {
-					// Not part of the US/Metric toggle — the unit set mixes
+				if ( type === 'scale' ) {
+					// Not part of the US/Metric toggle — yeast's units mix
 					// weight/volume/count/cell-count with no shared conversion
-					// basis — so this always just redisplays the base value here.
-					// The batch scaler (scaleAll(), below) is what actually
-					// changes it.
+					// basis, and water salts are weighed in grams whatever system
+					// a brewer uses — so this always just redisplays the base
+					// value here. The batch scaler (scaleAll(), below) is what
+					// actually changes it.
 					el.textContent = fmt( base );
 					return;
 				}
@@ -254,8 +264,8 @@
 					var unit = el.dataset.unit;
 					if ( isNaN( base ) ) return;
 
-					if ( type === 'yeast' ) {
-						el.textContent = fmtYeast( base * ratio, unit );
+					if ( type === 'scale' ) {
+						el.textContent = fmtScaled( base * ratio, unit );
 						return;
 					}
 
