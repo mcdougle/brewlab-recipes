@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.0
+- New Water section for water chemistry. Add salt and acid additions
+  (like 1 tsp gypsum or 3.8 ml lactic acid) the same way as other
+  ingredients, each marked as added to the mash, sparge, boil, all water,
+  or fermenter.
+- Optional water profile in the same section: source water type and note,
+  source and target ion levels (Ca, Mg, Na, SO4, Cl, HCO3 in ppm), a
+  target profile name, and mash pH marked as target or measured. Only the
+  values you fill in appear on the card. Nothing is calculated; copy the
+  numbers from your water calculator.
+- Water additions scale with the batch-size scaler but stay in their own
+  units when switching US/Metric. Spoon amounts round to the nearest
+  quarter, tablets to the nearest half, and drops to whole drops. Percent
+  of grist doesn't scale.
+- Fixed a doubled border on the left edge of the admin's segmented toggles
+  (like the mash step °F/°C switch).
+
 ## 1.0.6
 - The BrewLab Recipe block now shows the BrewLab logo in the block
   inserter, toolbar, and editor placeholder instead of the WordPress
