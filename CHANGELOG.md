@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.1
+- Other Additions now scale with the batch-size scaler, like water
+  additions: they follow the batch size but stay in their own units when
+  switching US/Metric. Spoon and cup amounts round to the nearest quarter,
+  countable items (like a vanilla bean) to the nearest half.
+- Fixed switching between US and Metric slightly changing every amount on
+  the card (for example 10 lb showing as 4.53 kg instead of 4.54 kg).
+- Other Additions measured in litres now show "L" instead of "l".
+
 ## 1.1.0
 - New Water section for water chemistry. Add salt and acid additions
   (like 1 tsp gypsum or 3.8 ml lactic acid) the same way as other

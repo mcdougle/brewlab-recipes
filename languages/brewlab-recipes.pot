@@ -2,14 +2,14 @@
 # This file is distributed under the Proprietary.
 msgid ""
 msgstr ""
-"Project-Id-Version: BrewLab Recipes 1.1.0\n"
+"Project-Id-Version: BrewLab Recipes 1.1.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/brewlab-recipes\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-04T18:06:04+00:00\n"
+"POT-Creation-Date: 2026-10-04T18:18:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: brewlab-recipes\n"
@@ -185,7 +185,7 @@ msgstr ""
 #: includes/admin/fields/repeater-schemas.php:89
 #: includes/admin/fields/simple-fields.php:57
 #: templates/recipe-card.php:329
-#: templates/recipe-card.php:426
+#: templates/recipe-card.php:441
 msgid "Other"
 msgstr ""
 
@@ -255,7 +255,7 @@ msgid "Packaging"
 msgstr ""
 
 #: includes/admin/fields/repeater-schemas.php:154
-#: templates/recipe-card.php:419
+#: templates/recipe-card.php:434
 msgid "Water"
 msgstr ""
 
@@ -273,7 +273,7 @@ msgstr ""
 
 #: includes/admin/fields/repeater-schemas.php:206
 #: includes/admin/fields/repeater-schemas.php:275
-#: templates/recipe-card.php:625
+#: templates/recipe-card.php:640
 msgid "Mash"
 msgstr ""
 
@@ -283,7 +283,7 @@ msgstr ""
 
 #: includes/admin/fields/repeater-schemas.php:208
 #: includes/admin/fields/repeater-schemas.php:272
-#: templates/recipe-card.php:661
+#: templates/recipe-card.php:676
 msgid "Boil"
 msgstr ""
 
@@ -296,7 +296,7 @@ msgid "Fermenter"
 msgstr ""
 
 #: includes/admin/fields/repeater-schemas.php:218
-#: templates/recipe-card.php:521
+#: templates/recipe-card.php:536
 msgid "Hops"
 msgstr ""
 
@@ -366,7 +366,7 @@ msgstr ""
 
 #: includes/admin/fields/repeater-schemas.php:302
 #: includes/admin/fields/repeater-schemas.php:303
-#: templates/recipe-card.php:575
+#: templates/recipe-card.php:590
 msgid "Yeast"
 msgstr ""
 
@@ -633,7 +633,7 @@ msgstr ""
 
 #: includes/admin/fields/simple-fields.php:159
 #: includes/admin/fields/simple-fields.php:511
-#: templates/recipe-card.php:472
+#: templates/recipe-card.php:487
 msgid "Water Profile"
 msgstr ""
 
@@ -685,13 +685,13 @@ msgstr ""
 #: includes/admin/fields/simple-fields.php:237
 #: includes/admin/fields/simple-fields.php:499
 #: templates/recipe-card.php:80
-#: templates/recipe-card.php:504
+#: templates/recipe-card.php:519
 msgid "Target"
 msgstr ""
 
 #: includes/admin/fields/simple-fields.php:231
 #: includes/admin/fields/simple-fields.php:551
-#: templates/recipe-card.php:510
+#: templates/recipe-card.php:525
 msgid "Mash pH"
 msgstr ""
 
@@ -871,7 +871,7 @@ msgid "Method"
 msgstr ""
 
 #: templates/recipe-card.php:280
-#: templates/recipe-card.php:711
+#: templates/recipe-card.php:726
 msgid "Fermentation"
 msgstr ""
 
@@ -879,27 +879,27 @@ msgstr ""
 msgid "Total:"
 msgstr ""
 
-#: templates/recipe-card.php:399
+#: templates/recipe-card.php:414
 msgid "Added at: "
 msgstr ""
 
-#: templates/recipe-card.php:559
-#: templates/recipe-card.php:744
+#: templates/recipe-card.php:574
+#: templates/recipe-card.php:759
 msgid "days"
 msgstr ""
 
-#: templates/recipe-card.php:559
-#: templates/recipe-card.php:646
+#: templates/recipe-card.php:574
 #: templates/recipe-card.php:661
-#: templates/recipe-card.php:672
+#: templates/recipe-card.php:676
+#: templates/recipe-card.php:687
 msgid "min"
 msgstr ""
 
-#: templates/recipe-card.php:743
+#: templates/recipe-card.php:758
 msgid "Pressure Ferment @"
 msgstr ""
 
-#: templates/recipe-card.php:745
+#: templates/recipe-card.php:760
 msgid "day ramp"
 msgstr ""
 
