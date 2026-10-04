@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.3
+- Fixed Ezoic's video player sometimes appearing inside the recipe card
+  (for example in the middle of the ingredient list). The card now uses
+  Ezoic's own opt-out so its auto-placed videos go elsewhere on the page.
+  Sites that don't use Ezoic aren't affected.
+
 ## 1.1.2
 - Fixed ad networks inserting ads inside the recipe card. Services that
   automatically place ads after paragraphs (like Ezoic's "Longest Content"
