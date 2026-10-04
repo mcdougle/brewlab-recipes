@@ -187,16 +187,25 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 
 			<h2 class="brewlab-recipes-card__title"><?php echo esc_html( $recipe['title'] ); ?></h2>
 
-			<?php if ( ! empty( $recipe['summary'] ) ) : ?>
-				<p class="brewlab-recipes-card__summary"><?php echo esc_html( $recipe['summary'] ); ?></p>
+			<?php
+			// <div>, not <p>, here and for the credit line below: ad networks
+			// that auto-insert after paragraphs (Ezoic's "Longest Content" and
+			// "under paragraph N" placements, and similar) pick <p> elements
+			// out of the post body, card included. A long summary became the
+			// longest paragraph on a live article and got two ads injected
+			// into the card header between it and the author line. The card
+			// CSS styles these by class, so the element swap doesn't change
+			// how they look.
+			if ( ! empty( $recipe['summary'] ) ) : ?>
+				<div class="brewlab-recipes-card__summary"><?php echo esc_html( $recipe['summary'] ); ?></div>
 			<?php endif; ?>
 
 			<?php if ( $author_name ) : ?>
-				<p class="brewlab-recipes-card__author"><?php echo esc_html( sprintf(
+				<div class="brewlab-recipes-card__author"><?php echo esc_html( sprintf(
 					/* translators: %s: recipe author's display name */
 					__( 'by %s', 'brewlab-recipes' ),
 					$author_name
-				) ); ?></p>
+				) ); ?></div>
 			<?php endif; ?>
 		</div>
 	</div>
@@ -779,6 +788,6 @@ $metric_ferm_unit = function ( $unit ) use ( $ferm_unit_info, $metric_weight_uni
 
 </div>
 
-<p class="brewlab-recipes-credit"><a href="https://brewlab.app" target="_blank" rel="noopener noreferrer">Powered by <span class="brewlab-recipes-credit__logo"><?php echo brewlab_recipes_menu_icon_svg( 'currentColor', 'currentColor', 'currentColor' ); // phpcs:ignore -- static SVG, no user input ?></span>BrewLab</a></p>
+<div class="brewlab-recipes-credit"><a href="https://brewlab.app" target="_blank" rel="noopener noreferrer">Powered by <span class="brewlab-recipes-credit__logo"><?php echo brewlab_recipes_menu_icon_svg( 'currentColor', 'currentColor', 'currentColor' ); // phpcs:ignore -- static SVG, no user input ?></span>BrewLab</a></div>
 
 </div>
